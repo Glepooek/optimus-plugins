@@ -2,6 +2,31 @@
 
 本领域自 7.2.1 起使用**独立版本号**。7.2.0 及之前为知识库统一全局版本号时代，相关条目见下方「全局版本时代」，其版本号为当时的全局版本。
 
+## [8.0.0] - 2026-10-27
+
+### 不兼容性
+
+本领域**不再是团队 C# 规范的家**。17 篇规范正文（`rules/01`–`rules/17`）迁入 `optimus-backend-plugin` 的 `csharp-code-review` skill 的 `references/`，随插件分发。所有指向 `knowledge-base/csharp/rules/*.md` 的引用都失效，消费方须改读插件内 `references/`。
+
+### Removed
+
+- `rules/` 全目录（17 篇）——迁至 `csharp-code-review/references/`，文件名不变
+- `index.jsonl` 中 142 条指向 `rules/` 的索引条目（仅保留 `csharp.ref.refit`）
+
+### Changed
+
+- `README.md` 重写为「创作素材存档」定位：删除已失效的文件地图、阅读路径与规范执行说明，改为「需要 C# 规范时去哪里」的跳转表
+
+### Kept
+
+- `reference/refit.md` —— 创作期素材，无 skill 读取，不进插件包
+
+### 迁移理由
+
+插件 marketplace 安装时只复制 `plugins/<name>/` 整目录，知识库不在包内。判据留在知识库会导致安装后 skill 读不到、静默退化为泛型建议——报告看起来正常，但团队规范一条没执行。
+
+---
+
 ## [7.2.1] - 2026-08-29
 
 ### Changed

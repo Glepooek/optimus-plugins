@@ -25,6 +25,7 @@ git config core.hooksPath .githooks
 | 5 | 镜像不指向已删除的 skill | 悬空链接 |
 | 6 | 镜像以 `120000` 模式入库 | `core.symlinks=false` 时会存成普通文件，克隆到别的机器就不是链接 |
 | 7 | `evals/` 下每个子目录都含 `case.yaml` 或 `prompt.md` | 缺 marker 的目录被 `claude plugin eval` 静默忽略——少跑一个 case，而总数只在 verbose 输出里 |
+| 8 | 插件内不引用插件目录以外的路径 | 安装后读不到被判据引用的文件，skill 静默退化为泛型知识审查 |
 
 第 1 项由 `check_plugin_versions.py` 实现（18 个单元测试）。
 
@@ -35,6 +36,16 @@ git config core.hooksPath .githooks
 **外部引用条目**（`source` 为对象，非本地相对路径）：`sha` 是否 40 位全长、是否误写 `version`、`strict:false` 是否配了非空 `skills` 数组、`source.source` 类型与 `git-subdir` 的 `path`、展示元数据（`description`/`homepage`/`author`）是否齐备，以及是否登记进 `.claude/skills/add-external-skill/registry.md` 的「已接入」表且台账 sha 与条目 sha 一致；另外还会检查拷贝模式落位的 `external_plugins/*/UPSTREAM.md` 是否存在且含 40 位 SHA。这些写歪的形态多数不报错——漏 `sha` 只是静默退回「跟随分支最新」，缺 `skills` 数组则整条加载失败，都是需要借提交关口拦的形态。刻意不联网：条目结构完美但上游仓库已被删除或转私有，这一项抓不到，只能靠实际安装时暴露。
 
 **全部条目与插件目录**（判据真源是 `knowledge-base/claude-code-plugin-system/`，每条报错都带对应索引条目 ID）：marketplace 名是否撞上 17 个 Anthropic 保留名或 Claude Desktop 的三个保留名、marketplace 与条目名是否满足 kebab-case 与 Claude Desktop 托管同步的字符集、本地路径源的 `./` 前缀 / `..` / 反斜杠 / 目标目录存在性、`relevance` 的 `topic` 长度与五种信号的条数与长度上限（含 `hosts` 的裸小写主机名形态与 `manifestDeps` 的 `file` 末尾锚定）、以及 `.claude-plugin/` 目录内除清单外是否混进了组件目录。这一组针对的同样是「不报错」的形态：保留名会在某个版本起让整个 marketplace 停止加载、条目名不合规会被 Claude Desktop 静默删除、拼错的信号名只会静默不匹配、组件放进 `.claude-plugin/` 后插件仍显示为启用而组件一个都调不出来。
+
+### `check_plugin_self_contained.py`：第 8 项，判据是「这个引用装出去还解析得到吗」
+
+第 8 项由 `check_plugin_self_contained.py` 实现（17 个单元测试）。插件安装单元是 `plugins/<name>/`——marketplace 安装时整个目录被复制进用户缓存，`knowledge-base/`、`.claude/`、本仓 `docs/` 都不在其中。插件正文里任何指向这些位置的引用，在 `--plugin-dir` 开发模式下能解析，安装后必然失效。
+
+**难点在区分「引用」与「输出路径」**：`判据见 knowledge-base/csharp/rules/02.md` 是引用，`报告写入 docs/project-overview.md` 是让用户在**自己项目**里产出的路径。两者语法完全一样，判据只能落在「该路径能不能在本仓命中一个真实文件」——后者指向用户项目的未来产物，本仓自然没有。
+
+因此**重点测试的是不误报**：占位符（`<slug>`、`*.md`）、用户项目输出路径、历史记录（`CHANGELOG.md`、`known-issues*.md`）、构建期开发说明（`hooks/README.md`）、书籍录入工作区（`books/`）各有用例锁住。一个会误报的门禁会被逐步加白名单直到形同虚设。
+
+⚠️ 它只查越界，不查插件内笔误——后者噪音大且与「安装后失效」无关，`check_refs.py` 已覆盖带 § 引用的那一类。
 
 ### `check_skill_mirrors.py`：第 4–6 项，判据是「这个 skill 由本仓分发吗」
 
@@ -84,7 +95,7 @@ python -m unittest discover -s .githooks -p "test_*.py"
 
 `.github/workflows/ci.yml` 的 `gates-hooks` job **逐字执行 `sh .githooks/pre-commit`**，不在 workflow YAML 里重写一份门禁逻辑。这是本目录唯一的第二执行点。
 
-🔴 **由此产生一条硬约定：`pre-commit` 不得引入依赖暂存区的检查**（`git diff --cached`、`git diff --name-only --staged` 等）。当前七项检查全部基于工作树与 `git ls-files`，**这条性质必须保持**——一旦引入，CI 的逐字复用即失效，门禁判据会在两个环境间静默分叉：本地拦得住的 CI 拦不住，反之亦然。
+🔴 **由此产生一条硬约定：`pre-commit` 不得引入依赖暂存区的检查**（`git diff --cached`、`git diff --name-only --staged` 等）。当前八项检查全部基于工作树与 `git ls-files`，**这条性质必须保持**——一旦引入，CI 的逐字复用即失效，门禁判据会在两个环境间静默分叉：本地拦得住的 CI 拦不住，反之亦然。
 
 需要 diff 的门禁改为「接受 base/head 两个 ref 作参数、只由 CI 调用、不进 `pre-commit` 序列」。⚠️ **这条约定约束的是检查，不是文件**：`check_new_skill_eval_case.py` 的两个模式分别落在约定的两侧——增量模式走上面那条路，`--all` 模式因为只读工作树而挂进了 `pre-commit`（见上一节）。**判断该不该挂，看的是这个检查要不要 diff，而不是它所在的脚本以前挂没挂。**
 

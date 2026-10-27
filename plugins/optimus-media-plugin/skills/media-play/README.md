@@ -46,7 +46,7 @@ Step 3  执行播放：按类型选命令模板（HLS 指定清晰度时先 ffpr
 用户 ──触发──▶ media-play ──引用──▶ media-ffmpeg-common/REFERENCE.md
                             └──▶ media-ffmpeg-common/CLI-REFERENCE.md
                             └──▶ media-ffmpeg-common/INSTALL.md
-                            └──▶ knowledge-base/media（网络流协议 / 文件结构概念）
+                            └──▶ media-ffmpeg-common/reference/（网络流协议 / 文件结构概念）
 ```
 
 本 skill 为只读终态操作，不参与 media-ffmpeg-common/REFERENCE.md 的"组合请求处理约定"顺序编排，可在 trim/resize/compress 组合流程的任意步骤后按需调用以预览效果。

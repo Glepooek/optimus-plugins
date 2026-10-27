@@ -1,3 +1,16 @@
+## [1.1.0] - 2026-10-27
+
+### Changed
+
+- 判据出处从知识库改为同插件 `dotnet-diagnose-triage` skill 的 `references/`：`.NET 高级调试` 领域 15 篇判据文件随插件分发，安装后 agent 仍能读到完整判据
+- `agents/dotnet-diagnose.md` 第 35 行的「判据的唯一出处」与 `agent-docs/dotnet-diagnose/README.md` 的依赖图同步更新
+
+### 迁移理由
+
+插件 marketplace 安装只复制 `plugins/<name>/` 整目录，知识库不在包内。判据留在 `knowledge-base/dotnet-debugging/` 会让安装后的 agent 读不到判据，退化为泛型经验推断——报告看起来正常，但判据一条没用上。
+
+---
+
 ## [1.0.0] - 2026-09-06
 
 ### Added

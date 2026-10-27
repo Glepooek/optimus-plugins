@@ -28,7 +28,7 @@
 
 缺符号可降级分析的情形按 `symbols-and-tool-matching.md § 4. 缺符号时的降级读法` 判断：**结论只依赖托管栈时不必补符号**。
 
-⚠️ 知识库入口篇 `debugging-decision-tree.md` 第 7 行显式要求：「命令报错先查 `reference/symbols-and-tool-matching.md`」。用户报「命令报错了 / 输出一堆错误」时**先查符号**，不要当成「证据不足」而降级结论强度。
+⚠️ 知识库入口篇 `debugging-decision-tree.md` 第 7 行显式要求：「命令报错先查 `symbols-and-tool-matching.md`」。用户报「命令报错了 / 输出一堆错误」时**先查符号**，不要当成「证据不足」而降级结论强度。
 
 ## 崩溃日志的定位
 

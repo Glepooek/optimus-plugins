@@ -4,7 +4,7 @@
 
 > 面向团队的软件架构风格与设计原则总纲。**语言无关**——不绑定任何编程语言或框架；只回答「该怎么切、依赖指向哪、边界在哪」，不回答「用什么类型怎么写」。
 
-本领域负责架构风格、分层契约、设计原则与选型判据；C# 语言与 .NET 落地细节归 `knowledge-base/csharp/`，WPF/XAML 专属规则归 `knowledge-base/wpf/`，平台与运行时事实归 `knowledge-base/dotnet/`。需要落地手段时引用对应领域，不要在本领域出现语言专有类型名。
+本领域负责架构风格、分层契约、设计原则与选型判据；C# 语言与 .NET 落地细节见 `csharp-code-review` skill 的 `references/`（随 `optimus-backend-plugin` 分发），WPF/XAML 专属规则见 `wpf-code-review` skill 的 `references/`（随 `optimus-frontend-plugin` 分发），平台与运行时事实归 `knowledge-base/dotnet/`。需要落地手段时引用对应领域，不要在本领域出现语言专有类型名。
 
 ## 文档目的
 
@@ -88,8 +88,8 @@
 
 ## 与仓库已有资产的关系
 
-- `knowledge-base/csharp/`：本规范的 C# 落地侧。`rules/01-project-structure.md` § 6 与 `rules/03-design-principles.md` § 1、§ 2、§ 6、§ 8 保留 C# 特有增量，通用约束在本领域
-- `knowledge-base/wpf/`：桌面 UI 的架构落地形态（MVVM 属分层在 UI 侧的具体形态）
+- `csharp-code-review` skill（`optimus-backend-plugin`）：本规范的 C# 落地侧。其 `references/01-project-structure.md` 与 `references/03-design-principles.md` 保留 C# 特有增量，通用约束在本领域。⚠️ 该规范随插件分发，本库不再持有副本
+- `wpf-code-review` skill（`optimus-frontend-plugin`）：桌面 UI 的架构落地形态（MVVM 属分层在 UI 侧的具体形态），同样随插件分发
 - `knowledge-base/design-patterns/`：单个设计模式的选用判据。本领域只做**架构风格**级别的选型（`rules/06-style-selection.md`），不写任何单个 GoF 模式的判据
 
 ## 权威参考

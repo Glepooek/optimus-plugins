@@ -2,7 +2,7 @@
 name: media-play
 description: Use when user wants to play or preview a media file — 播放视频、播放音频、预览一下这个视频、听一下这段音频、ffplay。Not for editing, converting, compressing, trimming, or codec/format inspection.
 metadata:
-  version: "1.2.1"
+  version: "1.2.2"
   author: desktop client team
   category: tool
 compatibility: 需要用户本机已安装 ffplay（随 ffmpeg 套件提供，部分精简发行版可能未包含）并加入 PATH，参见 ../media-ffmpeg-common/INSTALL.md；播放窗口依赖本机图形显示环境，无 GUI 的远程会话无法弹出播放窗口。
@@ -18,7 +18,7 @@ allowed-tools: Bash
 - **本地文件播放**：播放本机已存在的音视频文件（如 `C:\videos\demo.mp4`），是 skill 的原有能力
 - **网络流播放**：播放网络媒体地址（如 `https://.../index.m3u8`、`rtsp://...`、`rtmp://...`），依赖本机 ffmpeg 构建对相应协议的支持；其中 HLS（m3u8）若为含多档清晰度的主清单，支持指定清晰度档位播放，其余协议与本地文件为单档，无清晰度可选
 
-两种形态的校验方式与命令模板不同，不可混用；仅支持单目标播放，不支持播放列表/多文件；不产出任何文件，播放窗口关闭或播放结束即任务完成。网络流协议（HLS/RTSP/RTMP/DASH 等）概念见 [`knowledge-base/media/reference/streaming-protocols.md`](../../../../knowledge-base/media/reference/streaming-protocols.md)；本地文件的容器/编码/流结构见 `media-stream-basics.md` §1「一个媒体文件由什么构成」。
+两种形态的校验方式与命令模板不同，不可混用；仅支持单目标播放，不支持播放列表/多文件；不产出任何文件，播放窗口关闭或播放结束即任务完成。网络流协议（HLS/RTSP/RTMP/DASH 等）概念见 [`streaming-protocols.md`](../media-ffmpeg-common/reference/streaming-protocols.md)；本地文件的容器/编码/流结构见 `media-stream-basics.md` §1「一个媒体文件由什么构成」。
 
 ## 使用方法
 
@@ -87,7 +87,7 @@ ffplay -window_title "<流标题>" -rtsp_transport tcp -autoexit "rtsp://..."
 - RTSP 默认走 UDP 传输，弱网下丢包易花屏，加 `-rtsp_transport tcp` 改为 TCP 传输
 - 直播流是实时的，不能往回拖进度条；DRM（Widevine/FairPlay 等）加密内容 ffplay 无法解密播放
 
-参数说明见 `../media-ffmpeg-common/CLI-REFERENCE.md`；网络流协议细节见 [`knowledge-base/media/reference/streaming-protocols.md`](../../../../knowledge-base/media/reference/streaming-protocols.md) §8「与 ffprobe / ffplay 的关系」。
+参数说明见 `../media-ffmpeg-common/CLI-REFERENCE.md`；网络流协议细节见 [`streaming-protocols.md`](../media-ffmpeg-common/reference/streaming-protocols.md) §8「与 ffprobe / ffplay 的关系」。
 
 ## 失败处理
 

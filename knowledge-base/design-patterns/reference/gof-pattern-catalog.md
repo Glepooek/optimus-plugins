@@ -69,6 +69,6 @@
 |---|---|
 | 这个模式该不该引入、误用信号是什么 | 本领域 `rules/01`-`06` |
 | 在 C# 里怎么写 | `knowledge-base/csharp/rules/03-design-principles.md` |
-| 在 WPF 里的形态（命令、事件聚合器、Behavior） | `knowledge-base/wpf/rules/03-mvvm.md`、`knowledge-base/wpf/rules/16-interactivity.md` |
+| 在 WPF 里的形态（命令、事件聚合器、Behavior） | `wpf-code-review` skill 的 `references/03-mvvm.md`、`references/16-interactivity.md`（随 `optimus-frontend-plugin` 分发） |
 | 架构风格该怎么选（分层/六边形/整洁/DDD） | `knowledge-base/architecture/rules/06-style-selection.md` |
 | 从症状反查该考虑哪些模式 | 本领域 `reference/pattern-decision-guide.md` |

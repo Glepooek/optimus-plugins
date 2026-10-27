@@ -2,7 +2,7 @@
 name: project-analyze
 description: 对项目进行全面分析，输出功能、技术栈、架构、目录结构、数据模型、接口与通信、部署方式、依赖关系等专业概览报告，支持 Web/H5、WPF 桌面、Android、iOS、HarmonyOS（鸿蒙）、Flutter、纯后端等多种项目形态并自动适配分析维度。触发词：快速了解一个项目，评估项目技术选型和架构质量，为新成员生成项目入门文档，梳理服务依赖关系，分析这个项目，项目概览，了解这个仓库，analyze project，project overview。
 metadata:
-  version: "2.2.0"
+  version: "2.3.0"
   author: desktop client team
   category: generator
 compatibility: 需要 Git（clone/pull/log 分析）；可选调用 optimus-office-plugin:docx-writer 将报告转 Word。
@@ -17,7 +17,7 @@ allowed-tools: Glob Grep Read Write Edit Bash Task
 
 14 个章节按"认知定位→技术构成→行为表面→交付依赖→落地评估"5 层递进排列（见"5 层分组"）：先回答"是什么"，再回答"用什么造的"，再回答"运行时具体做什么"，再回答"怎么交付、依赖谁、如何上手"，最后回答"值不值得信任"。这个数字不是套用某个外部行业标准，而是历次实践归纳的结果——本次重构给它补上了结构依据，而不是让维度数随意膨胀。
 
-项目形态不同，关键分析维度也不同：Web/H5 项目关心接口清单和前端路由，WPF 桌面项目关心 View/ViewModel 绑定和 MVVM 框架，Android/iOS/HarmonyOS 原生项目关心页面清单和权限声明，Flutter 关心 Widget 树和跨端状态管理，纯后端项目没有前端可分析。本 skill 通过**平台画像识别**（见"第一步"）自动判定项目形态（Web/H5、WPF、Android、iOS、HarmonyOS、Flutter、纯后端共 7 选一），14 个章节编号保持不变，但"行为表面"层的第 7/8/9/10 章内容规格随画像切换（见"平台章节适配矩阵"），避免对非 Web 项目机械套用 Web 模板产出空洞或猜测内容。HarmonyOS 和 Flutter 在本仓库无既有规范沉淀，判定信号和插槽内容基于公开通用知识设计，置信度低于有 `knowledge-base/wpf/` 支撑的 WPF 画像，报告中会显式标注。
+项目形态不同，关键分析维度也不同：Web/H5 项目关心接口清单和前端路由，WPF 桌面项目关心 View/ViewModel 绑定和 MVVM 框架，Android/iOS/HarmonyOS 原生项目关心页面清单和权限声明，Flutter 关心 Widget 树和跨端状态管理，纯后端项目没有前端可分析。本 skill 通过**平台画像识别**（见"第一步"）自动判定项目形态（Web/H5、WPF、Android、iOS、HarmonyOS、Flutter、纯后端共 7 选一），14 个章节编号保持不变，但"行为表面"层的第 7/8/9/10 章内容规格随画像切换（见"平台章节适配矩阵"），避免对非 Web 项目机械套用 Web 模板产出空洞或猜测内容。HarmonyOS 和 Flutter 在本仓库无既有规范沉淀，判定信号和插槽内容基于公开通用知识设计，置信度低于有本 skill `references/wpf-profile-rules.md` 支撑的 WPF 画像，报告中会显式标注。
 
 ## 输入
 
@@ -53,8 +53,8 @@ allowed-tools: Glob Grep Read Write Edit Bash Task
 | 优先级 | 画像 | 判定信号（任一命中即可） | 置信度 |
 |------|------|------------------------|--------|
 | 1 | Flutter | `pubspec.yaml` 存在 且 `lib/main.dart` 存在 | 高 |
-| 2 | HarmonyOS（鸿蒙） | 存在 `AppScope/app.json5`，或 `build-profile.json5` + `*.ets` 文件 | 中——无 knowledge-base 既有规范支撑，判定信号基于公开通用知识设计 |
-| 3 | WPF/桌面 | `*.csproj` 含 `<UseWPF>true</UseWPF>`，或存在 `App.xaml` + `*.xaml` 文件 | 高——有 `knowledge-base/wpf/` 完整规范支撑 |
+| 2 | HarmonyOS（鸿蒙） | 存在 `AppScope/app.json5`，或 `build-profile.json5` + `*.ets` 文件 | 中——无既有规范支撑，判定信号基于公开通用知识设计 |
+| 3 | WPF/桌面 | `*.csproj` 含 `<UseWPF>true</UseWPF>`，或存在 `App.xaml` + `*.xaml` 文件 | 高——有 `references/wpf-profile-rules.md` 支撑 |
 | 4 | Android | 存在 `AndroidManifest.xml`，或 `build.gradle(.kts)` + `src/main/java\|kotlin` | 高 |
 | 5 | iOS | 存在 `*.xcodeproj`/`*.xcworkspace`，或 `Podfile`/`Package.swift` + `*.swift`/`*.m` | 高 |
 | 6 | 纯后端 | 存在后端框架特征（`pom.xml`/`go.mod` 等）且**不存在**前端目录（无 `views`/`pages`/`components`，无前端依赖特征的 `package.json`） | 高 |
@@ -70,8 +70,8 @@ allowed-tools: Glob Grep Read Write Edit Bash Task
 |------|----------------|----------|---------|-----|-----------|---------|--------|
 | 7. 数据模型 | ER 关系图 | 有本地DB/ORM同左；否则"不适用，桌面项目无持久层" | Room/SQLite 实体（若有） | CoreData/SQLite 实体（若有） | 关系型数据库(RDB)/分布式数据管理实体（若有） | sqflite/Hive/Drift 等本地模型（若有） | ER 关系图（同左） |
 | 8. 接口与通信 | 端点清单 | 调用后端API时列出调用清单（HttpClient/Refit等）；否则"不适用" | Retrofit/OkHttp 调用清单 | Alamofire/URLSession 调用清单 | `@ohos.net.http` 调用清单 | dio/http package 调用清单 | 端点清单（同左） |
-| 9. 界面与交互 | 路由表 | **替换为** View/ViewModel 清单及绑定关系，命名判定引用 `knowledge-base/wpf/rules/02-project-structure.md` | **替换为** Activity/Fragment清单 + 权限声明清单 + 构建变体(flavor) | **替换为** ViewController/Scene清单 + 权限声明(Info.plist) + Scheme | **替换为** Page/Ability清单 + 权限声明(module.json5) | **替换为** Widget树/路由(Navigator/GoRouter) + 页面清单 | "不适用（纯后端项目）" |
-| 10. 状态管理 | 数据流分析 | **替换为** MVVM框架识别（引用 `knowledge-base/wpf/rules/03-mvvm.md`）+ DI容器 + 控件库（引用 `knowledge-base/wpf/rules/17-common-libraries.md`） | **替换为** ViewModel+LiveData/StateFlow、SharedPreferences | **替换为** Combine/SwiftUI State、UserDefaults | **替换为** ArkUI状态机制(@State/@Prop/AppStorage) | **替换为** Provider/Riverpod/Bloc + SharedPreferences | "不适用（纯后端项目）" |
+| 9. 界面与交互 | 路由表 | **替换为** View/ViewModel 清单及绑定关系，命名判定引用 `references/wpf-profile-rules.md § 1` | **替换为** Activity/Fragment清单 + 权限声明清单 + 构建变体(flavor) | **替换为** ViewController/Scene清单 + 权限声明(Info.plist) + Scheme | **替换为** Page/Ability清单 + 权限声明(module.json5) | **替换为** Widget树/路由(Navigator/GoRouter) + 页面清单 | "不适用（纯后端项目）" |
+| 10. 状态管理 | 数据流分析 | **替换为** MVVM框架识别（引用 `references/wpf-profile-rules.md § 2`）+ DI容器 + 控件库（引用 `references/wpf-profile-rules.md § 3`） | **替换为** ViewModel+LiveData/StateFlow、SharedPreferences | **替换为** Combine/SwiftUI State、UserDefaults | **替换为** ArkUI状态机制(@State/@Prop/AppStorage) | **替换为** Provider/Riverpod/Bloc + SharedPreferences | "不适用（纯后端项目）" |
 
 HarmonyOS、Flutter 两画像的插槽内容基于公开通用知识设计，无本仓库既有规范支撑，分析置信度低于其他画像，报告开头需显式标注（见"第一步"CHECKPOINT）。
 
@@ -116,7 +116,7 @@ HarmonyOS、Flutter 两画像的插槽内容基于公开通用知识设计，无
   → 或提示用户提供已克隆的本地路径
 ```
 
-🔴 **CHECKPOINT · 项目确认**：向用户展示识别到的项目名称、**平台画像**（Web/H5、WPF/桌面、Android、iOS、HarmonyOS、Flutter、纯后端）、技术栈类型、文件数量，确认分析范围无误后再继续。如果是 Monorepo，询问用户要分析哪个子项目。平台画像置信度低时（信号冲突或全部未命中）在此处一并确认；识别结果为 HarmonyOS 或 Flutter 时，额外提示"该画像无 knowledge-base 既有规范支撑，判定信号与插槽内容基于公开通用知识设计，建议人工复核分析结论"。
+🔴 **CHECKPOINT · 项目确认**：向用户展示识别到的项目名称、**平台画像**（Web/H5、WPF/桌面、Android、iOS、HarmonyOS、Flutter、纯后端）、技术栈类型、文件数量，确认分析范围无误后再继续。如果是 Monorepo，询问用户要分析哪个子项目。平台画像置信度低时（信号冲突或全部未命中）在此处一并确认；识别结果为 HarmonyOS 或 Flutter 时，额外提示"该画像无既有规范支撑，判定信号与插槽内容基于公开通用知识设计，建议人工复核分析结论"。
 
 ### 第二步：快速扫描与并行读取
 
@@ -316,7 +316,7 @@ Glob(**) 或 Bash(find . -maxdepth 3) → 获取完整项目结构，识别技�
 | 路由 | 页面 | 功能 | 权限 |
 |------|------|------|------|
 
-**WPF/桌面**（命名判定引用 `knowledge-base/wpf/rules/02-project-structure.md`）：
+**WPF/桌面**（命名判定引用 `references/wpf-profile-rules.md § 1`）：
 | View | ViewModel | 绑定方式 | 职责 |
 |------|-----------|---------|------|
 
@@ -342,7 +342,7 @@ Glob(**) 或 Bash(find . -maxdepth 3) → 获取完整项目结构，识别技�
 
 **Web/H5：** {数据流分析}
 
-**WPF/桌面：** MVVM 框架识别（Prism/CommunityToolkit.Mvvm/原生，引用 `knowledge-base/wpf/rules/03-mvvm.md`）+ DI 容器 + 控件库选型（引用 `knowledge-base/wpf/rules/17-common-libraries.md`）
+**WPF/桌面：** MVVM 框架识别（Prism/CommunityToolkit.Mvvm/原生，引用 `references/wpf-profile-rules.md § 2`）+ DI 容器 + 控件库选型（引用 `references/wpf-profile-rules.md § 3`）
 
 **Android：** ViewModel + LiveData/StateFlow、SharedPreferences
 

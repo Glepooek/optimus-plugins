@@ -2,7 +2,7 @@
 name: media-frame-extract
 description: Use when user wants to capture still images out of a video — 视频截图、截帧、抽帧、导出封面图、截取某一帧、每隔几秒截一张、生成预览图。Not for playing or previewing video (that is media-play), clip trimming, or codec/format inspection.
 metadata:
-  version: "1.0.2"
+  version: "1.0.3"
   author: desktop client team
   category: tool
 compatibility: 需要用户本机已安装 ffmpeg/ffprobe 并加入 PATH，参见 ../media-ffmpeg-common/INSTALL.md。
@@ -106,7 +106,7 @@ media-trim 需要双模式，是因为它的快速模式用 `-c copy` 不解码�
 ⛔ **不得只带 `-update 1` 而漏掉 `-frames:v 1`**：`-update 1` 的语义是允许反复写入同一个文件，此时缺少帧数限制会让 ffmpeg 一路解码到视频结尾、用后续每一帧覆盖输出文件，**最终留下的是视频最后一帧而非目标时间点那一帧**，且退出码为 0、无任何报错（实测产物 md5 等于视频末帧）。这是本 skill 唯一会静默产出错误内容的组合，比报错中断更难发现。
 
 
-> 关键帧（I/P/B 帧）与 GOP 概念见 [`knowledge-base/media/reference/video-codecs.md`](../../../../knowledge-base/media/reference/video-codecs.md) 的「关键帧（I / P / B 帧）与 GOP」小节；帧率与时间采样概念见 [`media-parameters.md`](../../../../knowledge-base/media/reference/media-parameters.md) §2「帧率」。
+> 关键帧（I/P/B 帧）与 GOP 概念见 [`video-codecs.md`](../media-ffmpeg-common/reference/video-codecs.md) 的「关键帧（I / P / B 帧）与 GOP」小节；帧率与时间采样概念见 [`media-parameters.md`](../media-ffmpeg-common/reference/media-parameters.md) §2「帧率」。
 
 参数说明见 `../media-ffmpeg-common/CLI-REFERENCE.md`。
 

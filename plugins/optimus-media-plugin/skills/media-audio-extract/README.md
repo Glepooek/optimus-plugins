@@ -63,7 +63,7 @@ Step 5  执行提取（-map 0:a:0 不可省略，保证与 Step 4 探测的是�
                                         └──▶ media-ffmpeg-common/REFERENCE.md
                                         └──▶ media-ffmpeg-common/CLI-REFERENCE.md
                                         └──▶ media-ffmpeg-common/INSTALL.md
-                                        └──▶ knowledge-base/media/reference/
+                                        └──▶ media-ffmpeg-common/reference/
                                               audio-container-formats.md
                                               audio-codecs.md / audio-parameters.md
 

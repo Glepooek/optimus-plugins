@@ -2,7 +2,7 @@
 name: media-analyze
 description: Use when user wants to inspect a media file's codec, resolution, bitrate, frame rate, or duration — 分析视频、分析音频、查看编码格式、查看分辨率码率帧率、这个视频什么编码、ffprobe。Not for editing, converting, compressing, or trimming media.
 metadata:
-  version: "1.1.3"
+  version: "1.1.4"
   author: desktop client team
   category: tool
 compatibility: 需要用户本机已安装 ffmpeg/ffprobe 并加入 PATH，参见 ../media-ffmpeg-common/INSTALL.md。
@@ -66,7 +66,7 @@ ffprobe -v quiet -print_format json -show_format -show_streams <input>
 | 时长 | 从 `format.duration` 提取，格式化为 `HH:MM:SS` |
 | 文件大小 | 从 `format.size` 提取，换算为可读单位（KB/MB/GB） |
 
-> 各字段的含义与换算规则（bps→kbps 的 1000 进制、文件大小 KB/MB/GB 的 1024 进制等）见 [`knowledge-base/media/reference/ffprobe-field-map.md`](../../../../knowledge-base/media/reference/ffprobe-field-map.md)；分辨率/帧率/码率概念详解见 `media-parameters.md`。
+> 各字段的含义与换算规则（bps→kbps 的 1000 进制、文件大小 KB/MB/GB 的 1024 进制等）见 [`ffprobe-field-map.md`](../media-ffmpeg-common/reference/ffprobe-field-map.md)；分辨率/帧率/码率概念详解见 `media-parameters.md`。
 
 无视频流（纯音频文件）时省略视频相关行；无音频流同理。
 

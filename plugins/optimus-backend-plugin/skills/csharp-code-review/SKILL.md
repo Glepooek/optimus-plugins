@@ -2,7 +2,7 @@
 name: csharp-code-review
 description: 用于审查 C# 代码的 Microsoft 编码规范、命名标准、代码质量，以及异常处理/取消令牌传播等 API 健壮性问题。当用户提到：审查/检查/review C# 代码、.cs 文件、C# 项目代码规范、准备合并/PR、代码质量检查、命名约定问题、代码风格统一时，务必使用此 skill。也适用于用户询问"这段 C# 代码有什么问题"、"帮我看看这个类的命名"、"检查一下代码规范"等场景。
 metadata:
-  version: "1.5.5"
+  version: "1.6.0"
   author: desktop client team
   category: quality
 compatibility: 需要 .NET/C# 代码库；支持基于用户粘贴代码审查，也可扫描本地代码库（Grep/Glob）；无外部 CLI/MCP 依赖。
@@ -13,7 +13,7 @@ allowed-tools: Read Grep Glob
 
 ## 概述
 
-基于团队 C# 编写规范集（[`knowledge-base/csharp/`](../../../../knowledge-base/csharp/README.md)）的系统化代码审查。
+基于团队 C# 编写规范集的系统化代码审查。**审查判据全部内置于本 skill 的 `references/`，安装后即可完整运行，不依赖外部仓库。**
 
 **核心原则**：通过全面的 checklist 驱动审查，确保不遗漏任何违规。规范不是约束，而是帮助团队写出一致、可维护、专业的代码。
 
@@ -80,20 +80,20 @@ allowed-tools: Read Grep Glob
 
 ## 审查清单
 
-系统性地检查以下每个类别，标记 ✅ 已检查或 ⚠️ 发现违规。规则内容以 `knowledge-base/csharp/` 为唯一来源，本表只做定位，不重复规则文本——审查时打开对应文件锚点读取具体条款。
+系统性地检查以下每个类别，标记 ✅ 已检查或 ⚠️ 发现违规。规则内容以 `references/` 下的 17 份规范为唯一来源，本表只做定位，不重复规则文本——审查时打开对应文件锚点读取具体条款。
 
-| # | 类别 | knowledge-base 参考 | 核对要点 |
+| # | 类别 | 参考文件 | 核对要点 |
 |---|---|---|---|
-| 1 | 命名约定 | `rules/02-coding-style.md` § 1. 命名规范 | 接口/类/字段/参数命名规则、命名禁忌、布尔命名 |
-| 2 | 类型、运算符与判空 | `rules/02-coding-style.md` § 2.2 类型与运算符 | C# 关键字而非 BCL 类型名；`&&`/`||` 短路运算符；判空用 `is null` |
-| 3 | 字符串处理 | `rules/02-coding-style.md` § 2.3 字符串处理 | 插值 / StringBuilder / 原始字符串场景选择 |
-| 4 | 代码结构 | `rules/02-coding-style.md` § 2.1 结构与布局 | 命名空间、大括号风格、缩进、空行 |
-| 5 | `var` 与对象创建 | `rules/02-coding-style.md` § 2.4 `var` 与对象创建 | 类型可推断时用 `var`，否则显式类型；目标类型 `new()` |
-| 6 | 集合与 LINQ | `rules/07-performance.md` § 3. LINQ 边界 | 避免多次枚举、长链中间对象、逐元素高成本调用 |
-| 7 | 委托与事件 | `rules/02-coding-style.md` § 2.5 委托选择 | 优先 `Func<>`/`Action<>`，自定义委托仅限具名语义或 `ref`/`out` |
-| 8 | 异常处理 | `rules/05-error-handling.md` § 1. 失败表达、§ 4. 捕获边界与过滤 | 失败表达方式统一；禁止静默吞异常 |
-| 9 | 异步模式 | `rules/04-async-programming.md` § 2. 反模式表、§ 6. CancellationToken 传播 | 禁止 `.Result`/`.Wait()`；`CancellationToken` 传播 |
-| 10 | API 设计与健壮性 | `rules/13-api-design.md` § 2. 设计原则；`rules/05-error-handling.md` 全篇 | 隐式依赖契约显式说明；异常语义统一；取消令牌传播 |
+| 1 | 命名约定 | `references/02-coding-style.md` § 1. 命名规范 | 接口/类/字段/参数命名规则、命名禁忌、布尔命名 |
+| 2 | 类型、运算符与判空 | `references/02-coding-style.md` § 2.2 类型与运算符 | C# 关键字而非 BCL 类型名；`&&`/`||` 短路运算符；判空用 `is null` |
+| 3 | 字符串处理 | `references/02-coding-style.md` § 2.3 字符串处理 | 插值 / StringBuilder / 原始字符串场景选择 |
+| 4 | 代码结构 | `references/02-coding-style.md` § 2.1 结构与布局 | 命名空间、大括号风格、缩进、空行 |
+| 5 | `var` 与对象创建 | `references/02-coding-style.md` § 2.4 `var` 与对象创建 | 类型可推断时用 `var`，否则显式类型；目标类型 `new()` |
+| 6 | 集合与 LINQ | `references/07-performance.md` § 3. LINQ 边界 | 避免多次枚举、长链中间对象、逐元素高成本调用 |
+| 7 | 委托与事件 | `references/02-coding-style.md` § 2.5 委托选择 | 优先 `Func<>`/`Action<>`，自定义委托仅限具名语义或 `ref`/`out` |
+| 8 | 异常处理 | `references/05-error-handling.md` § 1. 失败表达、§ 4. 捕获边界与过滤 | 失败表达方式统一；禁止静默吞异常 |
+| 9 | 异步模式 | `references/04-async-programming.md` § 2. 反模式表、§ 6. CancellationToken 传播 | 禁止 `.Result`/`.Wait()`；`CancellationToken` 传播 |
+| 10 | API 设计与健壮性 | `references/13-api-design.md` § 2. 设计原则；`references/05-error-handling.md` 全篇 | 隐式依赖契约显式说明；异常语义统一；取消令牌传播 |
 
 ## 快速初审
 
@@ -107,7 +107,7 @@ allowed-tools: Read Grep Glob
 
 ## 权威参考
 
-团队规范以 [`knowledge-base/csharp/`](../../../../knowledge-base/csharp/README.md) 为准——本 skill 的审查依据直接来自该规范集，不额外维护规则文本。语言层的通用惯例背景可参考：
+团队规范以本 skill 的 `references/` 为准——审查依据直接来自那 17 份规范文件，不额外维护规则文本。目录内按 `01`–`17` 编号排列，文件名即主题；上表未点名的（如 `06-memory-resource.md`、`12-testing.md`）在被审代码涉及该方面时按需打开。语言层的通用惯例背景可参考：
 
 - [Microsoft C# 编码规范](https://learn.microsoft.com/zh-cn/dotnet/csharp/fundamentals/coding-style/coding-conventions)
 - [Microsoft 标识符命名规则](https://learn.microsoft.com/zh-cn/dotnet/csharp/fundamentals/coding-style/identifier-names)

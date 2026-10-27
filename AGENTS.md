@@ -182,13 +182,13 @@ Minor/Major 升级前必须用 `darwin-skill` 给改动的 skill 评分：新分
 
 发起提交前先自我校验，不要默认第一版就是对的——尤其是新增/迁移/重命名文件后的悬空引用（路径、`§ 章节号`、`index.jsonl` 条目与 `anchor`）和正文声明的计数（"共 N 条""六字段"）与实际产出是否一致，这两类错误 CI 能拦住的只是其中机械可判定的子集，遗漏的部分只能靠人工在提交前检查。改动 skill / hook / command 后用 `--plugin-dir` 加载本仓做交互验证，见 `test-locally` skill（`/test-locally` 触发）。以下清单本地复现「提交与推送」那六个必需检查中的**三个**——`gates-hooks`、`gates-tests`、`gates-data`；余下 `plugin-validate`（上游 action）、`new-skill-eval-case`（依赖 PR diff）与 `actionlint`（本机未装该二进制）**无本地等价命令，只能在 PR 上验证**，别把本节跑绿当成 CI 会绿。
 
-**七项提交门禁**（对应 `gates-hooks`，CI 逐字复用同一个文件）：
+**八项提交门禁**（对应 `gates-hooks`，CI 逐字复用同一个文件）：
 
 ```bash
 sh .githooks/pre-commit
 ```
 
-⚠️ 这一条覆盖全部七项，**跑它不需要先 `git config core.hooksPath .githooks`**——那条配置只决定提交时会不会自动触发，直接调文件路径始终可用。
+⚠️ 这一条覆盖全部八项，**跑它不需要先 `git config core.hooksPath .githooks`**——那条配置只决定提交时会不会自动触发，直接调文件路径始终可用。
 
 **Python 单元测试**（**本机无 `pytest`，只能用 `unittest`**）：全仓共 **9 个**测试目录，`unittest discover` 不递归跨目录，必须逐个跑。该清单的真源是 `ci.yml` 的 `gates-tests` job——**本地漏跑不会报错，只会在 PR 上撞红**，而 `gates-tests` 是必需检查、`bypass_actors` 为 null，无人可绕过。**新增测试目录时两处都要改。**
 
@@ -228,6 +228,6 @@ python .claude/skills/sync-cc-tips/scripts/validate_tips.py
 | `.claude-plugin/marketplace.json` | 插件清单与展示元数据；顶层 `version` 仅记录集合构成，**不是插件版本来源** | 两者共用 |
 | `.agents/plugins/marketplace.json` | Codex plugin marketplace 安装入口 | Codex 专属 |
 | `.claude/rules/`（四份，按编辑路径自动加载） | 各自承载什么见「产物规范」节 | 两者共用 |
-| `.githooks/`（`pre-commit` + 五个自检脚本） | 七项提交门禁，检查项与判据见 `.githooks/README.md`；需 `git config core.hooksPath .githooks` 启用 | 两者共用 |
+| `.githooks/`（`pre-commit` + 六个自检脚本） | 八项提交门禁，检查项与判据见 `.githooks/README.md`；需 `git config core.hooksPath .githooks` 启用 | 两者共用 |
 
 **已被 gitignore 的目录（有意排除，非缺失）：** `.claude/skills/darwin-skill/`（⚠️ 其中 `results.tsv` 已 `git add -f` 入库，**不受该行影响**，见「darwin-skill 评分门禁」节）、`.remember/`、`.codegraph/`、`.superpowers/`、`.playwright-cli/`、`.playwright-mcp/`

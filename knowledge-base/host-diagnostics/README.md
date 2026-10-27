@@ -126,7 +126,7 @@
 | | `dotnet-diagnose-triage` | 潜在的 host-diagnostics skill |
 |---|---|---|
 | 输入 | dump / SOS 输出 / trace | 诊断工具的采集结果（进程外环境证据） |
-| 判据源 | `knowledge-base/dotnet-debugging/` | `knowledge-base/host-diagnostics/` |
+| 判据源 | `dotnet-diagnose-triage` skill 的 `references/` | `knowledge-base/host-diagnostics/` |
 | 结论形态 | 进程内根因（死锁、泄漏、饥饿） | 进程外故障源（注入、拦截、网络、资源） |
 
 交接点已由 `symptom-routing.md § 6.1` 定义，两者互转而非重叠。归属插件应为 `optimus-devops-plugin`（与 `dotnet-diagnose-triage` 同插件，便于共享交接约定）。

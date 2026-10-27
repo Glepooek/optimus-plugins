@@ -10,61 +10,49 @@
     {
       "domain": "dotnet",
       "title": ".NET 平台与运行时",
-      "categories": ["reference"],
+      "categories": [
+        "reference"
+      ],
       "owner": "desktop client team",
       "status": "active",
-      "consumers": ["knowledge-base/csharp", "knowledge-base/wpf"],
+      "consumers": [],
       "reviewed_at": "2026-08-27",
       "notes": "纯描述性领域，负责 Runtime、.NET Framework、SDK、目标框架、Windows 兼容性与生命周期"
     },
     {
       "domain": "csharp",
       "title": "C# 语言与通用工程实践",
-      "categories": ["rules", "reference"],
-      "owner": "desktop client team",
-      "status": "active",
-      "consumers": ["plugins/optimus-backend-plugin/skills/csharp-code-review"],
-      "reviewed_at": "2026-08-27",
-      "notes": "语言层与通用工程规范；平台判断引用 dotnet，桌面 UI 引用 wpf，版本控制协作引用 git"
-    },
-    {
-      "domain": "wpf",
-      "title": "WPF / XAML 桌面 UI",
-      "categories": ["rules"],
-      "owner": "desktop client team",
-      "status": "active",
-      "consumers": [
-        "plugins/optimus-frontend-plugin/skills/wpf-code-review",
-        "plugins/optimus-devops-plugin/skills/project-analyze",
-        "plugins/optimus-devops-plugin/skills/dotnet-diagnose-triage"
+      "categories": [
+        "reference"
       ],
-      "reviewed_at": "2026-09-12",
-      "notes": "WPF 技术栈专属规范；语言层规范引用 csharp，运行环境引用 dotnet。⚠️ plugins/optimus-frontend-plugin/skills/wpf-project-conventions 曾被登记为 consumer，实为设计上的共享约定文档（无 SKILL.md，被 mastergo-to-wpf-components 与 mastergo-to-wpf-page 读取），不检索本领域，2026-09-12 已移出"
+      "owner": "desktop client team",
+      "status": "active",
+      "consumers": [],
+      "reviewed_at": "2026-08-27",
+      "notes": "仅存创作期素材 reference/refit.md（REST 客户端契约参考，skill 不读）；团队 C# 规范正文已随 optimus-backend-plugin 的 csharp-code-review skill 分发"
     },
     {
       "domain": "git",
       "title": "Git 版本控制与协作",
-      "categories": ["rules", "reference"],
+      "categories": [
+        "rules",
+        "reference"
+      ],
       "owner": "desktop client team",
       "status": "active",
-      "consumers": [".claude/skills/commit-cc-plugin"],
+      "consumers": [
+        ".claude/skills/commit-cc-plugin"
+      ],
       "reviewed_at": "2026-08-27",
       "notes": "分支、提交、PR、发布与所有权；条款迁移自 csharp/rules/16-collaboration.md"
     },
     {
-      "domain": "media",
-      "title": "媒体处理概念",
-      "categories": ["reference"],
-      "owner": "desktop client team",
-      "status": "active",
-      "consumers": ["plugins/optimus-media-plugin"],
-      "reviewed_at": "2026-08-27",
-      "notes": "纯描述性领域，知识库负责概念、skill 负责操作；不收命令模板"
-    },
-    {
       "domain": "architecture",
       "title": "软件架构风格与设计原则",
-      "categories": ["rules", "reference"],
+      "categories": [
+        "rules",
+        "reference"
+      ],
       "owner": "desktop client team",
       "status": "active",
       "consumers": [],
@@ -74,17 +62,28 @@
     {
       "domain": "skill-authoring",
       "title": "Skill 创建与维护规范",
-      "categories": ["rules", "reference"],
+      "categories": [
+        "rules",
+        "reference"
+      ],
       "owner": "desktop client team",
       "status": "active",
-      "consumers": [".claude/rules/skill-conventions.md", ".claude/rules/doc-conventions.md", ".claude/rules/agent-conventions.md", ".claude/skills/darwin-skill"],
+      "consumers": [
+        ".claude/rules/skill-conventions.md",
+        ".claude/rules/doc-conventions.md",
+        ".claude/rules/agent-conventions.md",
+        ".claude/skills/darwin-skill"
+      ],
       "reviewed_at": "2026-08-27",
       "notes": "开放 Agent Skills 规范的通用约束；本仓库专属约定见 .claude/rules/ 三份规则文件（skill-conventions / doc-conventions / agent-conventions）"
     },
     {
       "domain": "design-patterns",
       "title": "设计模式选用与反模式",
-      "categories": ["rules", "reference"],
+      "categories": [
+        "rules",
+        "reference"
+      ],
       "owner": "desktop client team",
       "status": "active",
       "consumers": [],
@@ -94,7 +93,10 @@
     {
       "domain": "data-structures-algorithms",
       "title": "数据结构与算法",
-      "categories": ["rules", "reference"],
+      "categories": [
+        "rules",
+        "reference"
+      ],
       "owner": "desktop client team",
       "status": "active",
       "consumers": [],
@@ -104,7 +106,10 @@
     {
       "domain": "mcp",
       "title": "MCP（Model Context Protocol）",
-      "categories": ["rules", "reference"],
+      "categories": [
+        "rules",
+        "reference"
+      ],
       "owner": "desktop client team",
       "status": "active",
       "consumers": [],
@@ -112,24 +117,17 @@
       "notes": "开发者使用视角的 MCP 协议知识（架构、server/client 概念、接入方式、构建实践）+ 授权安全规范条款；内容取自 modelcontextprotocol.io 官方文档 2026-07-28 版本，不收录完整 Specification/SEP/社区治理文档"
     },
     {
-      "domain": "dotnet-debugging",
-      "title": ".NET 高级调试与诊断",
-      "categories": ["rules", "reference"],
-      "owner": "desktop client team",
-      "status": "active",
-      "consumers": ["plugins/optimus-devops-plugin/skills/dotnet-diagnose-triage"],
-      "reviewed_at": "2026-09-06",
-      "notes": "事后诊断与定位：征象判据、CLR 可观测结构、dump 抓取与分析命令、SOS 输出解读。覆盖 .NET Framework 4.x / .NET 6+ / Linux 容器三运行时的共性层；预防性编码规范归 csharp 与 wpf，平台生命周期归 dotnet。含活体监控工具链（EventPipe / dotnet-counters / dotnet-trace，仅 .NET 5+）与 WPF 专属归因分支（Dispatcher 死锁、四类泄漏形态，仅 Windows）；暂不含 PerfView/ETW。进程外部环境故障（模块注入、安全软件拦截、网络、硬件）归 host-diagnostics"
-    },
-    {
       "domain": "host-diagnostics",
       "title": "宿主进程环境诊断",
-      "categories": ["rules", "reference"],
+      "categories": [
+        "rules",
+        "reference"
+      ],
       "owner": "desktop client team",
       "status": "active",
       "consumers": [],
       "reviewed_at": "2026-09-06",
-      "notes": "诊断宿主进程外部故障源：第三方模块注入、安全软件拦截、网络不通、硬件资源不足、系统环境劫持。与 dotnet-debugging 互补——后者负责进程内部（托管堆/线程/锁）取证，本领域负责进程外部环境。目标工具为 .NET 8+ / .NET Framework 4.6.2+ 的 Windows 桌面程序。核心约束「知识库给方法，不给名单」：不内置具体产品黑名单，只收判断框架与冲突形态。⚠️ reference/aha-doctor-teardown.md 为第三方商业软件（字节跳动 AHA 电脑医生）的只读静态分析，基于 2026-09-06 本机快照；仅含公开可读配置与文件元数据层面的观察，未反编译二进制、未解密受保护规则包。其中【推断】标记内容不得作为判据依据引用"
+      "notes": "进程外部环境故障取证。进程内部取证已随 optimus-devops-plugin 的 dotnet-diagnose-triage skill 分发"
     },
     {
       "domain": "claude-code-hooks",
@@ -164,10 +162,14 @@
     {
       "domain": "tools",
       "title": "工具与资源目录",
-      "categories": ["reference"],
+      "categories": [
+        "reference"
+      ],
       "owner": "desktop client team",
       "status": "active",
-      "consumers": [".claude/skills/record-tools"],
+      "consumers": [
+        ".claude/skills/record-tools"
+      ],
       "reviewed_at": "2026-09-19",
       "notes": "记录团队已调研或已使用的外部工具/资源（CLI、MCP server、Skill、Agent、Plugin）的能力、安装方式与取舍理由，纯描述性领域，无规范条款。2026-09-19 从根目录 tools.md 迁移而来，唯一写入方为 .claude/skills/record-tools skill；每个工具一条独立 reference 条目，原固定 5 分类改为 tags 数组承载。与 mcp 领域的区别：mcp 讲协议本身的架构与机制，tools 记录具体产品的评估结论"
     }

@@ -2,7 +2,7 @@
 name: media-audio-extract
 description: Use when user wants to pull the audio track out of a video file — 提取音频、提取音轨、视频转音频、扒音频、从视频里提取声音、视频转mp3、只要声音不要画面。Not for audio-to-audio format conversion (that is media-audio-convert), video container conversion, or codec/format inspection.
 metadata:
-  version: "1.0.3"
+  version: "1.0.4"
   author: desktop client team
   category: tool
 compatibility: 需要用户本机已安装 ffmpeg/ffprobe 并加入 PATH，参见 ../media-ffmpeg-common/INSTALL.md。
@@ -75,7 +75,7 @@ ffprobe -v error -show_entries stream=index,codec_type,codec_name,bit_rate -of d
 | `vorbis` | `.ogg` |
 | `pcm_s16le` 等 PCM | `.wav` |
 
-> 容器与编码的关系、"后缀不等于真实编码"见 [`knowledge-base/media/reference/audio-container-formats.md`](../../../../knowledge-base/media/reference/audio-container-formats.md) §1「音频文件的构成」与 §3「后缀 vs 编码的判断方法」；各编码的有损/无损性质见 [`audio-codecs.md`](../../../../knowledge-base/media/reference/audio-codecs.md) §2「常见音频编解码器对比」。
+> 容器与编码的关系、"后缀不等于真实编码"见 [`audio-container-formats.md`](../media-ffmpeg-common/reference/audio-container-formats.md) §1「音频文件的构成」与 §3「后缀 vs 编码的判断方法」；各编码的有损/无损性质见 [`audio-codecs.md`](../media-ffmpeg-common/reference/audio-codecs.md) §2「常见音频编解码器对比」。
 
 **⑤ 源音频编码与目标扩展名不兼容**
 
@@ -135,7 +135,7 @@ ffmpeg -y -i <input> -vn -map 0:a:0 -c:a <目标编码器> -b:a <目标码率> <
 - `-y`：覆盖策略见 `../media-ffmpeg-common/PREFLIGHT.md` 的「覆盖策略」，不得省略
 
 
-> 音频码率与音质的关系、采样率/位深/声道概念见 [`knowledge-base/media/reference/audio-parameters.md`](../../../../knowledge-base/media/reference/audio-parameters.md)；编码器选型见 [`audio-codecs.md`](../../../../knowledge-base/media/reference/audio-codecs.md) §4「怎么选」。
+> 音频码率与音质的关系、采样率/位深/声道概念见 [`audio-parameters.md`](../media-ffmpeg-common/reference/audio-parameters.md)；编码器选型见 [`audio-codecs.md`](../media-ffmpeg-common/reference/audio-codecs.md) §4「怎么选」。
 
 参数说明见 `../media-ffmpeg-common/CLI-REFERENCE.md`。
 
