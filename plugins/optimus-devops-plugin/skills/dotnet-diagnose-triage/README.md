@@ -69,9 +69,9 @@ dotnet-diagnose (agent, 编排层)
 ★ dotnet-diagnose-triage
         │ 读取（判据来源，只读不复制）
         ▼
-knowledge-base/dotnet-debugging/
+dotnet-diagnose-triage/references/
         │ 需要新证据时指向（不执行，只交接）
         ▼
 官方 dump-collect / dotnet-trace-collect skill
-（未安装时回落 knowledge-base/dotnet-debugging/dump-capture.md 等）
+（未安装时回落本插件 references/dump-capture.md 等）
 ```

@@ -2,7 +2,7 @@
 
 > 版本：1.0.0 | 产物类型：agent
 
-在已经拿到 dump / SOS 输出 / trace 报告之后，按假设台账消解定位 .NET 应用的运行期根因，判据全部出自 `knowledge-base/dotnet-debugging/`。
+在已经拿到 dump / SOS 输出 / trace 报告之后，按假设台账消解定位 .NET 应用的运行期根因，判据全部出自同插件 `dotnet-diagnose-triage` skill 的 `references/`。
 
 ## 所处层级
 
@@ -75,7 +75,7 @@ description 主体用中文撰写，判据知识库也全为中文，而官方 `
                             │
                             ├──Skill 加载──▶ optimus-devops-plugin:dotnet-diagnose-triage
                             │                     │
-                            │                     └──Read──▶ knowledge-base/dotnet-debugging/
+                            │                     └──Read──▶ dotnet-diagnose-triage/references/
                             │
                             └──建议转向（不调用）──▶ 官方 dump-collect / dotnet-trace-collect
                                                       官方未安装时回落本知识库 dump-capture.md

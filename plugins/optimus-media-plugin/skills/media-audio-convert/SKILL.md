@@ -2,7 +2,7 @@
 name: media-audio-convert
 description: Use when user wants to convert an audio file to another audio format or change its bitrate, sample rate, or channel count — 音频格式转换、wav转mp3、flac转aac、音频转码、改音频码率、改采样率、音频转单声道、无损转有损。Not for extracting audio from video (that is media-audio-extract), video container conversion, or codec/format inspection.
 metadata:
-  version: "1.0.2"
+  version: "1.0.3"
   author: desktop client team
   category: tool
 compatibility: 需要用户本机已安装 ffmpeg/ffprobe 并加入 PATH，参见 ../media-ffmpeg-common/INSTALL.md。
@@ -53,7 +53,7 @@ ffprobe -v error -show_entries stream=index,codec_type,codec_name,sample_rate,ch
 
 判据必须是"有无 `codec_type=video` 行"，**不能靠能否查到音频编码**——视频文件里的音频流同样能被正常查出编码与码率，只看音频信息无法与纯音频文件区分。若在此放行，Step 5 的转换命令会静默丢弃视频流并产出音频文件，用户无从知晓画面去哪了。
 
-> 「后缀 ≠ 真实编码」的判断方法与常见格式辨析见 [`knowledge-base/media/reference/audio-container-formats.md`](../../../../knowledge-base/media/reference/audio-container-formats.md) §2「常见音频格式辨析」与 §3「后缀 vs 编码的判断方法」；各编码的有损/无损性质见 [`audio-codecs.md`](../../../../knowledge-base/media/reference/audio-codecs.md) §1「音频编码分类」。
+> 「后缀 ≠ 真实编码」的判断方法与常见格式辨析见 [`audio-container-formats.md`](../media-ffmpeg-common/reference/audio-container-formats.md) §2「常见音频格式辨析」与 §3「后缀 vs 编码的判断方法」；各编码的有损/无损性质见 [`audio-codecs.md`](../media-ffmpeg-common/reference/audio-codecs.md) §1「音频编码分类」。
 
 查得真实编码后，按下表判定本次转换的性质。🔴 **CHECKPOINT**：命中"需告知"的行，必须在执行前主动说明，而非等用户听出音质问题才解释；未确认前不得进入 Step 5：
 
@@ -73,7 +73,7 @@ ffprobe -v error -show_entries stream=index,codec_type,codec_name,sample_rate,ch
 - **体积与质量的走向必须对照 Step 4 查得的源 `bit_rate` 得出**，不得套用方向固定的结论。同一句"转成 aac"，源是 320k 的 mp3 与源是 96k 的 mp3，体积一个减小一个增大
 - 用户明确指定了 `-ar`/`-ac` 且数值低于源文件时（如 48000→44100、立体声→单声道），额外告知这是不可逆的信息丢失
 
-> 采样率与声道数的含义、降采样/缩混的影响见 [`audio-parameters.md`](../../../../knowledge-base/media/reference/audio-parameters.md) §1「采样率」与 §3「声道数」。
+> 采样率与声道数的含义、降采样/缩混的影响见 [`audio-parameters.md`](../media-ffmpeg-common/reference/audio-parameters.md) §1「采样率」与 §3「声道数」。
 
 ### Step 5：执行转换
 

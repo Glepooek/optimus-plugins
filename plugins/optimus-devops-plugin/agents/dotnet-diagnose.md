@@ -32,7 +32,7 @@ Step 3  按判据裁剪台账 → 自检 → 出结论（含台账与下一步�
 | 手里有 dump 或崩溃日志 | `references/evidence-precheck.md` |
 | 每轮裁剪台账、以及出结论给修复方向 | `references/verdict-forms.md` |
 
-⚠️ **判据表不写在本文件内。** 我只负责编排与输出格式，判据的唯一出处是上面那个 skill 与它引用的 `knowledge-base/dotnet-debugging/`。
+⚠️ **判据表不写在本文件内。** 我只负责编排与输出格式，判据的唯一出处是上面那个 skill 的 `references/`。
 
 ## 边界
 

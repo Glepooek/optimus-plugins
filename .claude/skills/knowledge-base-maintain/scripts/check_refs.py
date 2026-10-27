@@ -12,6 +12,10 @@
 - **脆弱性报告**：只写章节号、没写标题的引用无法做一致性校验，
   重编号时会静默失效。这类引用会被列出并建议补标题，但不算失败。
 
+路径基准分两种：知识库正文按所属领域目录解析（`rules/x.md`），插件按消费者所在目录
+解析（`references/x.md`、`../其他 skill/references/x.md`）。插件内引用不经知识库，
+故不做领域归属判断。
+
 用法：
     python check_refs.py            # 校验全部消费者
     python check_refs.py --strict   # 把脆弱引用也算作失败
@@ -36,9 +40,17 @@ CONSUMER_GLOBS = (
 # （领域元数据文件与根 README 同名，故领域提取与文件路径提取分开）
 DOMAIN_RE = re.compile(r'knowledge-base/(?P<domain>[a-z0-9-]+)/')
 
-# 目标文件 token：完整路径 / 领域内相对路径 / 同目录裸文件名
+# 目标文件 token：完整路径 / 相对路径 / 同目录裸文件名
+#
+# 三种相对路径形态各归各的基准目录，不可混为一谈：
+# - `rules/x.md`、`reference/x.md` 是**知识库正文**的写法，基准是所属领域目录
+# - `references/x.md` 是**插件**的写法（判据随 skill 分发），基准是消费者所在目录
+# - `../其他 skill/references/x.md` 是插件内跨 skill 引用，同样以消费者目录为基准
+# 迁移后插件不再引用知识库，故 `references/` 绝不可按知识库领域解析——那会让
+# 每一处插件内引用都报「引用的文件不存在」。
 FULL_PATH_RE = re.compile(r'knowledge-base/(?P<domain>[a-z0-9-]+)/(?P<rel>(?:rules|reference)/[a-z0-9][a-z0-9-]*\.md)')
-REL_PATH_RE = re.compile(r'`(?P<rel>(?:rules|reference)/[a-z0-9][a-z0-9-]*\.md)`')
+KB_REL_PATH_RE = re.compile(r'`(?P<rel>(?:rules|reference)/[a-z0-9][a-z0-9-]*\.md)`')
+PLUGIN_REL_PATH_RE = re.compile(r'`(?P<rel>(?:\.\./[a-z0-9-]+/)?references/[a-z0-9][a-z0-9-]*\.md)`')
 BARE_NAME_RE = re.compile(r'`(?P<name>[a-z0-9][a-z0-9-]*\.md)`')
 
 # 章节引用：§ 后跟编号，可选跟标题（引号包裹，或 `.`/空格 分隔的裸文本）
@@ -97,37 +109,45 @@ def parse_headings(path):
     return headings
 
 
-def iter_file_segments(line, default_domain, last_dir):
-    """把一行按目标文件 token 切段，产出 (领域, 领域内相对路径, 该文件之后的文本, 新的 last_dir)。
+def iter_file_segments(line, default_domain, last_dir, consumer_dir, repo_root):
+    """把一行按目标文件 token 切段，产出 (目标路径, 该文件之后的文本, 新的 last_dir)。
 
     一行可以引用多个文件（例如 `rules/13-api-design.md` § 2；`rules/05-error-handling.md` 全篇），
     每个文件只认领它之后、下一个文件 token 之前的 § 引用。
+
+    目标路径从一开始就解析成绝对位置，而不是留「领域 + 相对路径」到调用方再拼：
+    插件内引用的基准是消费者目录，知识库引用的基准是领域目录，两者无法用同一个字段表达。
     """
     tokens = []
     for m in FULL_PATH_RE.finditer(line):
-        tokens.append((m.start(), m.end(), m.group("domain"), m.group("rel")))
-    for m in REL_PATH_RE.finditer(line):
-        if default_domain and not any(s <= m.start() < e for s, e, _, _ in tokens):
-            tokens.append((m.start(), m.end(), default_domain, m.group("rel")))
+        tokens.append((m.start(), m.end(), repo_root / "knowledge-base" / m.group("domain") / m.group("rel")))
+    for m in KB_REL_PATH_RE.finditer(line):
+        if default_domain and not any(s <= m.start() < e for s, e, _ in tokens):
+            tokens.append((m.start(), m.end(), repo_root / "knowledge-base" / default_domain / m.group("rel")))
+    for m in PLUGIN_REL_PATH_RE.finditer(line):
+        if not any(s <= m.start() < e for s, e, _ in tokens):
+            tokens.append((m.start(), m.end(), (consumer_dir / m.group("rel")).resolve()))
 
     # 裸文件名（同目录省略写法）需要目录上下文：优先取本行前面已出现的文件所在目录，
     # 否则回退到上一行遗留的 last_dir。必须在收集完带路径的 token 之后再算。
     tokens.sort()
     for m in BARE_NAME_RE.finditer(line):
-        if any(s <= m.start() < e for s, e, _, _ in tokens):
+        if any(s <= m.start() < e for s, e, _ in tokens):
             continue
-        if not default_domain:
+        prior = [p for s, _, p in tokens if s < m.start() and p.parent != p]
+        if prior:
+            ctx = prior[-1].parent
+        elif last_dir is not None:
+            ctx = last_dir
+        else:
             continue
-        prior = [rel for s, _, _, rel in tokens if s < m.start() and "/" in rel]
-        ctx = prior[-1].rsplit("/", 1)[0] if prior else last_dir
-        if ctx:
-            tokens.append((m.start(), m.end(), default_domain, f"{ctx}/{m.group('name')}"))
+        tokens.append((m.start(), m.end(), ctx / m.group("name")))
 
     tokens.sort()
-    for i, (_, end, domain, rel) in enumerate(tokens):
+    for i, (_, end, target) in enumerate(tokens):
         stop = tokens[i + 1][0] if i + 1 < len(tokens) else len(line)
-        last_dir = rel.rsplit("/", 1)[0] if "/" in rel else last_dir
-        yield domain, rel, line[end:stop], last_dir
+        last_dir = target.parent
+        yield target, line[end:stop], last_dir
 
 
 def own_domain(consumer_path, repo_root):
@@ -144,7 +164,7 @@ def own_domain(consumer_path, repo_root):
 
 
 def extract_refs(consumer_path, repo_root):
-    """从消费者文件提取 (行号, 领域, 相对路径, 章节号, 引用标题或 None) 五元组。"""
+    """从消费者文件提取 (行号, 目标路径, 章节号, 引用标题或 None) 四元组。"""
     text = consumer_path.read_text(encoding="utf-8")
 
     # 相对路径引用的基准领域：知识库正文取自身所在领域；skill 取正文中唯一出现的领域名
@@ -157,14 +177,15 @@ def extract_refs(consumer_path, repo_root):
     refs = []
     last_dir = None
     for line_no, line in enumerate(text.splitlines(), start=1):
-        for domain, rel, tail, last_dir in iter_file_segments(line, default_domain, last_dir):
+        for target, tail, last_dir in iter_file_segments(
+                line, default_domain, last_dir, consumer_path.parent, repo_root):
             for m in SECTION_RE.finditer(tail):
                 title = (m.group("cjk") or m.group("curly") or m.group("straight")
                          or m.group("plain") or m.group("spaced") or "")
                 title = normalize(title)
                 if NOISE_TITLE_RE.match(title):
                     title = None
-                refs.append((line_no, domain, rel, m.group("num"), title))
+                refs.append((line_no, target, m.group("num"), title))
     return refs
 
 
@@ -174,28 +195,31 @@ def check_consumer(consumer_path, repo_root):
     rel_consumer = consumer_path.relative_to(repo_root).as_posix()
     heading_cache = {}
 
-    for line_no, domain, rel, num, title in extract_refs(consumer_path, repo_root):
-        target = repo_root / "knowledge-base" / domain / rel
+    for line_no, target, num, title in extract_refs(consumer_path, repo_root):
+        try:
+            shown = target.relative_to(repo_root).as_posix()
+        except ValueError:
+            shown = str(target)
         if target not in heading_cache:
             heading_cache[target] = parse_headings(target) if target.exists() else None
         headings = heading_cache[target]
 
         if headings is None:
-            problems.append(f"{rel_consumer}:{line_no}: 引用的文件不存在：knowledge-base/{domain}/{rel}")
+            problems.append(f"{rel_consumer}:{line_no}: 引用的文件不存在：{shown}")
             continue
         if num not in headings:
             problems.append(
-                f"{rel_consumer}:{line_no}: knowledge-base/{domain}/{rel} 无 § {num} 章节"
+                f"{rel_consumer}:{line_no}: {shown} 无 § {num} 章节"
                 f"（该文件现有章节号：{', '.join(sorted(headings, key=lambda s: [int(x) for x in s.split('.')]))}）"
             )
             continue
         if title is None:
-            fragile.append(f"{rel_consumer}:{line_no}: § {num} → {domain}/{rel}（现为「{headings[num]}」）")
+            fragile.append(f"{rel_consumer}:{line_no}: § {num} → {shown}（现为「{headings[num]}」）")
             continue
         actual = headings[num]
         if title not in actual and not actual.startswith(title):
             problems.append(
-                f"{rel_consumer}:{line_no}: knowledge-base/{domain}/{rel} § {num} 标题不符——"
+                f"{rel_consumer}:{line_no}: {shown} § {num} 标题不符——"
                 f"引用写「{title}」，实际为「{actual}」"
             )
     return problems, fragile

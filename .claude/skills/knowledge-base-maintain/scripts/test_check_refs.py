@@ -54,6 +54,17 @@ class Fixture:
         )
         return "reference/audio-container-formats.md"
 
+    def shown(self, refs):
+        """refs 里的目标路径是绝对位置，断言时统一折成仓库相对路径便于阅读。"""
+        out = []
+        for line_no, target, num, title in refs:
+            try:
+                rel = target.relative_to(self.root).as_posix()
+            except ValueError:
+                rel = str(target)
+            out.append((line_no, rel, num, title))
+        return out
+
 
 class TestNormalize(unittest.TestCase):
     def test_strips_backticks_and_bold(self):
@@ -86,7 +97,7 @@ class TestExtractRefs(unittest.TestCase):
             f = Fixture(tmp)
             c = f.consumer("规范见 knowledge-base/wpf/README.md\n\n| `rules/03-mvvm.md` §2 |\n")
             refs = extract_refs(c, f.root)
-            self.assertEqual(refs, [(3, "wpf", "rules/03-mvvm.md", "2", None)])
+            self.assertEqual(f.shown(refs), [(3, "knowledge-base/wpf/rules/03-mvvm.md", "2", None)])
 
     def test_splits_multiple_files_on_one_line(self):
         """一行引用两个文件时，每个 § 必须归属到它前面的那个文件。"""
@@ -95,27 +106,28 @@ class TestExtractRefs(unittest.TestCase):
             (f.spec_dir / "04-xaml.md").write_text("# 04\n\n## 9. 事件与命令\n", encoding="utf-8")
             c = f.consumer("knowledge-base/wpf/README.md\n\n`rules/03-mvvm.md` §2；`rules/04-xaml.md` §9\n")
             refs = extract_refs(c, f.root)
-            self.assertEqual([(r[2], r[3]) for r in refs],
-                             [("rules/03-mvvm.md", "2"), ("rules/04-xaml.md", "9")])
+            self.assertEqual([(r[1], r[2]) for r in f.shown(refs)],
+                             [("knowledge-base/wpf/rules/03-mvvm.md", "2"),
+                              ("knowledge-base/wpf/rules/04-xaml.md", "9")])
 
     def test_captures_quoted_title(self):
         with tempfile.TemporaryDirectory() as tmp:
             f = Fixture(tmp)
             c = f.consumer("knowledge-base/wpf/README.md\n\n`rules/03-mvvm.md` §7「事件与订阅」\n")
-            self.assertEqual(extract_refs(c, f.root)[0][4], "事件与订阅")
+            self.assertEqual(extract_refs(c, f.root)[0][3], "事件与订阅")
 
     def test_captures_plain_title(self):
         with tempfile.TemporaryDirectory() as tmp:
             f = Fixture(tmp)
             c = f.consumer("knowledge-base/wpf/README.md\n\n`rules/03-mvvm.md` § 7. 事件与订阅\n")
-            self.assertEqual(extract_refs(c, f.root)[0][4], "事件与订阅")
+            self.assertEqual(extract_refs(c, f.root)[0][3], "事件与订阅")
 
     def test_range_form_yields_no_bogus_title(self):
         """§1-§5 的连字符不得被当成标题文本。"""
         with tempfile.TemporaryDirectory() as tmp:
             f = Fixture(tmp)
             c = f.consumer("knowledge-base/wpf/README.md\n\n`rules/03-mvvm.md` §1-§2\n")
-            self.assertEqual([r[4] for r in extract_refs(c, f.root)], [None, None])
+            self.assertEqual([r[3] for r in extract_refs(c, f.root)], [None, None])
 
     def test_bare_filename_uses_prior_file_dir_on_same_line(self):
         """同一行先出现完整路径、后用裸文件名省略写法时，裸名须归到前者所在目录。"""
@@ -125,7 +137,9 @@ class TestExtractRefs(unittest.TestCase):
             c = f.consumer(
                 "见 knowledge-base/wpf/rules/03-mvvm.md §2. ViewModel 基类；另见 `04-xaml.md` §9. 事件与命令\n")
             refs = extract_refs(c, f.root)
-            self.assertEqual([r[2] for r in refs], ["rules/03-mvvm.md", "rules/04-xaml.md"])
+            self.assertEqual([r[1] for r in f.shown(refs)],
+                             ["knowledge-base/wpf/rules/03-mvvm.md",
+                              "knowledge-base/wpf/rules/04-xaml.md"])
             self.assertEqual(check_consumer(c, f.root)[0], [])
 
     def test_captures_title_in_double_quotes(self):
@@ -134,7 +148,7 @@ class TestExtractRefs(unittest.TestCase):
             f = Fixture(tmp)
             for quoted in ('"事件与订阅"', '“事件与订阅”'):
                 c = f.consumer(f'knowledge-base/wpf/README.md\n\n`rules/03-mvvm.md` §7 {quoted}\n')
-                self.assertEqual(extract_refs(c, f.root)[0][4], "事件与订阅", quoted)
+                self.assertEqual(extract_refs(c, f.root)[0][3], "事件与订阅", quoted)
                 self.assertEqual(check_consumer(c, f.root), ([], []), quoted)
 
     def test_captures_quoted_title_containing_halfwidth_quotes(self):
@@ -152,7 +166,7 @@ class TestExtractRefs(unittest.TestCase):
                 c = f.consumer(
                     f"knowledge-base/wpf/README.md\n\n`{rel}` §3 {quoted}\n",
                     name=f"C{ord(quoted[0])}.md")
-                self.assertEqual(extract_refs(c, f.root)[0][4], title, quoted)
+                self.assertEqual(extract_refs(c, f.root)[0][3], title, quoted)
                 self.assertEqual(check_consumer(c, f.root), ([], []), quoted)
 
     def test_halfwidth_quoted_title_still_terminates_on_own_delimiter(self):
@@ -160,7 +174,7 @@ class TestExtractRefs(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             f = Fixture(tmp)
             c = f.consumer('knowledge-base/wpf/README.md\n\n`rules/03-mvvm.md` §7 "事件与订阅"\n')
-            self.assertEqual(extract_refs(c, f.root)[0][4], "事件与订阅")
+            self.assertEqual(extract_refs(c, f.root)[0][3], "事件与订阅")
             self.assertEqual(check_consumer(c, f.root), ([], []))
 
     def test_subsection_title_separated_by_space_only(self):
@@ -172,7 +186,7 @@ class TestExtractRefs(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             f = Fixture(tmp)
             c = f.consumer("knowledge-base/wpf/README.md\n\n`rules/03-mvvm.md` § 2.1 属性变更通知\n")
-            self.assertEqual(extract_refs(c, f.root)[0][4], "属性变更通知")
+            self.assertEqual(extract_refs(c, f.root)[0][3], "属性变更通知")
             self.assertEqual(check_consumer(c, f.root), ([], []))
 
     def test_prose_continuation_after_number_is_not_a_title(self):
@@ -187,7 +201,7 @@ class TestExtractRefs(unittest.TestCase):
             c = f.consumer(
                 "knowledge-base/wpf/README.md\n\n"
                 "`rules/03-mvvm.md` §2 的可绑定属性要求源自本文件第 1 节\n")
-            self.assertIsNone(extract_refs(c, f.root)[0][4])
+            self.assertIsNone(extract_refs(c, f.root)[0][3])
             problems, fragile = check_consumer(c, f.root)
             self.assertEqual(problems, [])
             self.assertEqual(len(fragile), 1)
@@ -196,7 +210,7 @@ class TestExtractRefs(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             f = Fixture(tmp)
             c = f.consumer("knowledge-base/wpf/README.md\n\n`rules/03-mvvm.md` §7要求订阅须配对取消\n")
-            self.assertIsNone(extract_refs(c, f.root)[0][4])
+            self.assertIsNone(extract_refs(c, f.root)[0][3])
             self.assertEqual(check_consumer(c, f.root)[0], [])
 
     def test_plain_title_stops_at_chinese_period(self):
@@ -210,7 +224,7 @@ class TestExtractRefs(unittest.TestCase):
             c = f.consumer(
                 "knowledge-base/wpf/README.md\n\n"
                 "通用原则见 `rules/03-mvvm.md` § 7. 事件与订阅。本篇只写差异：\n")
-            self.assertEqual(extract_refs(c, f.root)[0][4], "事件与订阅")
+            self.assertEqual(extract_refs(c, f.root)[0][3], "事件与订阅")
             self.assertEqual(check_consumer(c, f.root)[0], [])
 
     def test_plain_title_stops_at_fullwidth_comma(self):
@@ -218,7 +232,7 @@ class TestExtractRefs(unittest.TestCase):
             f = Fixture(tmp)
             c = f.consumer(
                 "knowledge-base/wpf/README.md\n\n`rules/03-mvvm.md` § 1. MVVM 框架选型，另见下文\n")
-            self.assertEqual(extract_refs(c, f.root)[0][4], "MVVM 框架选型")
+            self.assertEqual(extract_refs(c, f.root)[0][3], "MVVM 框架选型")
 
     def test_plain_title_stops_at_closing_quote(self):
         """整句转述包裹引用时（「修复方向见 `x.md § 2. 标题`」），闭引号不属于标题。
@@ -230,7 +244,7 @@ class TestExtractRefs(unittest.TestCase):
             f = Fixture(tmp)
             c = f.consumer(
                 "原文即为：「修复方向见 `knowledge-base/wpf/rules/03-mvvm.md § 7. 事件与订阅`」。\n")
-            self.assertEqual(extract_refs(c, f.root)[0][4], "事件与订阅")
+            self.assertEqual(extract_refs(c, f.root)[0][3], "事件与订阅")
             self.assertEqual(check_consumer(c, f.root)[0], [])
 
     def test_kb_spec_file_resolves_relative_ref_against_own_domain(self):
@@ -244,8 +258,8 @@ class TestExtractRefs(unittest.TestCase):
             spec = f.spec_dir / "11-testing.md"
             spec.write_text("# 11\n\n分层见 `rules/03-mvvm.md` § 7. 事件与订阅\n", encoding="utf-8")
             refs = extract_refs(spec, f.root)
-            self.assertEqual([(r[1], r[2], r[4]) for r in refs],
-                             [("wpf", "rules/03-mvvm.md", "事件与订阅")])
+            self.assertEqual([(r[1], r[2], r[3]) for r in f.shown(refs)],
+                             [("knowledge-base/wpf/rules/03-mvvm.md", "7", "事件与订阅")])
             self.assertEqual(check_consumer(spec, f.root)[0], [])
 
     def test_kb_cross_domain_full_path_overrides_own_domain(self):
@@ -260,8 +274,8 @@ class TestExtractRefs(unittest.TestCase):
                 "# 11\n\n通用原则见 `knowledge-base/csharp/rules/12-testing.md` § 1. 测试策略与金字塔。"
                 "WPF 侧的差异：\n", encoding="utf-8")
             refs = extract_refs(spec, f.root)
-            self.assertEqual([(r[1], r[2], r[4]) for r in refs],
-                             [("csharp", "rules/12-testing.md", "测试策略与金字塔")])
+            self.assertEqual([(r[1], r[2], r[3]) for r in f.shown(refs)],
+                             [("knowledge-base/csharp/rules/12-testing.md", "1", "测试策略与金字塔")])
             self.assertEqual(check_consumer(spec, f.root)[0], [])
 
     def test_ambiguous_domain_skips_relative_refs(self):
@@ -270,6 +284,90 @@ class TestExtractRefs(unittest.TestCase):
             f = Fixture(tmp)
             c = f.consumer("knowledge-base/wpf/README.md knowledge-base/csharp/README.md\n\n`rules/03-mvvm.md` §2\n")
             self.assertEqual(extract_refs(c, f.root), [])
+
+
+class TestPluginReferences(unittest.TestCase):
+    """插件内判据的引用形态（迁移后 SKILL.md 与 references/ 之间的引用）。
+
+    两类新基准与被搬迁的知识库形态完全不同：`references/x.md` 以消费者所在目录为基准，
+    `../<其他 skill>/references/x.md` 以插件内相邻 skill 为基准。迁移前这两种写法会被
+    check_refs 整体忽略——既查不出失效，也查不出章节不符，等于白跑一趟。
+    """
+
+    def test_resolves_references_dir_against_consumer_dir(self):
+        """`references/x.md` 的基准是消费者所在目录，不是知识库领域。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            f = Fixture(tmp)
+            (f.consumer_dir / "references").mkdir()
+            (f.consumer_dir / "references" / "02-coding-style.md").write_text(
+                "# 02\n\n## 1. 命名规范\n", encoding="utf-8")
+            c = f.consumer("| 1 | 命名约定 | `references/02-coding-style.md` § 1. 命名规范 |\n")
+            self.assertEqual(
+                [(r[2], r[3]) for r in f.shown(extract_refs(c, f.root))],
+                [("1", "命名规范")])
+            self.assertEqual(check_consumer(c, f.root), ([], []))
+
+    def test_detects_missing_plugin_reference_file(self):
+        """插件内引用了不存在的判据文件时必须报错，而不是静默跳过。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            f = Fixture(tmp)
+            c = f.consumer("见 `references/99-gone.md` § 1. 不存在的章节\n")
+            problems, _ = check_consumer(c, f.root)
+            self.assertEqual(len(problems), 1)
+            self.assertIn("引用的文件不存在", problems[0])
+            self.assertIn("references/99-gone.md", problems[0])
+
+    def test_detects_renumbered_plugin_reference_section(self):
+        """插件内判据章节重编号时，标题不符必须报出——与知识库侧同等强度。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            f = Fixture(tmp)
+            (f.consumer_dir / "references").mkdir()
+            (f.consumer_dir / "references" / "02-coding-style.md").write_text(
+                "# 02\n\n## 1. 命名规范\n", encoding="utf-8")
+            c = f.consumer("见 `references/02-coding-style.md` § 1. 结构布局\n")
+            problems, _ = check_consumer(c, f.root)
+            self.assertEqual(len(problems), 1)
+            self.assertIn("标题不符", problems[0])
+            self.assertIn("命名规范", problems[0])
+
+    def test_resolves_cross_skill_reference_within_plugin(self):
+        """`../<其他 skill>/references/x.md` 以插件内相邻 skill 为基准解析。
+
+        devops 插件的 triage / autopilot / agent 共享同一份判据，靠的就是这种写法；
+        媒体插件的 media-* 早已如此引用 media-ffmpeg-common。解析不到就等于判据全丢。
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            f = Fixture(tmp)
+            sibling = f.consumer_dir.parent / "triage" / "references"
+            sibling.mkdir(parents=True)
+            (sibling / "01-dump-handling.md").write_text(
+                "# 01\n\n## 2. 版本库隔离\n", encoding="utf-8")
+            c = f.consumer("落盘路径约束见 `../triage/references/01-dump-handling.md` § 2. 版本库隔离\n")
+            self.assertEqual(
+                [(r[2], r[3]) for r in f.shown(extract_refs(c, f.root))],
+                [("2", "版本库隔离")])
+            self.assertEqual(check_consumer(c, f.root), ([], []))
+
+    def test_plugin_ref_not_confused_with_kb_ref(self):
+        """`references/` 与知识库的 `reference/` 都须各认各的，不能互相吞掉。
+
+        `references/` 是插件内判据目录，`reference/` 是知识库的描述性知识目录；只差一个
+        `s`，正则一旦写成前缀匹配就会把两者混为一谈，把插件引用解析到知识库里去。
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            f = Fixture(tmp)
+            (f.consumer_dir / "references").mkdir()
+            (f.consumer_dir / "references" / "02-coding-style.md").write_text(
+                "# 02\n\n## 1. 命名规范\n", encoding="utf-8")
+            f.quoted_heading_spec()
+            c = f.consumer(
+                "`references/02-coding-style.md` § 1. 命名规范；"
+                "`knowledge-base/wpf/reference/audio-container-formats.md` § 3 「\"后缀 vs 编码\"的判断方法」\n")
+            shown = f.shown(extract_refs(c, f.root))
+            self.assertEqual(len(shown), 2)
+            self.assertEqual(shown[0][1], "plugins/p/skills/s/references/02-coding-style.md")
+            self.assertEqual(shown[1][1], "knowledge-base/wpf/reference/audio-container-formats.md")
+            self.assertEqual(check_consumer(c, f.root), ([], []))
 
 
 class TestCheckConsumer(unittest.TestCase):

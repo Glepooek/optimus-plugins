@@ -70,6 +70,19 @@ if ! python .githooks/check_new_skill_eval_case.py --all . ; then
   fail=1
 fi
 
+# --- 6. 插件运行时自包含：不得引用插件目录以外的路径 ---
+# 插件安装单元是 plugins/<name>/，装出去的包里没有 knowledge-base/、没有
+# .claude/、也没有本仓 docs/。插件内指向这些位置的引用在开发期能解析，
+# 安装后必然失效——而且是静默失效：skill 读不到判据，Claude 用泛型知识补全，
+# 报告看起来正常，团队规范一条都没执行。
+#
+# 判据与「哪些文件不查」（CHANGELOG、hooks/README、books/）见脚本 docstring。
+# 该脚本当前报出 48 处存量越界，正随「判据内聚到 references/」的搬迁逐项清零；
+# 清零前本项会持续阻断提交，**这是刻意的**——它让「还剩哪些没搬」变成可执行清单。
+if ! python .githooks/check_plugin_self_contained.py ; then
+  fail=1
+fi
+
 if [ "$fail" -ne 0 ]; then
   echo "[pre-commit] 未通过。修正后重新提交，不要用 --no-verify 绕过。"
   exit 1

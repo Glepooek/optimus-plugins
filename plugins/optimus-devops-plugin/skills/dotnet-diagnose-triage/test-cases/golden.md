@@ -100,9 +100,9 @@ Found 1 unique roots.
 
 **预期台账**：「Binding 泄漏」→ `已证实`，依据挂 `wpf-leak-patterns.md § 2`。
 
-**预期结论强度**：**已确认**，且修复方向**原样转述**该判据句自带的 `knowledge-base/wpf/rules/05-data-binding.md § 2. 变更通知：INotifyPropertyChanged / ObservableCollection`——**不改写为其他目标、不展开成修复方案**。
+**预期结论强度**：**已确认**，且修复方向**原样转述**该判据句自带的修复方向（「让绑定源实现 `INotifyPropertyChanged`、绑定不再依赖 `AddValueChanged`，或在生命周期结束处显式解绑」）——**不改写为其他目标、不展开成修复方案**。
 
-**考什么**：WPF 分支路由 + 修复方向第一档「判据句内引用原样转述」。这是本产物相对官方 `dump-collect` 的独有价值（官方全无 WPF 内容）。
+**考什么**：WPF 分支路由 + 修复方向第一档「判据句内修复方向原样转述」。这是本产物相对官方 `dump-collect` 的独有价值（官方全无 WPF 内容）。
 
 ---
 

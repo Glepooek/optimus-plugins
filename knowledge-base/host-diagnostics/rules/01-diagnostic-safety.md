@@ -75,7 +75,7 @@
 
 **理由**：诊断数据的敏感性容易被低估——它不含密码，但足以刻画一台机器与其使用者。
 
-> 若诊断涉及内存转储，其密级更高（可能含明文凭证与全量 PII），适用 `knowledge-base/dotnet-debugging/rules/01-dump-handling.md` 的更严格约束。
+> 若诊断涉及内存转储，其密级更高（可能含明文凭证与全量 PII），适用 `optimus-devops-plugin` 的 `dotnet-diagnose-triage` skill 中「01 · dump 处置」的更严格约束——该规范随插件分发，本库不持有副本。
 
 ## 5. 禁止进程内注入
 

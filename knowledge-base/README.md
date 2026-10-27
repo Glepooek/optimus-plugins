@@ -1,6 +1,8 @@
 # 知识库（knowledge-base）
 
-跨插件共享的规范知识库，供人类阅读也供 skill 编程式查询。当前收纳领域：`dotnet`、`csharp`、`wpf`、`git`、`media`、`skill-authoring`、`architecture`、`design-patterns`、`data-structures-algorithms`、`mcp`、`dotnet-debugging`、`host-diagnostics`、`claude-code-hooks`、`claude-code-plugin-system`、`tools`。其中 `dotnet`、`media`、`tools` 为纯描述性参考领域（无规范条款），其余领域为规范条款 + 参考混合。
+跨插件共享的规范知识库，供人类阅读也供 skill 编程式查询。当前收纳领域：`dotnet`、`csharp`、`git`、`skill-authoring`、`architecture`、`design-patterns`、`data-structures-algorithms`、`mcp`、`host-diagnostics`、`claude-code-hooks`、`claude-code-plugin-system`、`tools`。其中 `dotnet`、`tools` 为纯描述性参考领域（无规范条款），其余领域为规范条款 + 参考混合。
+
+⚠️ **判据文件已随插件分发**：C#、WPF、媒体、.NET 调试四个领域的规范与参考正文已迁入各自插件的 `references/`（`csharp-code-review`、`wpf-code-review`、`media-ffmpeg-common`、`dotnet-diagnose-triage`），安装后即可完整运行、不依赖本库。本库只保留创作素材与语言无关的领域知识，`csharp/` 现仅存 `reference/refit.md`。
 
 ## 目录结构
 
@@ -34,17 +36,14 @@
 | 领域 | 负责什么 | 与谁易混，怎么分 |
 |---|---|---|
 | `dotnet` | Runtime、.NET Framework、SDK、目标框架、操作系统兼容性与生命周期 | 平台层；语言层归 `csharp` |
-| `csharp` | C# 语言和通用工程实践 | 桌面 UI 归 `wpf`，平台判断归 `dotnet` |
-| `wpf` | WPF / XAML 桌面 UI 技术栈 | 语言层归 `csharp` |
+| `csharp` | 仅存 REST 客户端契约参考 `reference/refit.md`（创作期素材） | 团队 C# 规范正文已随 `csharp-code-review` skill 分发，不在本库 |
 | `git` | 版本控制协作：分支、提交、PR、发布与所有权 | 其 pre-commit 条款讲 **git 原生钩子**，与 `claude-code-hooks` 同名不同义 |
-| `media` | 媒体处理概念 | 纯描述性领域，无规范条款 |
 | `skill-authoring` | Skill 创建与维护规范 | 仓库专属约定在 `.claude/rules/skill-conventions.md` |
 | `architecture` | 语言无关的架构风格、分层契约与设计原则 | 具体模式的选用归 `design-patterns` |
 | `design-patterns` | 设计模式的选用判据与误用识别 | 分层与风格归 `architecture` |
 | `data-structures-algorithms` | 数据结构与算法的选型判据与复杂度判断 | `reference/` 提取自《Hello 算法》，CC BY-NC-SA 许可证目录级隔离 |
 | `mcp` | MCP 服务端与客户端的授权、安全与协议约束 | — |
-| `dotnet-debugging` | 程序出问题后的**进程内部**取证与定位（征象判据、CLR 可观测结构、dump 与 SOS 命令解读） | 与 `csharp`/`wpf` 的预防性规范互补；进程外部环境归 `host-diagnostics` |
-| `host-diagnostics` | 宿主进程**外部**的环境故障取证（模块注入、安全软件拦截、网络不通、硬件资源不足、系统环境劫持） | 与 `dotnet-debugging` 的进程内部取证互补；其 API Hook 条款讲**注入手法**，与 `claude-code-hooks` 同名不同义 |
+| `host-diagnostics` | 宿主进程**外部**的环境故障取证（模块注入、安全软件拦截、网络不通、硬件资源不足、系统环境劫持） | 进程**内部**取证归 `dotnet-diagnose-triage` skill，已随插件分发；其 API Hook 条款讲**注入手法**，与 `claude-code-hooks` 同名不同义 |
 | `claude-code-hooks` | Claude Code hook 机制的编写与审查判据（事件选型、输出契约、决策控制、异步边界） | **仅约束 Claude Code，不适用 Codex**；与 `git` 的原生钩子、`host-diagnostics` 的 API Hook 注入手法三者同名而不同义 |
 | `claude-code-plugin-system` | 插件这一产物形态本身的机制：清单与组件装配契约、marketplace 与七种插件源、版本解析与缓存、插件间依赖、安装推荐协议、企业托管治理 | **仅约束 Claude Code，不适用 Codex**；hook 事件表与输出契约、`${CLAUDE_PLUGIN_ROOT}` 语义归 `claude-code-hooks`，SKILL.md frontmatter 归 `skill-authoring`，MCP 协议与安全归 `mcp`；本仓专属版本约定在 `AGENTS.md` |
 | `tools` | 记录已调研或已使用的外部工具/资源（CLI、MCP server、Skill、Agent、Plugin）的能力、安装方式与取舍理由 | 与 `mcp` 同名相关但不同义——`mcp` 讲协议本身的架构与机制，本领域记录具体某个 MCP server/CLI 产品的评估结论；纯描述性领域，无规范条款 |
@@ -171,20 +170,15 @@ skill 需要引用某条规范/知识时，先用 Grep 在对应领域的 `index
 
 | 消费者 | 消费哪个领域 | 消费方式 |
 |---|---|---|
-| `plugins/optimus-media-plugin/skills/`（11 个 media-* skill） | `media` | 最大消费方；`media-ffmpeg-common` 不引用 |
-| `plugins/optimus-backend-plugin/skills/csharp-code-review` | `csharp` | 固定映射，见该 skill 的"权威参考"章节 |
-| `plugins/optimus-frontend-plugin/skills/wpf-code-review` | `wpf` | 固定映射 |
-| `plugins/optimus-devops-plugin/skills/project-analyze` | `wpf` | 动态检索 |
-| `plugins/optimus-devops-plugin/skills/dotnet-diagnose-triage` | `dotnet-debugging`、`wpf` | 动态检索 |
 | `.githooks/check_hook_configs.py` | `claude-code-hooks` | 脚本型消费者；报错携带索引条目 ID。注意 `plugins/*/hooks/` 三处配置是**被约束的对象**，不是消费者 |
 | `.githooks/check_external_entries.py` | `claude-code-plugin-system` | 脚本型消费者；报错携带索引条目 ID。注意 `.claude-plugin/marketplace.json` 与 `plugins/*/` 八个插件是**被约束的对象**，不是消费者 |
 | `.claude/skills/record-tools` | `tools` | 唯一写入方；新增工具前先查重、写入后同步索引 |
 
 ### 目前无消费者的领域
 
-`architecture`、`design-patterns`、`data-structures-algorithms`、`mcp`、`host-diagnostics` 尚无 skill 或脚本引用。这是**已知状态而非缺陷**——知识库是跨插件共享资产，供人类查阅与 agent 临时检索本身即成立。但新建领域前应按 `AGENTS.md` 的「引导器/传感器」自检问一句：这份内容有没有配对的消费方，还是只造轮子不造刹车。
+`architecture`、`design-patterns`、`data-structures-algorithms`、`mcp`、`host-diagnostics`、`csharp` 尚无 skill 或脚本引用（`csharp` 原有的消费方已改为读插件内 `references/`）。这是**已知状态而非缺陷**——知识库是跨插件共享资产，供人类查阅与 agent 临时检索本身即成立。但新建领域前应按 `AGENTS.md` 的「引导器/传感器」自检问一句：这份内容有没有配对的消费方，还是只造轮子不造刹车。
 
-⚠️ 一处易误认的目录：`plugins/optimus-frontend-plugin/skills/wpf-project-conventions` 虽在 `skills/` 下，**按设计不是 skill** ——它无 `SKILL.md`，只有 `CONVENTIONS.md`（项目工程约定的事实来源，由用户填写）与 `SAMPLE.md`，被 `mastergo-to-wpf-components` 与 `mastergo-to-wpf-page` 在生成前强制读取，缺失或关键项为空则拒绝生成。设计依据见 `docs/superpowers/plans/2026-08-19-wpf-visual-skills.md`。它**不检索本知识库**，曾被 `catalog.json` 误登记为 `wpf` 领域的 consumer，2026-09-12 已移出。
+⚠️ 一处易误认的目录：`plugins/optimus-frontend-plugin/skills/wpf-project-conventions` 虽在 `skills/` 下，**按设计不是 skill** ——它无 `SKILL.md`，只有 `CONVENTIONS.md`（项目工程约定的事实来源，由用户填写）与 `SAMPLE.md`，被 `mastergo-to-wpf-components` 与 `mastergo-to-wpf-page` 在生成前强制读取，缺失或关键项为空则拒绝生成。设计依据见 `docs/superpowers/plans/2026-08-19-wpf-visual-skills.md`。它**不检索本知识库**。
 
 ### 承载仓库专属约定的资产（不属于本知识库）
 

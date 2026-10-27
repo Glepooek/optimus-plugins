@@ -34,13 +34,13 @@
 
 ## 概念解释
 
-上表参数背后的媒体概念（关键帧对齐、CRF/码率控制、流复制 vs 转码、帧率与插帧）以 `knowledge-base/media/` 为唯一概念来源，参数表只做命令定位：
+上表参数背后的媒体概念（关键帧对齐、CRF/码率控制、流复制 vs 转码、帧率与插帧）以同插件 `media-ffmpeg-common/reference/` 为唯一概念来源，参数表只做命令定位：
 
-- `-crf` / `-preset` / `-b:v` / `-pass` 的码率控制与两轮编码概念 → [`knowledge-base/media/reference/video-quality.md`](../../../../knowledge-base/media/reference/video-quality.md) §2「码率控制模式」
-- `-c copy` 流复制 / `-c:v` 转码 → [`knowledge-base/media/reference/media-stream-basics.md`](../../../../knowledge-base/media/reference/media-stream-basics.md) §3「转码、重封装、流复制」
+- `-crf` / `-preset` / `-b:v` / `-pass` 的码率控制与两轮编码概念 → [`video-quality.md`](../media-ffmpeg-common/reference/video-quality.md) §2「码率控制模式」
+- `-c copy` 流复制 / `-c:v` 转码 → [`media-stream-basics.md`](../media-ffmpeg-common/reference/media-stream-basics.md) §3「转码、重封装、流复制」
 - `-ss` 对齐到最近关键帧 → `video-codecs.md` 的「关键帧（I / P / B 帧）与 GOP」小节
-- `-r` / `minterpolate` 的帧率与插帧机制 → [`knowledge-base/media/reference/media-parameters.md`](../../../../knowledge-base/media/reference/media-parameters.md) §2「帧率」
-- `-b:a` / `-ar` / `-ac` 的音频码率、采样率、声道数概念 → [`knowledge-base/media/reference/audio-parameters.md`](../../../../knowledge-base/media/reference/audio-parameters.md) §1「采样率」、§3「声道数」、§4「音频码率计算」
-- `-c:a <编码器>` 的音频编码选型与有损/无损性质 → [`audio-codecs.md`](../../../../knowledge-base/media/reference/audio-codecs.md) §1「音频编码分类」、§4「怎么选」
-- 音频容器与真实编码的关系（`-c:a copy` 能否搬入目标扩展名）→ [`audio-container-formats.md`](../../../../knowledge-base/media/reference/audio-container-formats.md) §3「后缀 vs 编码的判断方法」
+- `-r` / `minterpolate` 的帧率与插帧机制 → [`media-parameters.md`](../media-ffmpeg-common/reference/media-parameters.md) §2「帧率」
+- `-b:a` / `-ar` / `-ac` 的音频码率、采样率、声道数概念 → [`audio-parameters.md`](../media-ffmpeg-common/reference/audio-parameters.md) §1「采样率」、§3「声道数」、§4「音频码率计算」
+- `-c:a <编码器>` 的音频编码选型与有损/无损性质 → [`audio-codecs.md`](../media-ffmpeg-common/reference/audio-codecs.md) §1「音频编码分类」、§4「怎么选」
+- 音频容器与真实编码的关系（`-c:a copy` 能否搬入目标扩展名）→ [`audio-container-formats.md`](../media-ffmpeg-common/reference/audio-container-formats.md) §3「后缀 vs 编码的判断方法」
 - `-ss` + `-frames:v` 截图为何无需区分快速/精确模式（关键帧与解码）→ `video-codecs.md` 的「关键帧（I / P / B 帧）与 GOP」小节

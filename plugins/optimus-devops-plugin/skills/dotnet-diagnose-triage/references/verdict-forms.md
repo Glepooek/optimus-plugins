@@ -15,18 +15,17 @@
 
 ## 修复方向：转述而非自造
 
-「给修复方向」若靠自行推理，会产出无出处的建议。知识库**已把跨领域修复 anchor 内嵌在判据句里**，正确动作是原样转述，不是自己找映射。
+「给修复方向」若靠自行推理，会产出无出处的建议。本 skill 的判据文件已把修复方向写在判据句里或表格的「修复方向」列中，正确动作是原样转述，不是自己找映射。
 
-例如 `wpf-leak-patterns.md § 2` 的证实判据句末尾原文即为：「修复方向（跨领域引用）见 `knowledge-base/wpf/rules/05-data-binding.md § 2. 变更通知：INotifyPropertyChanged / ObservableCollection`」。
+例如 `wpf-leak-patterns.md § 2` 的证实判据句末尾原文即为：「修复方向：让绑定源实现 `INotifyPropertyChanged`、绑定不再依赖 `AddValueChanged`，或在生命周期结束处显式解绑」。
 
 覆盖不均，且引用出现的**位置**决定了能不能当修复方向用：
 
 | 位置 | 分布 | 怎么用 |
 |---|---|---|
-| **判据句内**（`→ **证实** … 修复方向见 X`） | 共 6 处：`wpf-leak-patterns.md § 2`、`wpf-dispatcher-deadlock.md § 3`（证实长任务）、`§ 4`（证实互等闭环）、`sos-heap-and-objects.md § 2`（静态集合字段）、`sos-locks-and-async.md § 3`（证实线程池饥饿）、`sos-threads-and-stacks.md § 4`（UI 线程异常） | **原样转述该 anchor**，不改写、不替换为自己认为更合适的目标。此档最可靠——修复方向与被证实的假设一对一绑定 |
-| **反查表格行内** | `sos-heap-and-objects.md § 4. !gcroot` 的根链形态表两行：静态字段 → `csharp/rules/06-memory-resource.md § 5. 静态引用`；事件 `_invocationList` → `§ 4. 事件与委托泄漏` | 与判据句内同等可靠——按根链末端形态一对一反查 |
-| **小节末「下一步」段** | `wpf-leak-patterns.md § 3`（`wpf/rules/10-performance.md § 7` + `wpf/rules/03-mvvm.md § 7`）、`§ 5`（`wpf/rules/09-threading.md § 7`） | 同样原样转述，但须注明它对应**整节**而非某一条判据 |
-| **文件导语或正文叙述段** | 五篇 reference 导语各一处（`clr-runtime-anatomy` / `sos-heap-and-objects` / `sos-locks-and-async` / `wpf-dispatcher-deadlock` / `wpf-leak-patterns`）；另 `clr-runtime-anatomy § 5`、`wpf-dispatcher-deadlock § 2` 为正文叙述 | ⚠️ **粒度太粗，只能作兜底**——导语引用的是整份 rules 文件或宽泛章节，用它回答「怎么修这条具体根因」会给出跑偏的指向 |
-| 四档都没有 | 两张决策表与取证工具篇（`dump-capture` / `dotnet-counters` / `dotnet-trace` / `dump-types-and-capability` / `symbols-and-tool-matching`）全篇无跨领域引用 | 回落到 `dotnet-debugging/README.md` 的相邻领域划界表（三行：`csharp/rules/06-memory-resource.md § 4/§6/§9`、`csharp/rules/11-observability.md § 7`、`wpf/rules/12-exceptions-crash.md § 1–3`）。**该表也覆盖不到时，如实说「本领域未登记该根因的修复侧引用」，不自造 anchor** |
+| **判据句内**（`→ **证实** … 修复方向…`） | 若干篇的命令篇判据行内 | **原样转述该句的修复方向**，不改写、不替换为自己认为更合适的目标。此档最可靠——修复方向与被证实的假设一对一绑定 |
+| **反查表格的「修复方向」列** | `sos-heap-and-objects.md § 4. !gcroot` 的根链形态表 | 与判据句内同等可靠——按根链末端形态一对一反查 |
+| **小节末「下一步」段** | 部分 `wpf-*.md` 小节末尾 | 同样原样转述，但须注明它对应**整节**而非某一条判据 |
+| 以上都没有 | 两张决策表与取证工具篇（`dump-capture` / `dotnet-counters` / `dotnet-trace` / `dump-types-and-capability` / `symbols-and-tool-matching`）全篇不含修复方向 | 如实说「本领域未登记该根因的修复方向」，不自造 |
 
-⚠️ **硬约束：修复方向只给 anchor 与一句话方向，不展开成修复方案。** 展开即越界到 `csharp-code-review` / `wpf-code-review` 的地盘（切线是「验尸 vs 预防」），也会复制那两个领域的正文。
+⚠️ **硬约束：修复方向只给一句话方向，不展开成修复方案。** 展开即越界到 `csharp-code-review` / `wpf-code-review` 的地盘（切线是「验尸 vs 预防」），也会复制那两个技能的正文。若用户需要完整的预防规范，提示他安装对应的 `optimus-backend-plugin`（C#）或 `optimus-frontend-plugin`（WPF），本技能不代答。

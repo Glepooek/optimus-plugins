@@ -95,7 +95,7 @@ optimus-devops-plugin:dotnet-diagnose（agent）
 optimus-devops-plugin:dotnet-diagnose-triage（skill）
  │ 读取（判据来源）
  ▼
-knowledge-base/dotnet-debugging/
+dotnet-diagnose-triage/references/
 ```
 
 本 skill 不加载任何 skill（`allowed-tools` 不含 `Skill`），只经 `Task` 工具调度 agent；与 `dotnet-diagnose-triage` 之间无直接依赖，全部间接经由 agent。

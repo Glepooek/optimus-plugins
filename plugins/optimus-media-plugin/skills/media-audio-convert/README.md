@@ -64,7 +64,7 @@ Step 5  执行转换
                                         └──▶ media-ffmpeg-common/REFERENCE.md
                                         └──▶ media-ffmpeg-common/CLI-REFERENCE.md
                                         └──▶ media-ffmpeg-common/INSTALL.md
-                                        └──▶ knowledge-base/media/reference/
+                                        └──▶ media-ffmpeg-common/reference/
                                               audio-container-formats.md §2/§3
                                               audio-codecs.md §1
                                               audio-parameters.md §1/§3

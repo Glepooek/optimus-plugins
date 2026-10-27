@@ -2,7 +2,7 @@
 name: wpf-code-review
 description: 用于审查 WPF 代码的 MVVM 架构、XAML 编写规范、数据绑定、控件/依赖属性、资源主题、布局渲染、线程调度、性能、异常/安全等全量规范，并覆盖虚拟化、Freezable 冻结、Shape 优化等性能诊断。当用户提到：审查/检查/review WPF 代码、.xaml 文件、WPF 项目代码规范、准备合并/PR、代码质量检查、界面卡顿、滚动慢、内存高、MVVM 规范、绑定规范时，务必使用此 skill。
 metadata:
-  version: "2.1.0"
+  version: "2.2.0"
   author: desktop client team
   category: quality
 compatibility: 需要 .NET/WPF/XAML 代码库；支持基于用户粘贴代码审查，也可扫描本地代码库（Grep/Glob）；可直接编辑修复（Edit）；无需额外 CLI/MCP。
@@ -13,7 +13,7 @@ allowed-tools: Read Grep Glob Edit
 
 ## 概述
 
-基于团队 WPF 开发规范集（[`knowledge-base/wpf/`](../../../../knowledge-base/wpf/README.md)）的系统化代码审查，覆盖架构、XAML、绑定、控件、线程、性能到异常/安全的全量维度。**核心原则**：通过全面的 checklist 驱动审查，确保不遗漏任何违规；规范不是约束，而是帮助团队写出一致、可维护、可扩展、可测的界面代码。
+基于团队 WPF 开发规范集的系统化代码审查，覆盖架构、XAML、绑定、控件、线程、性能到异常/安全的全量维度。审查判据全部内置于本 skill 的 `references/`，安装后即可完整运行，不依赖外部仓库。**核心原则**：通过全面的 checklist 驱动审查，确保不遗漏任何违规；规范不是约束，而是帮助团队写出一致、可维护、可扩展、可测的界面代码。
 
 ## 审查流程
 
@@ -79,26 +79,26 @@ allowed-tools: Read Grep Glob Edit
 
 ## 审查清单
 
-系统性地检查以下每个类别，标记 ✅ 已检查或 ⚠️ 发现违规。规则内容以 `knowledge-base/wpf/` 为唯一来源，本表只做定位，不重复规则文本——审查时打开对应文件锚点读取具体条款。
+系统性地检查以下每个类别，标记 ✅ 已检查或 ⚠️ 发现违规。规则内容以 `references/` 下的 17 份规范为唯一来源，本表只做定位，不重复规则文本——审查时打开对应文件锚点读取具体条款。
 
-| # | 类别 | knowledge-base 参考 | 核对要点 |
+| # | 类别 | 参考文件 | 核对要点 |
 |---|---|---|---|
-| 1 | 项目结构与 MVVM 架构 | `rules/02-project-structure.md` §4. View 与 code-behind 职责、§5. 命名规范；`rules/03-mvvm.md` §2. ViewModel 基类与可绑定属性、§3. 命令、§4. View 与 ViewModel 配对、§7. 事件与订阅 | View 与 code-behind 职责、命名规范；ViewModel 基类可绑定属性、ICommand、View/ViewModel 配对、事件订阅与取消、**View 访问 ViewModel 的时机**（构造函数内 `DataContext` 未就绪时访问 VM 数据会空引用） |
-| 2 | XAML 编写规范 | `rules/04-xaml.md` §1. 命名空间与根元素、§2. 资源引用、§4. x:Name 与 x:Key、§5. DataTemplate 组织、§8. 事件与命令 | 命名空间与根元素、StaticResource vs DynamicResource、x:Name 与 x:Key、DataTemplate 组织、事件与命令 |
-| 3 | 数据绑定 | `rules/05-data-binding.md` §1. Binding 模式选择、§2. 变更通知、§3. 绑定路径、§4. 数据转换器、§5. 绑定静默失败排查 | Binding 模式选择、INotifyPropertyChanged/ObservableCollection、绑定路径深度、IValueConverter、绑定静默失败 |
-| 4 | 控件与依赖属性 | `rules/06-controls.md` §2. 自定义控件约定、§3. 依赖属性、§4. 附加属性、§5. 模板与样式、§8. 绘制与图形 | 自定义控件约定、DependencyProperty/AttachedProperty、模板与样式、绘制与图形 |
-| 5 | 资源、样式与主题 | `rules/07-resources-themes.md` §2. 资源键命名、§3. 样式体系、§4. 主题与皮肤切换、§5. Freezable 与资源共享、§6. 资源可共享性检查 | 资源键命名、样式体系、主题切换、Freezable 与资源共享、资源可共享性 |
-| 6 | 布局与渲染 | `rules/08-layout-rendering.md` §2. 面板选型矩阵、§4. RenderTransform vs LayoutTransform、§7. Shape 与 Drawing、§8. 渲染性能 | 面板选型、RenderTransform vs LayoutTransform、Shape 与 Drawing、渲染性能 |
-| 7 | 线程与调度 | `rules/09-threading.md` §1. UI 线程访问铁律、§2. Dispatcher 使用规范、§4. async/await 与 WPF 上下文、§5. 死锁防护、§6. 集合跨线程更新 | UI 线程访问铁律、Dispatcher 使用、async/await 上下文、死锁防护、集合跨线程更新 |
-| 8 | 性能 | `rules/10-performance.md` 全篇 + 下方「性能专项诊断速查」 | 数据绑定、虚拟化、图形渲染、启动时间、布局、资源、事件泄漏的性能操作 |
-| 9 | 异常与崩溃处理 | `rules/12-exceptions-crash.md` §1. UI 线程异常、§4. 异常与错误设计、§5. 取消与资源释放 | UI 线程异常、异常与错误设计、取消与资源释放 |
-| 10 | 安全 | `rules/13-security.md` §1. 敏感数据处理、§2. 输入验证、§3. XAML 沙箱与部分信任 | 敏感数据处理、输入验证、XAML 沙箱与部分信任 |
-| 11 | 可访问性与本地化 | `rules/14-accessibility-localization.md` §1. 自动化属性、§2. 键盘导航、§4. 字体与缩放、§5. 本地化资源 | AutomationProperties、键盘导航、字体与缩放、本地化资源 |
-| 12 | 交互（XAML Behaviors） | `rules/16-interactivity.md` §2. 分工、§3. Behavior 生命周期 | 分工（Behavior/命令/附加属性/code-behind）、Behavior 生命周期与绑定 |
+| 1 | 项目结构与 MVVM 架构 | `references/02-project-structure.md` §4. View 与 code-behind 职责、§5. 命名规范；`references/03-mvvm.md` §2. ViewModel 基类与可绑定属性、§3. 命令、§4. View 与 ViewModel 配对、§7. 事件与订阅 | View 与 code-behind 职责、命名规范；ViewModel 基类可绑定属性、ICommand、View/ViewModel 配对、事件订阅与取消、**View 访问 ViewModel 的时机**（构造函数内 `DataContext` 未就绪时访问 VM 数据会空引用） |
+| 2 | XAML 编写规范 | `references/04-xaml.md` §1. 命名空间与根元素、§2. 资源引用、§4. x:Name 与 x:Key、§5. DataTemplate 组织、§8. 事件与命令 | 命名空间与根元素、StaticResource vs DynamicResource、x:Name 与 x:Key、DataTemplate 组织、事件与命令 |
+| 3 | 数据绑定 | `references/05-data-binding.md` §1. Binding 模式选择、§2. 变更通知、§3. 绑定路径、§4. 数据转换器、§5. 绑定静默失败排查 | Binding 模式选择、INotifyPropertyChanged/ObservableCollection、绑定路径深度、IValueConverter、绑定静默失败 |
+| 4 | 控件与依赖属性 | `references/06-controls.md` §2. 自定义控件约定、§3. 依赖属性、§4. 附加属性、§5. 模板与样式、§8. 绘制与图形 | 自定义控件约定、DependencyProperty/AttachedProperty、模板与样式、绘制与图形 |
+| 5 | 资源、样式与主题 | `references/07-resources-themes.md` §2. 资源键命名、§3. 样式体系、§4. 主题与皮肤切换、§5. Freezable 与资源共享、§6. 资源可共享性检查 | 资源键命名、样式体系、主题切换、Freezable 与资源共享、资源可共享性 |
+| 6 | 布局与渲染 | `references/08-layout-rendering.md` §2. 面板选型矩阵、§4. RenderTransform vs LayoutTransform、§7. Shape 与 Drawing、§8. 渲染性能 | 面板选型、RenderTransform vs LayoutTransform、Shape 与 Drawing、渲染性能 |
+| 7 | 线程与调度 | `references/09-threading.md` §1. UI 线程访问铁律、§2. Dispatcher 使用规范、§4. async/await 与 WPF 上下文、§5. 死锁防护、§6. 集合跨线程更新 | UI 线程访问铁律、Dispatcher 使用、async/await 上下文、死锁防护、集合跨线程更新 |
+| 8 | 性能 | `references/10-performance.md` 全篇 + 下方「性能专项诊断速查」 | 数据绑定、虚拟化、图形渲染、启动时间、布局、资源、事件泄漏的性能操作 |
+| 9 | 异常与崩溃处理 | `references/12-exceptions-crash.md` §1. UI 线程异常、§4. 异常与错误设计、§5. 取消与资源释放 | UI 线程异常、异常与错误设计、取消与资源释放 |
+| 10 | 安全 | `references/13-security.md` §1. 敏感数据处理、§2. 输入验证、§3. XAML 沙箱与部分信任 | 敏感数据处理、输入验证、XAML 沙箱与部分信任 |
+| 11 | 可访问性与本地化 | `references/14-accessibility-localization.md` §1. 自动化属性、§2. 键盘导航、§4. 字体与缩放、§5. 本地化资源 | AutomationProperties、键盘导航、字体与缩放、本地化资源 |
+| 12 | 交互（XAML Behaviors） | `references/16-interactivity.md` §2. 分工、§3. Behavior 生命周期 | 分工（Behavior/命令/附加属性/code-behind）、Behavior 生命周期与绑定 |
 
 ## 性能专项诊断速查
 
-性能类问题（上方第 8 类）检查时，按以下检查点定位具体瓶颈。这些操作级模式对应 `rules/10-performance.md`：
+性能类问题（上方第 8 类）检查时，按以下检查点定位具体瓶颈。这些操作级模式对应 `references/10-performance.md`：
 - **数据绑定**：集合用 `ObservableCollection<T>`；常量/只读用 `OneTime`；绑定路径 ≤3 层；昂贵转换器缓存
 - **虚拟化**：长列表开启虚拟化 + `VirtualizationMode="Recycling"`；确认数据量超出可视区再讨论；ItemTemplate 用轻量布局
 - **图形渲染**：动态高频图形用 `DrawingVisual`/`DrawingGroup`；静态用 `Path`/`StreamGeometry`；循环外创建并 `Freeze()` Brush
@@ -121,7 +121,7 @@ allowed-tools: Read Grep Glob Edit
 
 ## 权威参考
 
-团队规范以 [`knowledge-base/wpf/`](../../../../knowledge-base/wpf/README.md) 为准——本 skill 的审查依据直接来自该规范集，不额外维护规则文本。通用背景可参考：
+团队规范以本 skill 的 `references/` 为准——审查依据直接来自那 17 份规范文件，不额外维护规则文本。目录内按 `01`–`17` 编号排列，文件名即主题；上表未点名的（如 `11-testing.md`、`15-packaging-deployment.md`、`17-common-libraries.md`）在被审代码涉及该方面时按需打开。通用背景可参考：
 
 - [WPF 文档（.NET Desktop）](https://learn.microsoft.com/zh-cn/dotnet/desktop/wpf/overview/index)
 - [优化 WPF 应用程序性能](https://learn.microsoft.com/zh-cn/dotnet/desktop/wpf/advanced/optimizing-wpf-application-performance)

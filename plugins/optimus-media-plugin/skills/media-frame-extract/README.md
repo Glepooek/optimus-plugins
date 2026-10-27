@@ -63,7 +63,7 @@ Step 5  执行提取（只有一种 -ss 写法，不设双模式）
                                         └──▶ media-ffmpeg-common/REFERENCE.md
                                         └──▶ media-ffmpeg-common/CLI-REFERENCE.md
                                         └──▶ media-ffmpeg-common/INSTALL.md
-                                        └──▶ knowledge-base/media/reference/
+                                        └──▶ media-ffmpeg-common/reference/
                                               video-codecs.md（关键帧与 GOP）
                                               media-parameters.md §2（帧率）
 ```

@@ -2,7 +2,7 @@
 name: media-trim
 description: Use when user wants to cut a specific segment out of a media file — 片段截取、截取视频、剪切一段、掐头去尾、截取某个时间段。Not for resolution changes, compression, or codec/format inspection.
 metadata:
-  version: "1.1.4"
+  version: "1.1.5"
   author: desktop client team
   category: tool
 compatibility: 需要用户本机已安装 ffmpeg 并加入 PATH，参见 ../media-ffmpeg-common/INSTALL.md。
@@ -50,7 +50,7 @@ ffmpeg -y -i <input> -ss <start> -to <end> -c:v libx264 -crf 18 -c:a aac <output
 
 `-y` 是全局选项，固定放在命令最前，不参与上述 seek 语义——它位于 `-i` 之前不代表"输入端"含义，也不影响 `-ss` 与 `-i` 的相对位置判断。覆盖策略见 `../media-ffmpeg-common/PREFLIGHT.md` 的「覆盖策略」，不得省略。
 
-> 流复制（`-c copy`）快速模式与转码（重新编码）精确模式的取舍见 [`knowledge-base/media/reference/media-stream-basics.md`](../../../../knowledge-base/media/reference/media-stream-basics.md) §3「转码、重封装、流复制」；"对齐到最近关键帧"中的关键帧概念见 `video-codecs.md` 的「关键帧（I / P / B 帧）与 GOP」小节。
+> 流复制（`-c copy`）快速模式与转码（重新编码）精确模式的取舍见 [`media-stream-basics.md`](../media-ffmpeg-common/reference/media-stream-basics.md) §3「转码、重封装、流复制」；"对齐到最近关键帧"中的关键帧概念见 `video-codecs.md` 的「关键帧（I / P / B 帧）与 GOP」小节。
 
 参数说明见 `../media-ffmpeg-common/CLI-REFERENCE.md`。
 
