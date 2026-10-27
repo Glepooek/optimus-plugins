@@ -2,7 +2,7 @@
 name: project-analyze
 description: 对项目进行全面分析，输出功能、技术栈、架构、目录结构、数据模型、接口与通信、部署方式、依赖关系等专业概览报告，支持 Web/H5、WPF 桌面、Android、iOS、HarmonyOS（鸿蒙）、Flutter、纯后端等多种项目形态并自动适配分析维度。触发词：快速了解一个项目，评估项目技术选型和架构质量，为新成员生成项目入门文档，梳理服务依赖关系，分析这个项目，项目概览，了解这个仓库，analyze project，project overview。
 metadata:
-  version: "2.3.0"
+  version: "2.3.1"
   author: desktop client team
   category: generator
 compatibility: 需要 Git（clone/pull/log 分析）；可选调用 optimus-office-plugin:docx-writer 将报告转 Word。
@@ -96,7 +96,7 @@ HarmonyOS、Flutter 两画像的插槽内容基于公开通用知识设计，无
 
 1. **依赖检查**：确认 Git 可用（`git --version`），不可用则报错终止，提示用户安装 Git
 2. **输入参数检查**：本地路径是否存在，或 URL 格式是否合法；不合法报错终止
-3. **输出参数检查**：确认 `doc/` 的父目录（仓库根）存在且可写；不可写报错终止
+3. **输出参数检查**：确认 `docs/` 的父目录（仓库根）存在且可写；不可写报错终止
 4. **运行条件检查（可协商风险）**：目录扫描后进行平台画像识别（见"输出"章节"平台画像判定"）。若信号冲突或全部未命中导致置信度低，🔴 CHECKPOINT 显式询问用户确认项目类型——不报错终止，因为仍可按 Web/H5 默认继续，只是章节内容精准度会打折扣
 
 **获取源码：**
@@ -165,13 +165,7 @@ Glob(**) 或 Bash(find . -maxdepth 3) → 获取完整项目结构，识别技�
 | 不读不需要的 | Repository 从命名推断，不逐个读取；前端组件从路由表推断，不逐个读取 |
 | git 命令合并 | `git log` 和 `git shortlog` 合并为一次 shell 调用 |
 
-**典型调用轮次：**
-
-| 项目规模 | 工具调用轮次 | 说明 |
-|---------|------------|------|
-| 小型 (< 50 文件) | 2-3 轮 | 目录扫描 → 并行读取全部 → 生成报告 |
-| 中型 (50-500 文件) | 3-4 轮 | 目录扫描 → 并行读核心 → 补充细节 → 生成报告 |
-| 大型 (> 500 文件) | 4-5 轮 | 目录扫描 → 并行读核心 → 按模块补充 → 补充细节 → 生成报告 |
+**典型调用轮次**：按项目规模从 2–3 轮（小型）递增到 4–5 轮（大型），具体阈值与提速策略见「分析深度控制」。
 
 ### 第三步：深度分析
 
@@ -198,7 +192,7 @@ Glob(**) 或 Bash(find . -maxdepth 3) → 获取完整项目结构，识别技�
 
 ### 第四步：生成报告
 
-分析完成后生成报告到 `doc/project-overview.md`：
+分析完成后生成报告到 `docs/project-overview.md`：
 
 - 使用 `Write` 工具写入报告文件
 - 报告内容较长时，先 `Write` 写入前半部分（第 1-8 章），再用 `Edit` 追加后半部分（第 9-14 章）
@@ -420,11 +414,11 @@ Glob(**) 或 Bash(find . -maxdepth 3) → 获取完整项目结构，识别技�
 {编号列表}
 ```
 
-🔴 **CHECKPOINT · 报告审阅**：报告生成后，提示用户审阅 `doc/project-overview.md`，询问是否需要补充或修正。
+🔴 **CHECKPOINT · 报告审阅**：报告生成后，提示用户审阅 `docs/project-overview.md`，询问是否需要补充或修正。
 
 ### 第五步：转换格式（可选）
 
-如用户需要 Word 格式，使用 `optimus-office-plugin:docx-writer` skill 将 `doc/project-overview.md` 转换为 `doc/project-overview.docx`。
+如用户需要 Word 格式，使用 `optimus-office-plugin:docx-writer` skill 将 `docs/project-overview.md` 转换为 `docs/project-overview.docx`。
 
 ## 分析深度控制
 
@@ -432,7 +426,7 @@ Glob(**) 或 Bash(find . -maxdepth 3) → 获取完整项目结构，识别技�
 |---------|--------|---------|------|
 | 小型 | < 50 | 2-3 轮 | 全量并行读取，一次性生成 |
 | 中型 | 50-500 | 3-4 轮 | 并行读核心文件 + 按需补充 |
-| 大型 | > 500 | 4-5 轮 | readCode AST 模式 + 抽样 + 按需补充 |
+| 大型 | > 500 | 4-5 轮 | 抽样核心文件 + 从命名与签名推断其余（见下方提速策略） |
 | Monorepo | 不限 | 按子项目 | 先识别边界，每个子项目独立分析 |
 
 外部项目（非公司内部仓库）适配：
@@ -470,7 +464,7 @@ Glob(**) 或 Bash(find . -maxdepth 3) → 获取完整项目结构，识别技�
 | 无 README | 从代码和配置文件推断项目信息，标注"缺少 README，建议补充" |
 | 私有仓库无权限 | 提示用户提供 Personal Access Token 或添加 SSH Key |
 | 非主流技术栈 | 标注"未识别"，建议用户补充说明 |
-| API 接口无法逐个读取 | 先用通配符标注，后续补全具体端点 |
+| API 接口无法逐个读取 | 抽出可确认的端点逐个列出，其余标注"未读取到源码，待确认"；不得用通配符占位（见"反例与黑名单"第 2 条） |
 | Monorepo 多项目 | 提示用户指定要分析的子项目路径 |
 
 ## 迭代优化规则
@@ -504,6 +498,6 @@ Glob(**) 或 Bash(find . -maxdepth 3) → 获取完整项目结构，识别技�
 - [ ] 评估有依据（引用具体文件/代码），非主观臆断
 - [ ] 快速上手路径覆盖环境搭建和核心业务操作
 - [ ] 风险分析覆盖数据库层、安全层、前端层、运维层
-- [ ] 报告输出到 doc/project-overview.md
+- [ ] 报告输出到 docs/project-overview.md
 - [ ] 不泄露敏感信息（密码、Token、内部 IP 等用占位符替代）
 - [ ] 敏感信息脱敏验证：搜索报告中是否包含 `password`、`secret`、`token`、`10.`/`192.168` 等真实值，确认均已替换为 `[password]`、`[secret]` 等占位符
