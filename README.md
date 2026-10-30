@@ -1,6 +1,6 @@
 # Optimus 插件库（Claude Code / Codex CLI）
 
-[![Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FGlepooek%2Foptimus-plugins-official%2Fmaster%2F.claude-plugin%2Fmarketplace.json&query=%24.version&label=version&color=blue)](https://github.com/Glepooek/optimus-plugins-official)
+[![Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FGlepooek%2Foptimus-plugins%2Fmaster%2F.claude-plugin%2Fmarketplace.json&query=%24.version&label=version&color=blue)](https://github.com/Glepooek/optimus-plugins)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 企业级开发工具链插件仓库，同时支持 **Claude Code** 与 **OpenAI Codex CLI** 两个 harness。
@@ -47,14 +47,14 @@
 在 Claude Code 会话中执行：
 
 ```bash
-/plugin marketplace add Glepooek/optimus-plugins-official
+/plugin marketplace add Glepooek/optimus-plugins
 ```
 
 **方式 2：手动克隆安装**
 
 ```bash
 # 克隆仓库到 Claude Code marketplace 插件目录
-git clone https://github.com/Glepooek/optimus-plugins-official ~/.claude/plugins/marketplace/optimus-plugins-official
+git clone https://github.com/Glepooek/optimus-plugins ~/.claude/plugins/marketplace/optimus-plugins
 ```
 
 在 Claude Code 中调用插件的 skills：
@@ -80,10 +80,10 @@ git clone https://github.com/Glepooek/optimus-plugins-official ~/.claude/plugins
 
 ```bash
 # 添加 GitHub 仓库为 marketplace（owner/repo 或 HTTPS/SSH 均可）
-codex plugin marketplace add Glepooek/optimus-plugins-official
+codex plugin marketplace add Glepooek/optimus-plugins
 
 # 手动安装单个插件（AVAILABLE）
-codex plugin add optimus-frontend@optimus-plugins-official
+codex plugin add optimus-frontend@optimus-plugins
 
 # 查看可用插件与已安装状态
 codex plugin list --available --json
@@ -94,14 +94,14 @@ codex plugin list --available --json
 ```bash
 # 从仓库根目录添加本地 marketplace
 codex plugin marketplace add ./
-codex plugin add optimus-frontend@optimus-plugins-official
+codex plugin add optimus-frontend@optimus-plugins
 ```
 
 **更新已安装的插件：**
 
 ```bash
 # 刷新指定市场（远程添加的市场才有快照可刷；add 后需 upgrade 才拉到新插件）
-codex plugin marketplace upgrade optimus-plugins-official
+codex plugin marketplace upgrade optimus-plugins
 ```
 
 ```bash

@@ -1,5 +1,5 @@
 {
-  "name": "optimus-plugins-official",
+  "name": "optimus-plugins",
   "interface": { "displayName": "Optimus 官方插件" },
   "plugins": [
     {

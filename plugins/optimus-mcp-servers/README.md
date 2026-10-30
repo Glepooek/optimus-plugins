@@ -57,7 +57,7 @@
 1. **安装插件**
    ```bash
    # 通过 marketplace 安装
-   claude plugins install optimus-mcp-servers@optimus-plugins-official
+   claude plugins install optimus-mcp-servers@optimus-plugins
    ```
 
 2. **启用插件**
@@ -79,8 +79,8 @@ Codex 有两种方式加载这些 MCP 服务器，可按需选择。
 **方式 A：通过 marketplace 安装插件**——Codex 读取插件内的 `.mcp.json` 自动加载，marketplace 清单见 `.agents/plugins/marketplace.json`：
 
 ```bash
-codex plugin marketplace add https://github.com/Glepooek/optimus-plugins-official
-codex plugin add optimus-mcp-servers@optimus-plugins-official
+codex plugin marketplace add https://github.com/Glepooek/optimus-plugins
+codex plugin add optimus-mcp-servers@optimus-plugins
 ```
 
 **方式 B：手动写入 `~/.codex/config.toml`**——需要在 Codex 侧精细管理鉴权时推荐，Codex 原生字段更可靠。复制插件根目录的 `config.toml.example` 到 `~/.codex/config.toml`：

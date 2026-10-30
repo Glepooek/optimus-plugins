@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.5] - 2026-10-30
+
+### Changed
+- 仓库名引用同步：`optimus-plugins-official` → `optimus-plugins`（known-issues 与 commit-message-rules 中的出处说明）
+
 ## [1.0.4] - 2026-10-30
 
 ### Changed

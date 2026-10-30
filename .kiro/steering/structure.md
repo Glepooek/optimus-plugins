@@ -3,7 +3,7 @@
 ## 顶层目录
 
 ```
-optimus-plugins-official/
+optimus-plugins/
 ├── .claude-plugin/          # 插件仓库元数据
 │   └── marketplace.json     # 版本号、插件注册表
 ├── .claude/skills/          # 项目级 Skills（不进 marketplace，仅本仓库开发用）

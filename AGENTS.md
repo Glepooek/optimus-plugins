@@ -14,7 +14,7 @@
 
 | 方面 | Claude Code | Codex |
 |---|---|---|
-| 安装入口 | `/plugin marketplace add` 或手动 clone 到 `~/.claude/plugins/marketplace/` | `codex plugin marketplace add <repo>` → `codex plugin add <plugin>@optimus-plugins-official`，读取 `.agents/plugins/marketplace.json` |
+| 安装入口 | `/plugin marketplace add` 或手动 clone 到 `~/.claude/plugins/marketplace/` | `codex plugin marketplace add <repo>` → `codex plugin add <plugin>@optimus-plugins`，读取 `.agents/plugins/marketplace.json` |
 | 提交流程 | 强制 `/commit-cc-plugin` skill | 标准 git + Conventional Commits，禁止 `--no-verify`；`.githooks/pre-commit` 的一致性门禁两侧同等生效 |
 | Hooks | SessionStart（技巧轮播）、Notification（权限通知）生效 | 无对应机制，Claude 侧 hooks 在 Codex 中不生效 |
 | 维护型 skill 镜像目录 | `.kiro/skills/<name>` | `.agents/skills/<name>` |

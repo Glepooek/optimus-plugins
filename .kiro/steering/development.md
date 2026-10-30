@@ -100,10 +100,10 @@ Co-Authored-By: Claude Sonnet 4.6 (1M context) <noreply@anthropic.com>
 
 ```bash
 # 完整测试
-claude --plugin-dir "F:\optimus-plugins-official"
+claude --plugin-dir "F:\optimus-plugins"
 
 # 单插件测试
-claude --plugin-dir "F:\optimus-plugins-official\plugins\optimus-devops"
+claude --plugin-dir "F:\optimus-plugins\plugins\optimus-devops"
 ```
 
 文件改动立即生效，无需重启或重装。

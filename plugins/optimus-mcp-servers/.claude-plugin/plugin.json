@@ -1,13 +1,13 @@
 {
   "name": "optimus-mcp-servers",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "MCP 服务集成：Avalonia 文档、MasterGo 设计协作、飞书项目",
   "author": {
     "name": "optimus",
     "url": "https://www.optimus.cn"
   },
-  "homepage": "https://github.com/Glepooek/optimus-plugins-official",
-  "repository": "https://github.com/Glepooek/optimus-plugins-official",
+  "homepage": "https://github.com/Glepooek/optimus-plugins",
+  "repository": "https://github.com/Glepooek/optimus-plugins",
   "license": "MIT",
   "keywords": ["mcp", "avalonia", "mastergo", "feishu"]
 }

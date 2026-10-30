@@ -2,7 +2,7 @@
 
 本参考随 `commit-message-review` 一起分发，供已安装插件在没有仓库根知识库时使用。内容是本仓 Git 提交信息规范中与该 skill 的审查职责直接相关的规则摘要。
 
-> 摘要来源：optimus-plugins-official 仓库 knowledge-base 的 Git 规范领域中「提交信息」一篇（02-commit-messages），同步于 2026-10-30。该摘要是手工维护的副本，源规范变更后不会自动同步；两者不一致时以源规范为准，并回头更新本文件。
+> 摘要来源：optimus-plugins 仓库 knowledge-base 的 Git 规范领域中「提交信息」一篇（02-commit-messages），同步于 2026-10-30。该摘要是手工维护的副本，源规范变更后不会自动同步；两者不一致时以源规范为准，并回头更新本文件。
 
 ## 必须修复
 
