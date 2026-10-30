@@ -63,7 +63,7 @@
 2. **`optimus-qa` 的飞书 skill 只改说明**（`optimus-qa-feishu-project-sync`、`optimus-qa-test-report`）：`compatibility` 改为"需自行安装飞书项目 CLI 并完成授权"。⚠️ 已知缺口：两个 skill 的 `allowed-tools` 与正文仍按 `FeishuProjectMcp` 工具调用，并未改写为 CLI 流程——这是用户明确选择的"只改说明"范围，**本次不修，留作后续**，PR 描述需写明。
 3. **`optimus-qa-test-design` 的 `compatibility` 微调**：现写"MasterGo 为本仓库内置 mastergo-magic-mcp"，MCP 搬走后该句仍成立但归属变了（用户需装 `optimus-frontend`），改为"由 `optimus-frontend` 插件提供"。
 4. **AGENTS.md 加一条约束**：声明 MCP 配置只面向 Claude Code、不做 Codex 镜像，防止后人按"双 harness"惯性补 `config.toml`。写入「重要约束」，一句话。
-5. **令牌变量名统一为 `MASTERGO_TOKEN`**：用户只需设置 `MASTERGO_TOKEN`。`@mastergo/magic-mcp` 读取的原生变量名是 `MG_MCP_TOKEN`，故 `.mcp.json` 的 `env` 写成 `"MG_MCP_TOKEN": "${MASTERGO_TOKEN}"`（键是 server 子进程看到的名字，值是用户设置的名字）；`args` 里原有的 `--token=<MG_MCP_TOKEN>` 保持不动。三个 mastergo skill 的 `compatibility` 已写 `MASTERGO_TOKEN`，无需改这一项。⚠️ 该映射是否让 MasterGo 真正鉴权成功，须在 §9 第 6 条实测。
+5. **令牌变量名统一为 `MASTERGO_TOKEN`**：用户只需设置 `MASTERGO_TOKEN`。`@mastergo/magic-mcp` 读取的原生变量名是 `MG_MCP_TOKEN`，故 `.mcp.json` 的 `env` 写成 `"MG_MCP_TOKEN": "${MASTERGO_TOKEN}"`（键是 server 子进程看到的名字，值是用户设置的名字）；`args` 里的占位符 `--token=<MG_MCP_TOKEN>` 在合入后被改为 `--token=<MASTERGO_TOKEN>`（用户确认的有意改动），与用户设置的变量名一致。三个 mastergo skill 的 `compatibility` 已写 `MASTERGO_TOKEN`，无需改这一项。⚠️ 该映射是否让 MasterGo 真正鉴权成功，须在 §9 第 6 条实测。
 6. **README 重写而非原样搬**：用 `git mv` 保留历史后再编辑；标题改为 MCP 说明，删「飞书项目 MCP」整节、「单一真源」引言、整个「Codex 使用方式」、飞书 Token 获取、`MCP_USER_TOKEN`；安装命令改为 `optimus-frontend@optimus-plugins`；`enabledMcpjsonServers` 示例去掉 `FeishuProjectMcp`。
 7. **`optimus-frontend` 升 Minor**（`2.1.3 → 2.2.0`）：新增 MCP 配置，等同新增用户可见能力（触发矩阵 Minor 列虽未点名 MCP，按"新增 skill/agent/hook/command"同类处理）。
 
@@ -140,7 +140,7 @@
 2. 8 个 unittest 目录逐个通过（见 AGENTS.md 清单，已删 mcp-servers 一项）；`check_index.py`、`check_refs.py` 通过
 3. `plugins/<旧 MCP 插件>/` 不存在；`plugins/optimus-frontend/.mcp.json` 含且仅含 `avalonia-docs`、`mastergo-magic-mcp`；`.codex-plugin/plugin.json` 无 `mcpServers`
 4. `grep -rIn "旧 MCP 插件"` 在现行文件无残留；允许残留仅限 §6.4 所列与本 spec/plan
-5. `grep -rIn "MG_MCP_TOKEN"` 现行文件中仅剩 `plugins/optimus-frontend/.mcp.json` 的 `env` 键与 `args` 两处；`.kiro/steering/` 无 旧 MCP 插件 与 `Feishu Project` 残留
+5. `grep -rIn "MG_MCP_TOKEN"` 现行文件中仅剩 `plugins/optimus-frontend/.mcp.json` 的 `env` 键一处（`args` 已改为 `<MASTERGO_TOKEN>`）及 README 迁移小节的说明；`.kiro/steering/` 无 旧 MCP 插件 与 `Feishu Project` 残留
 5b. `grep -rIn "FeishuProjectMcp\|MCP_USER_TOKEN"`：`allowed-tools` 中的 `FeishuProjectMcp` 按 §5 第 2 条保留，其余现行文件无残留
 6. `test-locally`：`--plugin-dir` 加载本仓，`/mcp` 能看到 frontend 提供的两个 server，且不再出现 `FeishuProjectMcp`；记录实测的命名空间并回填 README 迁移小节。另在仅设置 `MASTERGO_TOKEN`（不设 `MG_MCP_TOKEN`）的环境下确认 MasterGo server 状态为已连接——需有效令牌，由用户协助验证
 7. PR 上六个必需检查全绿（`plugin-validate`、`new-skill-eval-case`、`actionlint` 无本地等价，只能在 PR 验证）
