@@ -8,5 +8,10 @@
     "id": 2,
     "prompt": "原生迁移中的一个窗口使用 Style.Triggers、TemplateBinding、DependencyProperty 和 pack URI。请迁移它。",
     "expected": "先收敛到一个垂直切片，再按需查询 styling、bindings、properties、resources 等官方映射；解释或实现结果须经过构建和平台验收，不能凭静态记忆声称等价。"
+  },
+  {
+    "id": 3,
+    "prompt": "原生迁移里，这个 UserControl 的 ViewModel 通过 DataContext 提供属性，XAML 里大量用了 `{Binding Name}`、`{Binding Count}` 这种普通绑定。迁移到 Avalonia 时这些绑定要改吗？",
+    "expected": "经官方映射查询（bindings 主题）确认而非凭静态记忆：点出 compiled bindings 默认开启这一迁移后果——每条绑定都要有起始类型，通常是作用域上的 x:DataType，缺了会构建失败（Cannot parse a compiled binding without an explicit x:DataType…），不会静默回退反射；{ReflectionBinding} 才是 WPF {Binding} 的逐绑定等价物。绝不能把 {Binding} 答成「改个命名空间就行、行为一致」。"
   }
 ]
