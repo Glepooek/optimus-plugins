@@ -4,7 +4,7 @@ description: Use when migrating a WPF application to Avalonia, selecting Avaloni
 license: MIT
 compatibility: 需要 optimus-frontend 内置的无需认证的 Avalonia Docs MCP；迁移目标项目须可由本地文件工具读取，实际构建与测试仍依赖目标项目所需的 .NET SDK。
 metadata:
-  version: "1.2.4"
+  version: "1.3.0"
   author: desktop client team
   category: workflow
 allowed-tools: Read Glob Grep Write avalonia-docs
@@ -38,9 +38,13 @@ allowed-tools: Read Glob Grep Write avalonia-docs
 ## Step 3：迁移一个可验证垂直切片
 
 1. 先建立可构建的目标工程和最小启动路径，再迁移一个 View、其 ViewModel、资源和必要服务。
-2. 用映射工具核对高风险差异：样式/伪类、属性系统、绑定、模板、输入事件、资源 URI、线程与窗口行为。
+2. 用映射工具核对高风险差异：样式/伪类、属性系统、绑定、模板、输入事件、资源 URI、线程与窗口行为。绑定迁移须查 `bindings` 主题——compiled bindings 默认开启，缺 `x:DataType` 起始类型是构建失败级差异，不可按 WPF 记忆默认反射；迁移后若需给自定义控件新增属性或路由事件，读 `references/custom-control-authoring.md`。
 3. 若目标已是 Avalonia 项目，调用 `migrate_diagnostics` 配置受支持的 Developer Tools；不得引入已弃用的 `Avalonia.Diagnostics`。
 4. 每完成一个切片就构建、运行并记录平台差异；只在该切片通过后再扩大范围。
+
+### 🔴 CHECKPOINT：确认下一迁移切片
+
+当前切片通过构建、运行与平台差异记录后，展示结果并等待用户确认再选下一切片；未经确认不得自动批量迁移其余 View。
 
 ## Step 4：交付迁移决策与验证记录
 
@@ -50,6 +54,10 @@ allowed-tools: Read Glob Grep Write avalonia-docs
 - 按切片排列的迁移清单、阻塞项与回退方案；
 - 每项使用的官方映射主题及需要人工验收的视觉/交互差异；
 - 已运行的构建、单元测试、UI/手工验收及其结果。
+
+### 🔴 CHECKPOINT：确认验收结论
+
+宣称迁移完成前，逐项展示视觉/交互差异的人工验收结果并等待用户确认；「能编译」不得作为迁移验收通过的依据。
 
 ## 失败处理
 

@@ -1,3 +1,13 @@
+## [1.3.0] - 2026-10-30
+
+### Added
+- Step 3 末尾新增「🔴 CHECKPOINT：确认下一迁移切片」——当前切片通过构建、运行与平台差异记录后须经用户确认再选下一切片，未经确认不得自动批量迁移其余 View
+- Step 4 末尾新增「🔴 CHECKPOINT：确认验收结论」——宣称迁移完成前逐项展示视觉/交互差异的人工验收结果并等待确认，「能编译」不得作为验收通过依据
+- `test-prompts.json` 追加 id3 绑定题（DataContext 普通绑定迁移场景），填补 darwin dim8 对绑定类改动的结构性失明
+
+### Changed
+- Step 3 第 2 条扩充：绑定迁移须查 `bindings` 主题——compiled bindings 默认开启、缺 `x:DataType` 起始类型是构建失败级差异，不可按 WPF 记忆默认反射；并补 `references/custom-control-authoring.md` 按需加载指针（此前该 reference 在正文零引用、属孤立资源）
+
 ## [1.2.4] - 2026-10-30
 
 ### Changed
