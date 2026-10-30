@@ -24,7 +24,7 @@ import json
 import re
 import sys
 
-DEFAULT_TIPS = "plugins/optimus-devops-plugin/hooks/sessionstart/tips.jsonl"
+DEFAULT_TIPS = "plugins/optimus-devops/hooks/sessionstart/tips.jsonl"
 
 # 功能描述重叠比例阈值。
 #

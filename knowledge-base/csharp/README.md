@@ -2,7 +2,7 @@
 
 > 版本：8.0.0
 
-> ⚠️ **团队 C# 规范正文已不在本目录。** 17 篇规范（`01`–`17`）已迁入 `optimus-backend-plugin` 的 `csharp-code-review` skill 的 `references/`，随插件分发，安装后即可完整运行、不依赖本仓库。
+> ⚠️ **团队 C# 规范正文已不在本目录。** 17 篇规范（`01`–`17`）已迁入 `optimus-backend` 的 `csharp-code-review` skill 的 `references/`，随插件分发，安装后即可完整运行、不依赖本仓库。
 
 ## 本领域现状
 
@@ -14,12 +14,12 @@
 
 | 你要找 | 去处 |
 |---|---|
-| 编码风格、异步、异常、内存、性能、并发、数据访问、依赖管理、可观测性、测试、API 设计、安全、审查、协作、注释 | `csharp-code-review` skill 的 `references/<编号>-<主题>.md`（`optimus-backend-plugin`） |
+| 编码风格、异步、异常、内存、性能、并发、数据访问、依赖管理、可观测性、测试、API 设计、安全、审查、协作、注释 | `csharp-code-review` skill 的 `references/<编号>-<主题>.md`（`optimus-backend`） |
 | 逐类审查清单与核对要点 | 同 skill 的 `SKILL.md` |
 | 平台与运行时事实（目标框架、SDK、生命周期） | `knowledge-base/dotnet/` |
 | 语言无关的架构风格、分层契约、设计原则 | `knowledge-base/architecture/` |
 | 设计模式的选用判据与误用识别 | `knowledge-base/design-patterns/` |
-| WPF/XAML 专属规则 | `wpf-code-review` skill（`optimus-frontend-plugin`） |
+| WPF/XAML 专属规则 | `wpf-code-review` skill（`optimus-frontend`） |
 
 **不要在本目录新增规范正文**——那会与插件内的判据形成两份必然漂移的副本，而安装后的 skill 读不到这里。
 

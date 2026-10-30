@@ -33,7 +33,7 @@ on:
         # 必填而非「留空跑全部」：仓库根不是合法运行位置（无 plugin.json），
         # 「全部」只能实现为按插件循环，而循环会把一次误触的成本乘以插件数。
         # 必填一个插件名 = 把成本上界写进接口本身，比在文档里叮嘱可靠。
-        description: 插件目录名，如 optimus-devops-plugin
+        description: 插件目录名，如 optimus-devops
         required: true
         type: string
 
@@ -75,7 +75,7 @@ jobs:
           #   --no-publish        🔴 报告默认发布到 claude.ai，而本仓 case
           #                       含内部 Jenkins job 名——发布是外发行为
           #   --ablation none     两个理由，第一个全仓通用，第二个只对
-          #                       optimus-devops-plugin 成立：
+          #                       optimus-devops 成立：
           #                       ① 默认 with-without 是 2 臂、成本翻倍；
           #                       ② 🔴 CLI 原文「under with-without, graders
           #                          marked with-only, incl. tool_used:

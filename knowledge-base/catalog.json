@@ -29,7 +29,7 @@
       "status": "active",
       "consumers": [],
       "reviewed_at": "2026-08-27",
-      "notes": "仅存创作期素材 reference/refit.md（REST 客户端契约参考，skill 不读）；团队 C# 规范正文已随 optimus-backend-plugin 的 csharp-code-review skill 分发"
+      "notes": "仅存创作期素材 reference/refit.md（REST 客户端契约参考，skill 不读）；团队 C# 规范正文已随 optimus-backend 的 csharp-code-review skill 分发"
     },
     {
       "domain": "git",
@@ -127,7 +127,7 @@
       "status": "active",
       "consumers": [],
       "reviewed_at": "2026-09-06",
-      "notes": "进程外部环境故障取证。进程内部取证已随 optimus-devops-plugin 的 dotnet-diagnose-triage skill 分发"
+      "notes": "进程外部环境故障取证。进程内部取证已随 optimus-devops 的 dotnet-diagnose-triage skill 分发"
     },
     {
       "domain": "claude-code-hooks",

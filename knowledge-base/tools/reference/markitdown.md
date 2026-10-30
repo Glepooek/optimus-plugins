@@ -12,4 +12,4 @@
 - **安装方式**：
   - `pip install 'markitdown[all]'`
   - 源码安装：`git clone git@github.com:microsoft/markitdown.git`，`cd markitdown`，`pip install -e 'packages/markitdown[all]'`
-- **备注**：需要 Python 3.10 及以上版本，官方建议在虚拟环境中安装以避免依赖冲突；官方安全提示 MarkItDown 以当前进程权限执行 I/O（如 `open()`、`requests.get()`），在不可信环境中使用需自行做输入校验，并按需调用最窄的 `convert_*` 方法（如 `convert_stream()`、`convert_local()`）。本仓库 `optimus-office-plugin` 的 `web-to-markdown` skill 已将其列为一级抓取依赖（`python -m markitdown`），抓取失败时才降级到 Playwright CLI 或 WebFetch。本次归档因本机网络无法直连 GitHub，playwright-cli 与 WebFetch 均连接失败，内容改由 WebSearch 检索到的官方信息整理，License 类型、更新/移除方式未能从可靠来源确认，故未填写对应字段。
+- **备注**：需要 Python 3.10 及以上版本，官方建议在虚拟环境中安装以避免依赖冲突；官方安全提示 MarkItDown 以当前进程权限执行 I/O（如 `open()`、`requests.get()`），在不可信环境中使用需自行做输入校验，并按需调用最窄的 `convert_*` 方法（如 `convert_stream()`、`convert_local()`）。本仓库 `optimus-office` 的 `web-to-markdown` skill 已将其列为一级抓取依赖（`python -m markitdown`），抓取失败时才降级到 Playwright CLI 或 WebFetch。本次归档因本机网络无法直连 GitHub，playwright-cli 与 WebFetch 均连接失败，内容改由 WebSearch 检索到的官方信息整理，License 类型、更新/移除方式未能从可靠来源确认，故未填写对应字段。

@@ -1,0 +1,24 @@
+## [1.1.2] - 2026-10-30
+
+### Changed
+- 插件目录重命名：`optimus-decision-plugin` → `optimus-decision`，本 skill 正文中的调用前缀与路径引用同步更新
+
+## [1.1.1] - 2026-08-30
+
+### Added
+- 新增 `known-issues.md` 使用期反馈记录机制（空模板），配套仓库新增的 skill 持续优化硬性约定，见 `knowledge-base/skill-authoring/rules/06-continuous-improvement.md`
+
+## [1.1.0] - 2026-08-30
+
+### Added
+- 补充 `metadata.category: decision`，标注该 skill 属于"决策支持类"（仅给出选型结论/依据，不产出代码或文件），新增 `decision` 枚举值见 `.claude/rules/skill-conventions.md`
+
+## [1.0.1] - 2026-08-30
+
+### Fixed
+- 阶段4盲测发现 E 段三条件自检未设置回溯式穷举决策树的判停条件，导致排列/组合类问题被误判为可用分治；新增步骤3（核对是否为回溯式穷举模式，判停条件对称于步骤2的DP判停）并补充 B 段对应反例，与 A2/相关skills 中已有的分治-回溯区分描述保持一致
+
+## [1.0.0] - 2026-08-30
+
+### Added
+- 初版发布：基于《Hello 算法》第 12 章蒸馏的分治问题判断 skill，覆盖可分解/子问题独立/可合并三条件自检法与分治-动态规划分界判据

@@ -19,7 +19,7 @@ allowed-tools: Bash
    claude --plugin-dir .
 
    # 单插件加载
-   claude --plugin-dir ./plugins/optimus-devops-plugin
+   claude --plugin-dir ./plugins/optimus-devops
    ```
 
 2. **在仓库根目录执行对应命令，在新会话里直接输入触发词验证行为**——无需重启、无需重新安装，文件改动立即生效。

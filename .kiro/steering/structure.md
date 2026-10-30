@@ -46,13 +46,13 @@ plugins/{plugin-name}/
 
 | 插件 | 路径 | Skills 数量 | 特殊组件 |
 |------|------|-------------|----------|
-| optimus-frontend-plugin | `plugins/optimus-frontend-plugin` | 3 | 含唯一复合 Skill |
-| optimus-backend-plugin | `plugins/optimus-backend-plugin` | 3 | Python 辅助脚本 |
-| optimus-qa-plugin | `plugins/optimus-qa-plugin` | 7 | 最多 Skills 的插件 |
-| optimus-prd-plugin | `plugins/optimus-prd-plugin` | 3 | — |
+| optimus-frontend | `plugins/optimus-frontend` | 3 | 含唯一复合 Skill |
+| optimus-backend | `plugins/optimus-backend` | 3 | Python 辅助脚本 |
+| optimus-qa | `plugins/optimus-qa` | 7 | 最多 Skills 的插件 |
+| optimus-prd | `plugins/optimus-prd` | 3 | — |
 | optimus-feishu-plugin | `plugins/optimus-feishu-plugin` | 3 | — |
-| optimus-office-plugin | `plugins/optimus-office-plugin` | 7 | Node.js 脚本 |
-| optimus-devops-plugin | `plugins/optimus-devops-plugin` | 5 | Hooks + 脚本 |
+| optimus-office | `plugins/optimus-office` | 7 | Node.js 脚本 |
+| optimus-devops | `plugins/optimus-devops` | 5 | Hooks + 脚本 |
 | optimus-mcp-servers | `plugins/optimus-mcp-servers` | 0 | 仅 .mcp.json |
 
 ## 命名约定
@@ -69,7 +69,7 @@ plugins/{plugin-name}/
 | `.claude-plugin/marketplace.json` | 仓库版本号和插件注册 |
 | `.claude/skills/commit-cc-plugin/SKILL.md` | 提交发布工作流（强制使用） |
 | `.claude/skills/sync-cc-tips/SKILL.md` | tips 文件同步 Skill |
-| `plugins/optimus-devops-plugin/hooks/hooks.json` | Hooks 配置入口 |
-| `plugins/optimus-devops-plugin/hooks/sessionstart/tips.jsonl` | 使用技巧库 |
+| `plugins/optimus-devops/hooks/hooks.json` | Hooks 配置入口 |
+| `plugins/optimus-devops/hooks/sessionstart/tips.jsonl` | 使用技巧库 |
 | `plugins/optimus-mcp-servers/.mcp.json` | MCP 服务器声明 |
-| `plugins/optimus-frontend-plugin/skills/optimus-fe-dev/ARCHITECTURE.md` | 复合 Skill 架构参考 |
+| `plugins/optimus-frontend/skills/optimus-fe-dev/ARCHITECTURE.md` | 复合 Skill 架构参考 |

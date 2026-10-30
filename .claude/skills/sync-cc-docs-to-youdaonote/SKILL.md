@@ -7,7 +7,7 @@ description: >
 metadata:
   version: "1.2.2"
   author: desktop client team
-compatibility: 需要 Python 运行时（含 markitdown 包）；需要已配置账号的 youdaonote CLI；依赖同仓库 optimus-office-plugin:web-to-markdown skill 完成抓取翻译流程。
+compatibility: 需要 Python 运行时（含 markitdown 包）；需要已配置账号的 youdaonote CLI；依赖同仓库 optimus-office:web-to-markdown skill 完成抓取翻译流程。
 allowed-tools: Bash Read Edit Write Task
 ---
 
@@ -173,7 +173,7 @@ youdaonote -s ydn list -f <GROUP_ID>
    - **有记录，但不在远端列表中**（用户手动删除过）→ 记录已过期，按未同步处理
    - **无记录** → 按未同步处理
 2. 未同步的页面，先完成"抓取 + 翻译"（这部分需要 LLM 判断，走
-   `optimus-office-plugin:web-to-markdown` skill 已有约定，不可脚本化）：
+   `optimus-office:web-to-markdown` skill 已有约定，不可脚本化）：
    - 创建本地目录：`mkdir -p docs/claude_docs/<Tab中文名>/<group_zh>`
    - `python -m markitdown "https://code.claude.com/docs/en<url>" > docs/claude_docs/<Tab中文名>/<group_zh>/.raw-<slug>.md`（三级降级见 web-to-markdown SKILL.md）
    - Read 原文 → 翻译（剥离站点通用 Documentation Index 横幅、`<Note>`/`<Tip>` 转引用块）→ Write 到 `docs/claude_docs/<Tab中文名>/<group_zh>/<slug>.md`

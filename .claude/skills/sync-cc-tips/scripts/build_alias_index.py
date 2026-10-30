@@ -13,7 +13,7 @@ import json
 import re
 import sys
 
-DEFAULT_TIPS = "plugins/optimus-devops-plugin/hooks/sessionstart/tips.jsonl"
+DEFAULT_TIPS = "plugins/optimus-devops/hooks/sessionstart/tips.jsonl"
 
 # 带语法标记的标识符模式。每一项都要求存在无法与自然语言混淆的前缀/形态。
 PATTERNS = (

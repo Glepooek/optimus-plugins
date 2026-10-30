@@ -35,9 +35,9 @@ git rev-parse --show-toplevel >/dev/null 2>&1 && test -z "$(git rev-parse --show
 python -V || python3 -V                              # 1 依赖：两者皆无才算缺失
 python .claude/skills/sync-cc-tips/scripts/check_slash_name.py init   # 1 依赖：verdict 非 binary_missing 即可
 python .claude/skills/sync-cc-tips/scripts/validate_tips.py           # 2 输入：只读 checks.json_valid
-test -w plugins/optimus-devops-plugin/hooks/sessionstart && test -w .claude/skills/sync-cc-tips  # 3 输出：两个输出文件分属不同目录
+test -w plugins/optimus-devops/hooks/sessionstart && test -w .claude/skills/sync-cc-tips  # 3 输出：两个输出文件分属不同目录
 ls .claude/skills/sync-cc-tips/.last-synced-version  # 2 输入：锚点文件
-git status --short plugins/optimus-devops-plugin/hooks/sessionstart/tips.jsonl  # 4 运行条件：回滚基线是否干净
+git status --short plugins/optimus-devops/hooks/sessionstart/tips.jsonl  # 4 运行条件：回滚基线是否干净
 ```
 
 | # | 类别 | 检查项 | 不满足时 |
@@ -47,7 +47,7 @@ git status --short plugins/optimus-devops-plugin/hooks/sessionstart/tips.jsonl  
 | 2 | 输入 | tips.jsonl 可解析 —— **判据只有 `checks.json_valid.ok`** | ❌ 该项为 false 才报错终止（在损坏文件上做增删会把损坏固化进 git）。⚠️ **不要拿整体 `ok` 或退出码当判据**：`ok` 聚合九项，库里任一存量 `schema`/`field_dup`/`body_shape` 缺陷都会让它为 false，据此终止就抢走了第二步「存量问题交用户裁决」那一支 |
 | 2 | 输入 | `.last-synced-version` 存在且为纯版本号（无 `v` 前缀） | ⚠️ 缺失按首次初始化处理，只在摘要说明；扫描范围过大由第一步「待处理版本 > 30」CHECKPOINT 兜住，此处不重复设卡 |
 | 2 | 输入 | 用户给了 `N` 时须为正整数 | ❌ 报错终止——不猜用户意图，不静默退回全量。这项是静态判断，无对应探测命令 |
-| 3 | 输出 | 两个输出文件所在目录**各自**可写 | ❌ 报错终止。⚠️ 二者**不同目录**：tips.jsonl 在 `plugins/optimus-devops-plugin/hooks/sessionstart/`，`.last-synced-version` 在 `.claude/skills/sync-cc-tips/`。漏查后者的后果是写完 tips.jsonl 才在第五步锚点写入时炸，落进人工善后分支 |
+| 3 | 输出 | 两个输出文件所在目录**各自**可写 | ❌ 报错终止。⚠️ 二者**不同目录**：tips.jsonl 在 `plugins/optimus-devops/hooks/sessionstart/`，`.last-synced-version` 在 `.claude/skills/sync-cc-tips/`。漏查后者的后果是写完 tips.jsonl 才在第五步锚点写入时炸，落进人工善后分支 |
 | 4 | 运行条件 | **cwd 必须等于仓库根**，不是"在仓库内" | ❌ **硬约束**，报错终止。⚠️ 两个坑：`git rev-parse --show-toplevel` 成功**不**构成通过（它在任意子目录都退出 0，而本 skill 的脚本路径全是**相对仓库根**的）；而拿 `--show-toplevel` 与 `pwd` 直接比字符串在本机**必然假阴性**——前者给 `E:/...`、后者给 `/e/...`。故判据用 `--show-prefix` 为空（与路径形式无关），加一条 `--show-toplevel` 成功以排除非仓库目录，再加一条 `test -f AGENTS.md` 以排除**别的**仓库的根目录（前两条对任何 git 仓库根都通过）。三条缺一不可。Bash 工具的 cwd 跨调用保持，上一条命令 `cd` 过就会踩到 |
 | 4 | 运行条件 | tips.jsonl 在 git 中无未提交改动 | 🔴 **可协商风险 → CHECKPOINT**，见下 |
 
@@ -55,7 +55,7 @@ git status --short plugins/optimus-devops-plugin/hooks/sessionstart/tips.jsonl  
 
 - `question`：「tips.jsonl 已有未提交改动（贴出 `git status --short` 输出）。继续同步会让本轮改动与这些混在一起，出错时 `git restore` 会把它们一并丢弃。是否继续？」
 - options：①「先 stash 这一个文件的改动，再继续同步」（推荐——**消除**风险且不放弃本轮）②「保留改动继续同步，我清楚它们」③「取消本轮，我自己处理」
-- 选①→ 执行 `git stash push -- plugins/optimus-devops-plugin/hooks/sessionstart/tips.jsonl` 后按干净基线执行。⚠️ **必须带 pathspec**：裸 `git stash` 是仓库级操作，会把工作区全部在途改动一起收走，而本 skill 的问题域只有这一个文件。⚠️ stash 了就**必须归还**——记下本轮曾 stash，第六步摘要按模板提示用户 `git stash pop`，否则用户的改动停在 stash 里无人告知；选②即继续且**不算任务失败**，同时**记下「脏基线已获同意」**——第四步写入前的复检见到同样的非空输出据此直接放行，**不得二次询问**（那等于作废刚给出的同意），只有输出与此刻所见**不同**（中途又被改过）才重新确认；选③或用户走 **Other 输入自由文本（视为非明确同意）→ 立即停止**
+- 选①→ 执行 `git stash push -- plugins/optimus-devops/hooks/sessionstart/tips.jsonl` 后按干净基线执行。⚠️ **必须带 pathspec**：裸 `git stash` 是仓库级操作，会把工作区全部在途改动一起收走，而本 skill 的问题域只有这一个文件。⚠️ stash 了就**必须归还**——记下本轮曾 stash，第六步摘要按模板提示用户 `git stash pop`，否则用户的改动停在 stash 里无人告知；选②即继续且**不算任务失败**，同时**记下「脏基线已获同意」**——第四步写入前的复检见到同样的非空输出据此直接放行，**不得二次询问**（那等于作废刚给出的同意），只有输出与此刻所见**不同**（中途又被改过）才重新确认；选③或用户走 **Other 输入自由文本（视为非明确同意）→ 立即停止**
 
 ⚠️ 前置校验只做**执行前的主动探测**。执行中才暴露的报错（抓取失败、Edit 报错、脚本崩溃）归各步自己的失败处理表，两者不合并——把执行中错误塞进本节会让它变成一份永远不完整的错误清单。
 
@@ -138,7 +138,7 @@ python $S/validate_tips.py        # 基线体检：{ok, entries, failed, checks}
 
 | 触发条件 | 一线处理 | 仍失败兜底 |
 |---|---|---|
-| 文件不存在 / 脚本报路径错 | 确认路径 `plugins/optimus-devops-plugin/hooks/sessionstart/tips.jsonl` 是否正确 | 停止整个流程，报告路径错误，不做任何修改 |
+| 文件不存在 / 脚本报路径错 | 确认路径 `plugins/optimus-devops/hooks/sessionstart/tips.jsonl` 是否正确 | 停止整个流程，报告路径错误，不做任何修改 |
 | `validate_tips.py` 报 `entries: 0` | 🔴 CHECKPOINT：停下询问用户是否为全新初始化场景 | 若用户确认，继续（视为无旧条目）；否则停止 |
 | `validate_tips.py` 有 `failed` 项 | 🔴 **CHECKPOINT**：用 `AskUserQuestion` 报告失败项，问「先修复存量问题再同步」还是「记下基线继续」 | 用户选择继续则**原样留存这份基线 JSON**，第五步按「基线豁免」判读（见第五步） |
 | 任一脚本非零退出 / traceback / 输出非 JSON | 跑 `python -m unittest discover -s .claude/skills/sync-cc-tips/scripts -p "test_*.py"` 定位是脚本坏了还是数据触发边界；单测过说明问题在数据 | 按上表「失败处置」列分别处理，不要一律停或一律继续 |
@@ -405,7 +405,7 @@ echo "{最新版本}" > .claude/skills/sync-cc-tips/.last-synced-version
 | **写入命令失败**（磁盘只读、路径不存在、重定向报错） | ❌ 视为未写入 | **不要继续提交**——tips.jsonl 已改而锚点没动，下轮会重扫同一区间并把本轮条目全部判为已覆盖，表面无害但掩盖了锚点损坏。立即报告「锚点写入失败，本轮改动未提交」，`cat` 该文件确认实际内容后由用户决定是手工写入还是回滚本轮改动 |
 | 校验 `ok: false` 而中止 | ❌ 不写入 | 数据未落定，下次需重新处理该区间 |
 
-**版本号升级不在本 skill 定义**——由 `commit-cc-plugin` 第二步按 AGENTS.md 触发矩阵统一处理，本 skill 只交接事实：本次改动落在 `plugins/optimus-devops-plugin/hooks/` 内，届时应升该插件的两份 `plugin.json`（Patch）。
+**版本号升级不在本 skill 定义**——由 `commit-cc-plugin` 第二步按 AGENTS.md 触发矩阵统一处理，本 skill 只交接事实：本次改动落在 `plugins/optimus-devops/hooks/` 内，届时应升该插件的两份 `plugin.json`（Patch）。
 
 ## 第六步 — 展示摘要并提交
 
@@ -461,7 +461,7 @@ echo "{最新版本}" > .claude/skills/sync-cc-tips/.last-synced-version
 | 删除旧功能条目，但该功能仍可用（只是有了替代方案） | 用户可能仍在用旧方式 | 仅在 changelog 明确标注 Removed/Deprecated 时删除 |
 | 往任何文档写入 tips 条目总数 | 派生值写死在展示文案里必然失准，且失准是静默的——没有任何机制会告诉你某处数字已经过期（历史事故规模见 `references/measurements.md`）。读者从分类列表已能感知规模，具体数字不影响任何决策 | 一律用不含数字的表述（「技巧智能轮播」）；需要数字时读 `validate_tips.py` 输出的 `entries` |
 | 抓取失败后继续执行后续步骤 | 基于空数据的操作可能误删现有条目 | 第一步 `ok: false` → 按 `next` 走，`stop` 则立即停止，不执行任何写入 |
-| 在本 skill 内自行决定版本号怎么升 | 规则的唯一依据是 AGENTS.md 触发矩阵，写第二份必然与之分叉——曾长期误写为升 marketplace 顶层 version 且漏升 `.claude-plugin/plugin.json` | 交给 `commit-cc-plugin` 第二步统一处理，本 skill 只交接「改动落在 `plugins/optimus-devops-plugin/hooks/` 内」这一事实 |
+| 在本 skill 内自行决定版本号怎么升 | 规则的唯一依据是 AGENTS.md 触发矩阵，写第二份必然与之分叉——曾长期误写为升 marketplace 顶层 version 且漏升 `.claude-plugin/plugin.json` | 交给 `commit-cc-plugin` 第二步统一处理，本 skill 只交接「改动落在 `plugins/optimus-devops/hooks/` 内」这一事实 |
 | `cp tips.jsonl /tmp/xxx.bak` 做备份 | Bash 工具是 Git Bash、Python 是 Windows 原生解释器，`/tmp` 对后者不可见——`cp` 报成功而实际读不到，备份形同虚设且无任何警示 | tips.jsonl 已入库，git 本身就是回滚基线：`git status --short` 确认干净、出错时 `git restore`、对比用 `git show HEAD:<path>` |
 | 在 SKILL.md 里重写取数命令，或按上述思路改 `fetch_changelog.py` 的降级链 | 三类写法都已实测证伪（管道吞退出码、302 回落同域当第二跳、等 N 秒重试同一命令），共同病根是**故障域与首跳重合**。逐条实测见 `references/measurements.md` | 调用 `fetch_changelog.py`，正确写法已被 `test_fetch_changelog.py::TestHopsAreIndependent` 锁住。**新增跳必须换主机名**，不是换工具、不是换 URL 字符串 |
 | 判重时退回手工 grep 扫全文 | 收录裸英文词会让别名集合膨胀到通用词量级，任何功能点都能「命中」→ 判重恒为已覆盖、新增恒为 0，属不报错的静默失效（实测见 `references/measurements.md`） | 只用 `build_alias_index.py`；脚本不可用时停止流程，不要用手工方案顶替 |
