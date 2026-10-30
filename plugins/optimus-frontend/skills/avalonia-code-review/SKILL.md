@@ -4,7 +4,7 @@ description: Use when reviewing Avalonia AXAML or C# UI code for framework corre
 license: MIT
 compatibility: 需要 optimus-frontend 内置的无需认证的 Avalonia Docs MCP；支持审查用户粘贴的代码或本地 Avalonia 项目中的已限定文件范围。
 metadata:
-  version: "1.0.4"
+  version: "1.1.0"
   author: desktop client team
   category: quality
 allowed-tools: Read Glob Grep avalonia-docs
@@ -20,7 +20,9 @@ allowed-tools: Read Glob Grep avalonia-docs
 
 ## Step 1：锁定范围与审查深度
 
-按以下优先级收敛，除非用户明确要求，不得扩大范围：指定文件/片段 → 指定功能模块 → 本次 `git diff` 涉及的 Avalonia 文件 → 单一最相关文件。扫描前先确定目录边界；约 20 个以上相关文件时请求用户缩小范围。
+按以下优先级收敛，除非用户明确要求，不得扩大范围：指定文件/片段 → 指定功能模块 → 本次 `git diff` 涉及的 Avalonia 文件 → 单一最相关文件。扫描前先确定目录边界；相关文件超过 20 个时请求用户缩小范围。
+
+审查深度：用户说“完整”“全面”“逐项”时为完整审查；未指定时默认快速初审，并在报告摘要中写“快速初审（默认）”。
 
 ### 🔴 CHECKPOINT：全项目审查
 
@@ -33,7 +35,7 @@ allowed-tools: Read Glob Grep avalonia-docs
 
 1. 对每次 Avalonia 审查会话调用 `get_avalonia_expert_rules`。
 2. 读取范围内的 `.axaml`、相关 C#、`.csproj` 和用户提供的错误输出；不要检查范围外文件来补猜上下文。
-3. 对每个疑点按需调用官方资料：确切类型/成员用 `lookup_avalonia_api`；概念和示例用 `search_avalonia_docs`。仅当审查 WPF 遗留代码时，调用 `lookup_wpf_to_avalonia_mapping` 的单个主题。
+3. 每个疑点至少调用一次官方资料。Avalonia 的确切类型/成员，第一次查询必须是 `lookup_avalonia_api`；该工具覆盖不全，对常见控件类型也可能返回无结果，无结果时改用 `search_avalonia_docs`（概念和示例）或 `lookup_wpf_to_avalonia_mapping`。WPF 独有的类型或成员（`System.Windows`、`DependencyProperty`、`Style.Triggers`、`Visibility`、`Dispatcher.Invoke` 等）不在 Avalonia API 中，直接调用 `lookup_wpf_to_avalonia_mapping`，每次只查一个主题。
 4. 在完整审查中，按当前范围核对以下主题：
 
 | 主题 | 核验重点 |
@@ -50,12 +52,12 @@ allowed-tools: Read Glob Grep avalonia-docs
 
 每个问题必须同时包含：位置、可观察风险、已查询的官方依据、严重度、最小修正和验证状态。
 
-- **🔴 严重**：已确认会导致构建失败、运行时异常、数据/交互故障、跨平台崩溃或阻断可访问性的缺陷。
+- **🔴 严重**：已确认会导致构建失败、运行时异常、数据/交互故障、跨平台崩溃或阻断可访问性的缺陷。WPF 独有的类型、成员或命名空间在 Avalonia 中不存在（如 `System.Windows`、`DependencyProperty`、`Visibility`、`Style.Triggers`），一律按构建失败判 🔴，不得降级。
 - **🟡 重要**：已确认违反 Avalonia 模型，或存在明确的性能、可维护性、跨平台或可访问性风险，但需要特定输入/配置才会失效。
 - **🟢 建议**：不改变正确性、仅提升可读性、一致性或未来维护性的优化。
 - 无法从可见代码和 MCP 资料确认的事项，列入“待确认项”，不得作为缺陷计数。
 
-只在代码片段和版本信息足够时提供最小修正片段；没有完整上下文时不生成声称可直接替换整个文件的代码。审查默认只读；用户明确要求修复时，先确认拟修改的文件和范围，并在修改后重新审查该范围。
+仅当同时满足以下两条时才提供最小修正片段：已看到问题元素或成员的完整定义；已知 Avalonia 主版本，或在片段旁明确写出版本假设。缺哪一条就在“修正后代码”中写明缺哪一条。任何情况下都不生成声称可直接替换整个文件的代码。审查默认只读；用户明确要求修复时，先确认拟修改的文件和范围，并在修改后重新审查该范围。
 
 ## 报告格式
 
@@ -91,6 +93,7 @@ allowed-tools: Read Glob Grep avalonia-docs
 | 触发条件 | 一线处理 | 仍失败兜底 |
 |---|---|---|
 | Avalonia Docs MCP 不可用 | 报告 MCP 不可用并检查 `optimus-frontend` 内置的 MCP 是否已启用 | 停止框架合规判定，不以记忆替代官方依据 |
+| `lookup_avalonia_api` 或 `search_avalonia_docs` 对某疑点返回无结果 | 换另一个工具或关键词重试一次（如 API 名查不到就改用概念搜索） | 该疑点写入“待确认项”并注明“MCP 无结果”，不计入缺陷数，不以记忆补写官方依据 |
 | 代码不属于 Avalonia 或缺少必要上下文 | 明确说明可见范围和不适用部分 | 只给通用说明或请求最小可复现代码，不编造问题 |
 | 官方资料与目标包版本不匹配 | 从 `.csproj` 确认版本并重新查询 | 标为待确认项，不给确定性修复指令 |
 | 构建/多平台行为无法运行 | 审查静态代码并列出未验证项 | 不将静态审查描述为已通过构建或平台验收 |
@@ -101,3 +104,9 @@ allowed-tools: Read Glob Grep avalonia-docs
 - 不把 WPF `Style.Triggers`、`DependencyProperty`、`pack://`、`Visibility` 或 `Dispatcher` 语义直接套到 Avalonia。
 - 不在没有 MCP 官方依据时给出确定性的 Avalonia API、版本或兼容性结论。
 - 不把配置依赖的推断、未运行的构建或未测试的平台行为标记为已验证。
+- 不把 WPF 独有 API 降级为 🟡/🟢。按根因计数：同一语法块只列一项（如 `Style.Triggers` 与其内的 `Trigger`/`IsMouseOver`，或 `DependencyProperty` 声明与其 `Register`/`PropertyMetadata`）；根因不同的 WPF API（如 `Visibility` 与 `DependencyProperty`）分别列项。
+- 不为让报告“显得完整”而添加 🟢 建议；没有可查证的依据就不列。
+- 不把为修正示例假设的类型名、命名空间（如 `SearchViewModel`）当作项目事实；必须在示例旁标注“占位，需替换”。
+- 不为代码片段编造文件行号；只引用片段自身的行序，或写“片段第 N 行”。
+- 不在用户未确认拟修改的文件和范围前改动任何文件，也不声称已运行构建。
+- 不让摘要中的问题总数和 🔴/🟡/🟢 计数与正文条目数不一致；写完报告后逐级数一遍，以正文实际条目为准更正摘要。
