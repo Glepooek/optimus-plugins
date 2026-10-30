@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.3] - 2026-10-30
+
+### Changed
+- 边界说明补充插件 `PreToolUse` 提交门禁：`git commit` 前强制先审查，标记与重新提交由调用方完成，skill 仍只读。
+
+## [1.0.2] - 2026-10-30
+
+### Changed
+- `description` 增加「准备 git commit / 提交代码、提交前把关 message」触发场景，使提交流程中拟好 message 时能按描述匹配到本 skill；仍为只读审查，不执行提交。
+
 ## [1.0.1] - 2026-10-30
 
 ### Changed

@@ -6,6 +6,7 @@
 
 - [SessionStart Hook - 会话启动技巧展示](#sessionstart-hook---会话启动技巧展示)
 - [Notification Hook - 智能权限通知](#notification-hook---智能权限通知)
+- [PreToolUse Hook - 提交信息审查门禁](#pretooluse-hook---提交信息审查门禁)
 - [安装指南](#安装指南)
 - [自定义配置](#自定义配置)
 - [规范依据](#规范依据)
@@ -101,6 +102,24 @@ export CLAUDE_NOTIFICATION="Claude 需要你的批准"
 默认图标路径：`~/.claude/icon.png`
 
 如果需要自定义图标，请将图片文件放置在该位置。
+
+---
+
+## PreToolUse Hook - 提交信息审查门禁
+
+拦截 Bash 工具执行的 `git commit`（含 `--amend`、`git -C <dir> commit`），要求这条提交命令先经 `optimus-devops-plugin:commit-message-review` 审查，通过后才放行。
+
+### 工作原理
+
+- 以**整条命令文本的 sha256** 判定"是否已审查"：message、`--amend`、`-F` 文件名任一变化，hash 随之变化，必须重新审查
+- 首次拦截（`exit 2`）时，提示里带有本次命令的 hash。审查结论为 PASS / ADVISORY 后，按提示执行 `bash "<脚本路径>" mark <hash>`，再原样重新提交即放行
+- 审查结论为 NEEDS_CHANGES：按建议修正 message 后重新提交，命令变化会再次触发门禁
+- 标记文件在 `.git/optimus-review-marks/commit-message.hash`（仓库本地、不入库），只记最近一次，一次审查对应一次提交
+- 非 `git commit` 命令（含 `git commit-tree`）、不在 git 仓库内，一律静默放行
+
+### 局限性
+
+这是**诚实门禁**，不是强制门禁：它防止"漏掉审查步骤"，不能防止刻意直接执行 `mark`；用户在终端手动提交、IDE 或 CI 提交不受约束。`git commit` 只靠命令文本匹配，`git` 别名、子 shell 包装等写法识别不到。**仅 Claude Code 生效**，Codex 无 `PreToolUse` 机制，那一侧只能靠 skill 的 `description` 软触发。判断 `git commit` 用纯 bash 正则，不起解释器（Git Bash 自带环境没有 `python3`）。
 
 ---
 

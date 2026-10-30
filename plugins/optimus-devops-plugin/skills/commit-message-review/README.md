@@ -28,7 +28,7 @@
 
 Claude Code：`/optimus-devops-plugin:commit-message-review`。Codex：自然语言触发或 `@optimus-devops-plugin:commit-message-review`。
 
-常见触发词：审查提交信息、review commit message、检查 commit msg、改写 Git 提交说明、Conventional Commits 校验、检查 AI co-author footer。
+常见触发词：审查提交信息、review commit message、检查 commit msg、改写 Git 提交说明、Conventional Commits 校验、检查 AI co-author footer、提交前检查 commit message、准备 git commit。
 
 ## 业务逻辑流程图
 
