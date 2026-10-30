@@ -151,17 +151,20 @@ if [[ ! -d "${SKILLS_SOURCE}" ]]; then
     exit 1
 fi
 
-# 只挑「含 SKILL.md 的目录」作为 skill。这条判据同时排除了非 skill 目录与
-# 嵌套子 skill（如 avalonia-controls/data-display）——嵌套项随其父目录
-# 一起被链接过去，不单独处理。**这是刻意的**：扁平化会重命名用户可见 skill，
-# 属独立议题，不在本脚本范围内。
+# 取 skills/ 下的**顶层目录**，而不是只取含 SKILL.md 的目录：
+# wpf-project-conventions/ 只有 CONVENTIONS.md / SAMPLE.md、没有 SKILL.md，但
+# mastergo-to-wpf-page 与 mastergo-to-wpf-components 第一步就读它，漏装则这两个
+# skill 装完即在前置校验处停下。无 SKILL.md 的目录不会被 harness 当 skill 发现，
+# 与其兄弟 skill 并排链接是无害的。嵌套子 skill（如 avalonia-controls/data-display）
+# 在更深一层，仍随其父目录一起被链接过去，不单独处理。**这是刻意的**：扁平化会
+# 重命名用户可见 skill，属独立议题，不在本脚本范围内。
 SKILL_DIRS=()
 for d in "${SKILLS_SOURCE}"/*/; do
-    [[ -f "${d}SKILL.md" ]] && SKILL_DIRS+=("${d%/}")
+    SKILL_DIRS+=("${d%/}")
 done
 
 if [[ ${#SKILL_DIRS[@]} -eq 0 ]]; then
-    error "在 ${SKILLS_SOURCE} 下没找到任何含 SKILL.md 的目录。"
+    error "在 ${SKILLS_SOURCE} 下没找到任何子目录。"
     exit 1
 fi
 
@@ -252,11 +255,14 @@ for agent_dir in "${TARGET_DIRS[@]}"; do
             ln -sfn "$hub_entry" "$link"
         fi
 
-        # 复核：这一次创建真的产出了符号链接、且能解析到 SKILL.md。
-        # 不做这一步的话，退化成的复制会一路绿灯到「安装完成」。
+        # 复核：这一次创建真的产出了符号链接、且能解析到目标。枢纽副本带 SKILL.md 的
+        # 必须能解析到 SKILL.md；无 SKILL.md 的伴随目录（wpf-project-conventions）只要求
+        # 链接解析到目录。不做这一步的话，退化成的复制会一路绿灯到「安装完成」。
         if [[ ! -L "$link" ]]; then
             failures+=("$link 不是符号链接（退化成了复制）")
-        elif [[ ! -f "$link/SKILL.md" ]]; then
+        elif [[ ! -d "$link" ]]; then
+            failures+=("$link 是悬空链接，解析不到目录")
+        elif [[ -f "$hub_entry/SKILL.md" && ! -f "$link/SKILL.md" ]]; then
             failures+=("$link 是悬空链接，解析不到 SKILL.md")
         else
             installed=$((installed + 1))
