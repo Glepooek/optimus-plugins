@@ -722,7 +722,7 @@ Step 3  执行截取
 
 - [ ] **Step 1: 编辑 marketplace.json 追加插件条目**
 
-在 `plugins` 数组的 `optimus-mcp-servers` 条目之后追加：
+在 `plugins` 数组的 旧 MCP 插件 条目之后追加：
 
 ```json
     {
@@ -732,7 +732,7 @@ Step 3  执行截取
     }
 ```
 
-注意 JSON 语法：`optimus-mcp-servers` 条目原有的结尾大括号后需补上逗号。
+注意 JSON 语法：旧 MCP 插件 条目原有的结尾大括号后需补上逗号。
 
 - [ ] **Step 2: 升级顶层 version 字段**
 

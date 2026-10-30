@@ -5,7 +5,7 @@ creator: yinxuan@optimus.cn
 metadata:
   author: desktop client team
   category: tool
-compatibility: 需要已配置的飞书项目管理 MCP server（本仓库内置 FeishuProjectMcp）及有效鉴权；模式C依赖 Playwright/Midscene 测试报告产物。
+compatibility: 需自行安装飞书项目 CLI，并完成授权；模式C依赖 Playwright/Midscene 测试报告产物。
 allowed-tools: Read Edit Write FeishuProjectMcp
 ---
 

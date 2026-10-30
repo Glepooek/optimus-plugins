@@ -732,7 +732,7 @@ metadata:
   version: "1.0.0"
   author: desktop client team
   category: generator
-compatibility: Python 3；需 mastergo-magic-mcp（本仓库 plugins/optimus-mcp-servers/.mcp.json 内置）与 MASTERGO_TOKEN；需 MasterGo Team 版及以上，草稿箱文件不可用；首次使用前须填写 plugins/optimus-frontend-plugin/skills/wpf-project-conventions/CONVENTIONS.md。
+compatibility: Python 3；需 mastergo-magic-mcp（本仓库 plugins/<旧 MCP 插件>/.mcp.json 内置）与 MASTERGO_TOKEN；需 MasterGo Team 版及以上，草稿箱文件不可用；首次使用前须填写 plugins/optimus-frontend-plugin/skills/wpf-project-conventions/CONVENTIONS.md。
 allowed-tools: Read Write Bash PowerShell mastergo-magic-mcp
 ---
 ```

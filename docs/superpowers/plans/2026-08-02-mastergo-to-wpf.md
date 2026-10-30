@@ -1470,7 +1470,7 @@ description: 当用户提供 MasterGo 设计稿链接并要求生成 WPF 界面�
 metadata:
   version: "1.0.0"
   author: desktop client team
-compatibility: Python 3；需 mastergo-magic-mcp（本仓库 plugins/optimus-mcp-servers/.mcp.json 内置）与 MASTERGO_TOKEN；需 MasterGo Team 版及以上，草稿箱文件不可用。
+compatibility: Python 3；需 mastergo-magic-mcp（本仓库 plugins/<旧 MCP 插件>/.mcp.json 内置）与 MASTERGO_TOKEN；需 MasterGo Team 版及以上，草稿箱文件不可用。
 allowed-tools: Read Write Bash PowerShell mastergo-magic-mcp
 ---
 ```

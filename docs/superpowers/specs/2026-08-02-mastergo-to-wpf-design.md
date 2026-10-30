@@ -236,7 +236,7 @@ Step 5  交付并说明：未转换项、需人工替换为真控件处、字体
 
 - 新增 skill → marketplace **Minor** 升版
 - SKILL.md frontmatter 遵循 `.claude/rules/skill-authoring.md`：六字段限制、`metadata.version: "1.0.0"`、`metadata.author: desktop client team`
-- `compatibility` 须注明：Python 3；需 `mastergo-magic-mcp`（本仓库 `plugins/optimus-mcp-servers/.mcp.json` 内置）及 `MASTERGO_TOKEN`；需 MasterGo Team 版及以上
+- `compatibility` 须注明：Python 3；需 `mastergo-magic-mcp`（本仓库 `plugins/<旧 MCP 插件>/.mcp.json` 内置）及 `MASTERGO_TOKEN`；需 MasterGo Team 版及以上
 - `allowed-tools`：`Read Write Bash PowerShell mastergo-magic-mcp`
 - 同步创建 CHANGELOG.md，初始 `[1.0.0]`
 

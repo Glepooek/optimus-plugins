@@ -2,9 +2,9 @@
 name: avalonia
 description: Use when building, reviewing, or troubleshooting an Avalonia UI application. Routes framework questions to the official Avalonia Docs MCP and routes WPF migrations to the enterprise migration workflow. 触发词："Avalonia 开发"、"Avalonia AXAML"、"Avalonia 报错"、"Avalonia 跨平台"。
 license: MIT
-compatibility: 需要安装 optimus-mcp-servers 中无需认证的 Avalonia Docs MCP；实际构建、运行和发布仍依赖目标项目所需的 .NET SDK。
+compatibility: 需要 optimus-frontend 内置的无需认证的 Avalonia Docs MCP；实际构建、运行和发布仍依赖目标项目所需的 .NET SDK。
 metadata:
-  version: "2.1.2"
+  version: "2.1.3"
   author: desktop client team
   category: workflow
 allowed-tools: Read Glob Grep avalonia-docs
@@ -49,7 +49,7 @@ allowed-tools: Read Glob Grep avalonia-docs
 
 | 触发条件 | 一线处理 | 仍失败兜底 |
 |---|---|---|
-| Avalonia Docs MCP 不可用 | 报告 MCP 不可用，检查 `optimus-mcp-servers` 是否已安装和配置 | 停止在框架事实确认阶段，不以记忆替代官方 API 结论 |
+| Avalonia Docs MCP 不可用 | 报告 MCP 不可用，检查 `optimus-frontend` 内置的 MCP 是否已启用 | 停止在框架事实确认阶段，不以记忆替代官方 API 结论 |
 | API 查询没有匹配项或版本不明确 | 查询目标项目的 Avalonia 包版本并缩小检索词 | 标记为待确认，不生成或声称兼容的代码 |
 | 本地构建/运行失败 | 收集最小错误输出并按涉及 API 继续查询 | 仅给出已证实的隔离修复，不扩大到无关文件 |
 

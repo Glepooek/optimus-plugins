@@ -16,7 +16,7 @@
 3. **两份 `plugin.json` 同值**——同一次改动内一起写入 `1.0.0`，不是一方抄另一方
 4. **marketplace 条目内不写 `version`**——会被 `plugin.json` 静默覆盖，且本地 source 会触发官方不一致警告
 5. **分段写入**——SKILL.md 预计 160-180 行、`templates.md` 预计 200+ 行，两者都必须先 Write 骨架再多次 Edit 填充，禁止单次输出全文
-6. **不写插件根 README**——10 个现有插件条目中仅 `optimus-mcp-servers` 有（且不含 skill）。`doc-conventions.md` 的六章节规范是对 skill 级 README 的要求
+6. **不写插件根 README**——10 个现有插件条目中仅 旧 MCP 插件 有（且不含 skill）。`doc-conventions.md` 的六章节规范是对 skill 级 README 的要求
 7. **不照抄参照实现的 frontmatter**——它是 `name`/`version`/`description`/`author`/`tags`/`category` 平铺结构，本仓要求 `metadata` 嵌套 + `compatibility` + `allowed-tools` 六字段
 
 ### 0.2 校验命令

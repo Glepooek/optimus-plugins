@@ -1285,7 +1285,7 @@ metadata:
   version: "1.0.0"
   author: desktop client team
   category: generator
-compatibility: Python 3 标准库；可选 Pillow（用于 .ico 合成，未安装时降级为多张 png）；需 mastergo-magic-mcp（本仓库 plugins/optimus-mcp-servers/.mcp.json 内置）与 MASTERGO_TOKEN；委派 optimus-frontend-plugin:svg-to-xaml-path 完成 SVG→Path.Data 转换。
+compatibility: Python 3 标准库；可选 Pillow（用于 .ico 合成，未安装时降级为多张 png）；需 mastergo-magic-mcp（本仓库 plugins/<旧 MCP 插件>/.mcp.json 内置）与 MASTERGO_TOKEN；委派 optimus-frontend-plugin:svg-to-xaml-path 完成 SVG→Path.Data 转换。
 allowed-tools: Read Write Bash PowerShell Skill mastergo-magic-mcp
 ---
 

@@ -2,10 +2,10 @@
 name: mastergo-to-wpf-components
 description: 当用户提供 MasterGo 设计稿链接并要求抽取可复用视觉组件、生成组件库、沉淀样式/DataTemplate/自定义控件时使用此 Skill；产出组件索引、颜色资源与 DataTemplate 资源，并可按严格映射登记控件。触发词："抽组件"、"生成组件库"、"抽取可复用组件"、"设计稿转组件"、"WPF 组件库"、"沉淀样式"。Not for page generation (use mastergo-to-wpf-page) or icon export (use mastergo-icon-expoter).
 metadata:
-  version: "1.0.2"
+  version: "1.0.3"
   author: desktop client team
   category: generator
-compatibility: Python 3；需 mastergo-magic-mcp（本仓库 plugins/optimus-mcp-servers/.mcp.json 内置）与 MASTERGO_TOKEN；需 MasterGo Team 版及以上，草稿箱文件不可用；首次使用前须填写 plugins/optimus-frontend/skills/wpf-project-conventions/CONVENTIONS.md。
+compatibility: Python 3；需 mastergo-magic-mcp（optimus-frontend 插件内置）与 MASTERGO_TOKEN；需 MasterGo Team 版及以上，草稿箱文件不可用；首次使用前须填写 plugins/optimus-frontend/skills/wpf-project-conventions/CONVENTIONS.md。
 allowed-tools: Read Write Bash PowerShell mastergo-magic-mcp
 ---
 

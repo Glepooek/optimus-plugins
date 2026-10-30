@@ -1,6 +1,6 @@
 # avalonia-code-review
 
-> 版本：1.0.3 | 分类：quality
+> 版本：1.0.4 | 分类：quality
 
 在用户指定范围内审查 Avalonia AXAML 与 C# UI 代码，并以官方 Avalonia Docs MCP 查询作为每项框架结论的依据。
 

@@ -188,7 +188,7 @@ Expected: 输出 `json ok`；两个 marketplace 的计数均为 `0`；两份 `pl
 
 - [ ] **Step 2: 根 README 依赖表**
 
-删除 `optimus-avalonia` 一行；`optimus-frontend` 一行依赖改为：`MasterGo MCP（设计稿读取）、Python 3；Avalonia 相关 skill 另需 Avalonia Docs MCP（由 optimus-mcp-servers 提供，无需认证），实际迁移/构建依赖目标项目的 .NET SDK`。
+删除 `optimus-avalonia` 一行；`optimus-frontend` 一行依赖改为：`MasterGo MCP（设计稿读取）、Python 3；Avalonia 相关 skill 另需 Avalonia Docs MCP（由 旧 MCP 插件 提供，无需认证），实际迁移/构建依赖目标项目的 .NET SDK`。
 
 - [ ] **Step 3: 根 README 示例前缀**
 

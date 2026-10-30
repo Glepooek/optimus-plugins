@@ -1,6 +1,6 @@
 # mastergo-to-wpf-components
 
-> 版本：1.0.0 | 分类：generator
+> 版本：1.0.3 | 分类：generator
 
 从 MasterGo 设计稿抽取可复用视觉组件，生成或增量更新 WPF 组件库（组件索引、颜色与 DataTemplate 资源）。
 

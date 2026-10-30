@@ -1,3 +1,8 @@
+## [2.0.4] - 2026-10-30
+
+### Changed
+- `compatibility` 中 mastergo-magic-mcp 的来源由 旧 MCP 插件 改为 `optimus-frontend` 插件内置（旧 MCP 插件 插件已删除，MCP 并入 `optimus-frontend`）；令牌环境变量仍为 `MASTERGO_TOKEN`；逻辑未改
+
 ## [2.0.3] - 2026-10-30
 
 ### Changed

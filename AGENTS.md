@@ -23,6 +23,7 @@
 ### 重要约束
 
 - **SKILL.md 是唯一真源**：只改 `plugins/*/skills/*/SKILL.md`，不为 Codex 维护副本或改 frontmatter——两 harness 读的是同一份文件
+- **MCP 配置只面向 Claude Code**：`plugins/*/.mcp.json` 不为 Codex 维护 `config.toml` 镜像，Codex 清单（`.codex-plugin/plugin.json`）不声明 `mcpServers`
 - **跨插件无重复 skills**：新功能前先确认无跨插件重叠
 - **Skills 可相互引用**：子 skill 用相对路径，跨插件用绝对命名空间
 - **复合 skills 很少见**：仅在 3 个以上阶段且每阶段 >200 行时使用
@@ -190,7 +191,7 @@ sh .githooks/pre-commit
 
 ⚠️ 这一条覆盖全部八项，**跑它不需要先 `git config core.hooksPath .githooks`**——那条配置只决定提交时会不会自动触发，直接调文件路径始终可用。
 
-**Python 单元测试**（**本机无 `pytest`，只能用 `unittest`**）：全仓共 **9 个**测试目录，`unittest discover` 不递归跨目录，必须逐个跑。该清单的真源是 `ci.yml` 的 `gates-tests` job——**本地漏跑不会报错，只会在 PR 上撞红**，而 `gates-tests` 是必需检查、`bypass_actors` 为 null，无人可绕过。**新增测试目录时两处都要改。**
+**Python 单元测试**（**本机无 `pytest`，只能用 `unittest`**）：全仓共 **8 个**测试目录，`unittest discover` 不递归跨目录，必须逐个跑。该清单的真源是 `ci.yml` 的 `gates-tests` job——**本地漏跑不会报错，只会在 PR 上撞红**，而 `gates-tests` 是必需检查、`bypass_actors` 为 null，无人可绕过。**新增测试目录时两处都要改。**
 
 ```bash
 # 维护型 skill
@@ -206,7 +207,6 @@ python -m unittest discover -s plugins/optimus-frontend/skills/mastergo-icon-exp
 python -m unittest discover -s plugins/optimus-frontend/skills/mastergo-to-wpf-components/scripts -p "test_*.py"
 python -m unittest discover -s plugins/optimus-frontend/skills/mastergo-to-wpf-page/scripts -p "test_*.py"
 python -m unittest discover -s plugins/optimus-frontend/skills/svg-to-xaml-path/scripts -p "test_*.py"
-python -m unittest discover -s plugins/optimus-mcp-servers/scripts -p "test_*.py"
 ```
 
 **数据文件一致性**（对应 `gates-data`，三项均从仓库根不带参数运行）：

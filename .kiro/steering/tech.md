@@ -26,7 +26,6 @@
 |------|------|------|
 | GitHub Copilot | HTTP | 代码生成增强 |
 | MasterGo Magic | stdio (npx) | 设计稿协作转换 |
-| Feishu Project | stdio (npx) | 飞书项目管理同步 |
 
 ### Hooks 机制
 

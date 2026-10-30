@@ -68,7 +68,7 @@ Codex 与 Claude 在本仓库的约定差异：
 
 - **提交**：Claude Code 用 `/commit-cc-plugin` skill；Codex 无此 skill，改用标准 git 工作流 + Conventional Commits（`type(scope): subject`），禁止 `--no-verify` 绕过 hook。
 - **Hooks**：Claude 侧有 SessionStart（技巧轮播）/Notification；Codex 无对应 hooks 机制，这些在 Codex 侧不生效。
-- **MCP**：各插件通过 `.codex-plugin/plugin.json` 的 `mcpServers` 字段暴露（见 `plugins/optimus-mcp-servers/.mcp.json`）。
+- **MCP**：各插件通过 `.codex-plugin/plugin.json` 的 `mcpServers` 字段暴露（见 `plugins/<旧 MCP 插件>/.mcp.json`）。
 - **两层 skill**：`plugins/*/skills/` 为对外发布产物；`.claude/skills/` 为本仓库维护自用，经 `.agents/skills/` 符号链接暴露给 Codex。
 ```
 
@@ -170,8 +170,8 @@ Expected: 内容仅 `@AGENTS.md` 一行（及可选追加行）
       "category": "DevOps"
     },
     {
-      "name": "optimus-mcp-servers",
-      "source": { "source": "local", "path": "./plugins/optimus-mcp-servers" },
+      "name": "旧 MCP 插件",
+      "source": { "source": "local", "path": "./plugins/<旧 MCP 插件>" },
       "policy": { "installation": "AVAILABLE", "authentication": "ON_USE" },
       "category": "MCP"
     },
@@ -236,13 +236,13 @@ Expected: 输出 `"marketplaceName": "optimus-plugins-official"`，无报错。
 }
 ```
 
-- [ ] **Step 2: 建 optimus-mcp-servers 的 plugin.json（特判：无 skills）**
+- [ ] **Step 2: 建 旧 MCP 插件 的 plugin.json（特判：无 skills）**
 
-`plugins/optimus-mcp-servers/.codex-plugin/plugin.json`，省略 `skills`，改用 `mcpServers`：
+`plugins/<旧 MCP 插件>/.codex-plugin/plugin.json`，省略 `skills`，改用 `mcpServers`：
 
 ```json
 {
-  "name": "optimus-mcp-servers",
+  "name": "旧 MCP 插件",
   "version": "12.0.0",
   "description": "MCP 服务器集成：GitHub Copilot MCP、MasterGo 设计协作、飞书项目等企业级 MCP 服务",
   "mcpServers": "./.mcp.json",
