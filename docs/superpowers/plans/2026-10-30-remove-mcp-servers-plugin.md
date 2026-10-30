@@ -14,7 +14,7 @@
 
 - [ ] 1.1 `git mv plugins/<旧 MCP 插件>/.mcp.json plugins/optimus-frontend/.mcp.json`
 - [ ] 1.2 `git mv plugins/<旧 MCP 插件>/README.md plugins/optimus-frontend/README.md`
-- [ ] 1.3 编辑 `plugins/optimus-frontend/.mcp.json`：删除整个 `FeishuProjectMcp` 对象；并把 `mastergo-magic-mcp.env` 改为 `"MG_MCP_TOKEN": "${MASTERGO_TOKEN}"`（`args` 不动，见 spec §5 第 5 条）→ 验证：`python -c "import json;d=json.load(open('plugins/optimus-frontend/.mcp.json'));print(list(d['mcpServers']))"` 输出 `['avalonia-docs', 'mastergo-magic-mcp']`
+- [ ] 1.3 编辑 `plugins/optimus-frontend/.mcp.json`：删除整个 `FeishuProjectMcp` 对象；并把 `mastergo-magic-mcp.env` 改为 `"MG_MCP_TOKEN": "${MASTERGO_TOKEN}"`（`args` 中的占位符后改为 `--token=<MASTERGO_TOKEN>`，见 spec §5 第 5 条）→ 验证：`python -c "import json;d=json.load(open('plugins/optimus-frontend/.mcp.json'));print(list(d['mcpServers']))"` 输出 `['avalonia-docs', 'mastergo-magic-mcp']`
 
 ## Task 2：删除旧插件（§6.2）
 
@@ -86,7 +86,7 @@
 - [ ] 8.4 `test-locally`：`claude --plugin-dir .` 加载，`/mcp` 看到 frontend 提供的 `avalonia-docs`、`mastergo-magic-mcp`，**没有** `FeishuProjectMcp`；记录实际的 server 显示名/命名空间
 - [ ] 8.5 把 8.4 实测的命名空间回填 README「迁移」小节，清除 Task 3.7 的占位 TODO → 验证：`grep -n TODO plugins/optimus-frontend/README.md` 无输出
 - [ ] 8.5b 令牌实测：仅设 `MASTERGO_TOKEN` 启动，`/mcp` 中 MasterGo server 应为已连接；失败则回到 `.mcp.json` 调整 env/args 映射（需用户提供有效令牌配合）
-- [ ] 8.6 残留对账：`grep -rIn "旧 MCP 插件" --exclude-dir=.git .` 命中项必须全部落在 spec §6.4 白名单 + 本 spec/plan 内；`grep -rIn "MG_MCP_TOKEN"` 只剩 `.mcp.json` 的 env 键与 args；`.kiro/steering/` 无 旧 MCP 插件；`grep -rIn "FeishuProjectMcp\|MCP_USER_TOKEN"` 只剩两个 qa skill 的 `allowed-tools` 与历史文档
+- [ ] 8.6 残留对账：`grep -rIn "旧 MCP 插件" --exclude-dir=.git .` 命中项必须全部落在 spec §6.4 白名单 + 本 spec/plan 内；`grep -rIn "MG_MCP_TOKEN"` 只剩 `.mcp.json` 的 env 键与 README 迁移说明；`.kiro/steering/` 无 旧 MCP 插件；`grep -rIn "FeishuProjectMcp\|MCP_USER_TOKEN"` 只剩两个 qa skill 的 `allowed-tools` 与历史文档
 
 ## Task 9：提交与合并
 
