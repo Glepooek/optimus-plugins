@@ -1,8 +1,8 @@
 # commit-message-review
 
-> 版本：1.0.0 | 分类：quality
+> 版本：1.0.1 | 分类：quality
 
-依据 Git 知识库审查拟提交或已有提交信息，产出按严重程度排序的合规结论和不编造事实的修正建议。
+依据随 skill 分发的提交信息规则审查拟提交或已有提交信息，产出按严重程度排序的合规结论和不编造事实的修正建议。
 
 ## 所处层级
 
@@ -36,7 +36,7 @@ Claude Code：`/optimus-devops-plugin:commit-message-review`。Codex：自然语
 Step 1  收集完整 message 或明确的 Git commit 引用
    │    可选：用户要求时才读取暂存 diff
    ▼
-Step 2  按 Git 知识库检查标题、type、意图、breaking change
+Step 2  按随附规则参考检查标题、type、意图、breaking change
    │    和 AI Co-Authored-By footer
    ▼
 Step 3  输出 PASS / NEEDS_CHANGES / ADVISORY
@@ -52,7 +52,7 @@ Step 4  人工确认后交给所在仓库的提交工作流
 输入：粘贴的 commit message 或明确的 Git commit 引用
   │
   ▼
-本 skill：知识库规则审查（只读）
+本 skill：随附规则参考审查（只读）
   │
   ▼
 产出：审查结论、问题清单、建议的完整 message、未验证范围
