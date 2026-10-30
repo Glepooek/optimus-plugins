@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Avalonia Skills Installer — optimus-frontend 版
+# Optimus Frontend Skills Installer
 #
 # 两级分发：先把本插件 skills/ 复制到枢纽目录，再从枢纽符号链接到各 agent
 # harness 的用户级 skill 目录，使 skill 在没有插件机制的 harness（如 Kiro）里也能被发现。
@@ -141,7 +141,7 @@ done
 
 # ── 前置校验：源与能力 ────────────────────────────────────────────────────────
 
-header "Avalonia Skills Installer"
+header "Optimus Frontend Skills Installer"
 
 # 源必须是插件 checkout（脚本被单独拷出来跑时，源就没了——要显式报错，
 # 不要静默装出空结果）。

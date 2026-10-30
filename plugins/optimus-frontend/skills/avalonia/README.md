@@ -1,6 +1,6 @@
 # avalonia
 
-> 版本：2.1.0 | 分类：workflow
+> 版本：2.1.2 | 分类：workflow
 
 Avalonia 开发入口：调用官方 Avalonia Docs MCP 确认框架事实，并将代码审查和 WPF 迁移交由受控流程处理。
 
