@@ -133,14 +133,14 @@ export CLAUDE_NOTIFICATION="Claude 需要你的批准"
 
 1. **安装或更新插件**
 
-   如果你是通过 Claude Code 插件市场安装的 `optimus-plugins-official`，插件更新后会自动包含这些 hooks。
+   如果你是通过 Claude Code 插件市场安装的 `optimus-plugins`，插件更新后会自动包含这些 hooks。
 
    ```bash
    # 或者手动从 Git 仓库安装/更新
    cd ~/.claude/plugins/marketplaces/
-   git clone https://github.com/Glepooek/optimus-plugins-official.git
+   git clone https://github.com/Glepooek/optimus-plugins.git
    # 或更新现有仓库
-   cd optimus-plugins-official && git pull
+   cd optimus-plugins && git pull
    ```
 
 2. **在 settings.json 中启用插件**
@@ -150,13 +150,13 @@ export CLAUDE_NOTIFICATION="Claude 需要你的批准"
    ```json
    {
      "enabledPlugins": {
-       "optimus-devops@optimus-plugins-official": true
+       "optimus-devops@optimus-plugins": true
      },
      "extraKnownMarketplaces": {
-       "optimus-plugins-official": {
+       "optimus-plugins": {
          "source": {
            "source": "github",
-           "repo": "Glepooek/optimus-plugins-official"
+           "repo": "Glepooek/optimus-plugins"
          }
        }
      }
@@ -186,14 +186,14 @@ export CLAUDE_NOTIFICATION="Claude 需要你的批准"
 **Unix/Linux/macOS:**
 
 ```bash
-cd /path/to/optimus-plugins-official
+cd /path/to/optimus-plugins
 ./plugins/optimus-devops/hooks/install.sh
 ```
 
 **Windows（Git Bash）:**
 
 ```bash
-cd /e/path/to/optimus-plugins-official
+cd /e/path/to/optimus-plugins
 ./plugins/optimus-devops/hooks/install.sh
 ```
 

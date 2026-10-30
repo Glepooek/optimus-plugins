@@ -2,7 +2,7 @@
 name: commit-message-review
 description: 审查拟提交或已有 Git commit message 是否符合随插件分发的 Git 提交信息规则，包括 Conventional Commits、变更意图、破坏性变更和 AI 协作者 footer。用户要求审查、review、检查、改写或生成 Git 提交信息，或在准备 git commit / 提交代码、已拟好 commit message 需要提交前把关时使用；不执行 git commit、amend、push 或绕过 hook。
 metadata:
-  version: "1.0.4"
+  version: "1.0.5"
   author: desktop client team
   category: quality
 compatibility: 审查粘贴的提交信息不需要本地依赖；读取指定 commit 或将信息与暂存改动比对时，需要在 Git 仓库中运行 Git。

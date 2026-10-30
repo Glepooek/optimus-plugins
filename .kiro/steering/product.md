@@ -2,7 +2,7 @@
 
 ## 产品定位
 
-Optimus 官方 Claude Code 插件仓库（optimus-plugins-official），为企业开发团队提供完整的 AI 辅助开发工具链。通过 Claude Code 插件机制，将前端/后端开发、测试QA、产品文档、飞书集成、Office文档处理、CI/CD、MCP服务等能力以 Skills 形式交付。
+Optimus 官方 Claude Code 插件仓库（optimus-plugins），为企业开发团队提供完整的 AI 辅助开发工具链。通过 Claude Code 插件机制，将前端/后端开发、测试QA、产品文档、飞书集成、Office文档处理、CI/CD、MCP服务等能力以 Skills 形式交付。
 
 ## 目标用户
 

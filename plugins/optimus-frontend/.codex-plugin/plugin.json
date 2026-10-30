@@ -1,14 +1,14 @@
 {
   "name": "optimus-frontend",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "桌面前端开发（WPF + Avalonia）：MasterGo 设计稿转页面与组件库、SVG 转 XAML、XAML/AXAML 代码审查、Avalonia 文档 MCP 路由开发、WPF 迁移 Avalonia 与 Linux deb 发布。内置 PreToolUse Hook：git commit 前门禁校验 .xaml / .axaml 改动是否已审查",
   "skills": "./skills/",
   "author": {
     "name": "optimus",
     "url": "https://www.optimus.cn"
   },
-  "homepage": "https://github.com/Glepooek/optimus-plugins-official",
-  "repository": "https://github.com/Glepooek/optimus-plugins-official",
+  "homepage": "https://github.com/Glepooek/optimus-plugins",
+  "repository": "https://github.com/Glepooek/optimus-plugins",
   "license": "MIT",
   "interface": {
     "displayName": "Optimus Frontend",

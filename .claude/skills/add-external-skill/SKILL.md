@@ -174,8 +174,8 @@ Codex 没有与 `disable-model-invocation` 等价的 SKILL.md frontmatter 字段
 
 顺序执行：
 
-1. `claude plugin marketplace update optimus-plugins-official`
-2. `claude plugin install <name>@optimus-plugins-official`
+1. `claude plugin marketplace update optimus-plugins`
+2. `claude plugin install <name>@optimus-plugins`
 3. 确认新接入的 skill 能在 skill 列表中列出。
 4. `python .githooks/check_external_entries.py .`，确认退出码为 0。
 
