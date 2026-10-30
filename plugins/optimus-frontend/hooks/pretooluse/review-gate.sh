@@ -54,7 +54,7 @@ staged_files() {
 }
 
 current_hash() {
-    git diff --cached -- "$(gate_pattern "$1")" | sha256sum | cut -d' ' -f1
+    git diff --cached -- ":(icase)$(gate_pattern "$1")" | sha256sum | cut -d' ' -f1
 }
 
 GIT_DIR="$(git rev-parse --git-dir 2>/dev/null || true)"
@@ -83,6 +83,7 @@ if [[ "${1:-}" == "mark" ]]; then
 fi
 
 # 检测模式：两类都没有 staged 改动，直接放行，不必关心当前命令是不是 git commit
+# 后缀不区分大小写（Windows 文件系统下 A.XAML 与 a.xaml 是同一类文件），分类用 [xX] 括号式，哈希用 :(icase) pathspec。
 # 一次 git 调用取全部 staged 路径，再在 bash 里按后缀归类，而不是每类各起一次 git——
 # 本 hook 每次 Bash 调用都会触发，进程数就是成本。-z 让路径不被引号转义，
 # 中文、空格文件名也能按后缀匹配，不会因此漏判。
@@ -90,8 +91,8 @@ WPF_FILES=()
 AVALONIA_FILES=()
 while IFS= read -r -d '' f; do
     case "$f" in
-        *.xaml) WPF_FILES+=("$f") ;;
-        *.axaml) AVALONIA_FILES+=("$f") ;;
+        *.[xX][aA][mM][lL]) WPF_FILES+=("$f") ;;
+        *.[aA][xX][aA][mM][lL]) AVALONIA_FILES+=("$f") ;;
     esac
 done < <(git diff --cached --name-only -z)
 
