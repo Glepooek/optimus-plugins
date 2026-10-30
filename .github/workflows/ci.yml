@@ -106,8 +106,7 @@ jobs:
             plugins/optimus-frontend/skills/mastergo-icon-expoter/scripts \
             plugins/optimus-frontend/skills/mastergo-to-wpf-components/scripts \
             plugins/optimus-frontend/skills/mastergo-to-wpf-page/scripts \
-            plugins/optimus-frontend/skills/svg-to-xaml-path/scripts \
-            plugins/optimus-mcp-servers/scripts
+            plugins/optimus-frontend/skills/svg-to-xaml-path/scripts
           do
             echo "::group::$d"
             python -m unittest discover -s "$d" -p "test_*.py" || fail=1
@@ -221,8 +220,7 @@ jobs:
       #    的 frontmatter 质量不该由本仓的门禁判失败（官方 action 的 40 步
       #    仍会在它改动时增量校验它）。当前该目录为空。
       #
-      # 本机 CLI 2.1.270 实测 9 个含 skills/ 的插件全绿
-      # （optimus-mcp-servers 无 skills/，被 -d 判断跳过），故设为硬失败。
+      # 本机 CLI 2.1.270 实测 9 个含 skills/ 的插件全绿，故设为硬失败。
       - name: 各插件 skills 目录的严格校验
         run: |
           fail=0

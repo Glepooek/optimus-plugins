@@ -58,7 +58,7 @@ metadata:
 
 ### compatibility
 
-一句话描述运行环境依赖（≤500字符），必须基于该 skill 实际用到的工具/依赖据实填写，不得凭空编造。常见依赖类型：语言运行时（Python/Node.js/.NET SDK）、第三方 CLI（lark-cli、JMeter）、MCP server——引用 MCP server 时须注明是本仓库 `plugins/optimus-mcp-servers/.mcp.json` 内置（如 `mastergo-magic-mcp`、`FeishuProjectMcp`）还是需要用户自行配置（如 Figma/Sketch/Chrome DevTools MCP）。
+一句话描述运行环境依赖（≤500字符），必须基于该 skill 实际用到的工具/依赖据实填写，不得凭空编造。常见依赖类型：语言运行时（Python/Node.js/.NET SDK）、第三方 CLI（lark-cli、JMeter）、MCP server——引用 MCP server 时须注明是本仓库 `plugins/optimus-frontend/.mcp.json` 内置（如 `mastergo-magic-mcp`、`avalonia-docs`）还是需要用户自行配置（如 Figma/Sketch/Chrome DevTools MCP）。
 
 ### allowed-tools
 

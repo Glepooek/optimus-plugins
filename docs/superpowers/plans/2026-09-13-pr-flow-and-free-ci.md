@@ -634,7 +634,7 @@ jobs:
             plugins/optimus-frontend-plugin/skills/mastergo-to-wpf-components/scripts \
             plugins/optimus-frontend-plugin/skills/mastergo-to-wpf-page/scripts \
             plugins/optimus-frontend-plugin/skills/svg-to-xaml-path/scripts \
-            plugins/optimus-mcp-servers/scripts
+            plugins/<旧 MCP 插件>/scripts
           do
             echo "::group::$d"
             python -m unittest discover -s "$d" -p "test_*.py" || fail=1
@@ -737,7 +737,7 @@ for d in \
   plugins/optimus-frontend-plugin/skills/mastergo-to-wpf-components/scripts \
   plugins/optimus-frontend-plugin/skills/mastergo-to-wpf-page/scripts \
   plugins/optimus-frontend-plugin/skills/svg-to-xaml-path/scripts \
-  plugins/optimus-mcp-servers/scripts
+  plugins/<旧 MCP 插件>/scripts
 do
   echo "=== $d"
   python -m unittest discover -s "$d" -p "test_*.py" || fail=1

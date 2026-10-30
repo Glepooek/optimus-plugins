@@ -53,11 +53,10 @@ plugins/{plugin-name}/
 | optimus-feishu-plugin | `plugins/optimus-feishu-plugin` | 3 | — |
 | optimus-office | `plugins/optimus-office` | 7 | Node.js 脚本 |
 | optimus-devops | `plugins/optimus-devops` | 5 | Hooks + 脚本 |
-| optimus-mcp-servers | `plugins/optimus-mcp-servers` | 0 | 仅 .mcp.json |
 
 ## 命名约定
 
-- **插件目录名**：`optimus-{domain}-plugin`（MCP 例外：`optimus-mcp-servers`）
+- **插件目录名**：`optimus-{domain}-plugin`
 - **Skill 目录名**：`optimus-{domain}-{功能}` 或 `{功能名}`（较新的独立 skill）
 - **文件名**：全小写，连字符分隔
 - **SKILL.md frontmatter**：必须包含 `name`、`version`、`description`
@@ -71,5 +70,5 @@ plugins/{plugin-name}/
 | `.claude/skills/sync-cc-tips/SKILL.md` | tips 文件同步 Skill |
 | `plugins/optimus-devops/hooks/hooks.json` | Hooks 配置入口 |
 | `plugins/optimus-devops/hooks/sessionstart/tips.jsonl` | 使用技巧库 |
-| `plugins/optimus-mcp-servers/.mcp.json` | MCP 服务器声明 |
+| `plugins/optimus-frontend/.mcp.json` | MCP 服务器声明 |
 | `plugins/optimus-frontend/skills/optimus-fe-dev/ARCHITECTURE.md` | 复合 Skill 架构参考 |

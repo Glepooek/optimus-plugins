@@ -39,12 +39,6 @@
       "category": "DevOps"
     },
     {
-      "name": "optimus-mcp-servers",
-      "source": { "source": "local", "path": "./plugins/optimus-mcp-servers" },
-      "policy": { "installation": "AVAILABLE", "authentication": "ON_USE" },
-      "category": "MCP"
-    },
-    {
       "name": "optimus-media",
       "source": { "source": "local", "path": "./plugins/optimus-media" },
       "policy": { "installation": "AVAILABLE", "authentication": "ON_USE" },

@@ -1,5 +1,10 @@
 # Changelog — MCP（Model Context Protocol）
 
+## [1.0.1] - 2026-10-30
+
+### Changed
+- 「与仓库已有资产的关系」及文首范围说明中的 MCP 配置所在插件由 旧 MCP 插件 改为 `optimus-frontend`（原插件已删除，飞书项目 MCP 不再由本仓提供）
+
 ## [1.0.0] - 2026-08-30
 
 ### Added

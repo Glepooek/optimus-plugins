@@ -184,7 +184,7 @@ metadata:
 
 | 插件 | plugin.json | 同 commit 的 marketplace 顶层 | 最后改于 |
 |---|---|---|---|
-| `optimus-mcp-servers` | 12.1.8 | **12.1.8** ✅ | 2026-08-28 |
+| 旧 MCP 插件 | 12.1.8 | **12.1.8** ✅ | 2026-08-28 |
 | `optimus-office-plugin` | 12.1.8 | **12.1.8** ✅ | 2026-08-28 |
 | `optimus-backend-plugin` | 12.1.9 | **12.1.9** ✅ | 2026-08-29 |
 | `optimus-media-plugin` | 13.1.2 | **13.1.2** ✅ | 2026-09-01 |
@@ -478,7 +478,7 @@ harness 拉取、缓存、更新的最小粒度就是插件——所以插件层
 
 因此实施顺序上这是**第一个动作，不是最后的验收项**：
 
-1. 先只改一个插件（建议 `optimus-mcp-servers`——它无 skills，改动面最小、影响最低）
+1. 先只改一个插件（建议 旧 MCP 插件——它无 skills，改动面最小、影响最低）
 2. 跑 `claude plugin list` 看改动前解析到什么，再 `update` / `install` 后复看，确认变为 `1.0.0`
 3. 通过 → 推广至其余 8 个；**不通过 → 停下来回报，本节决策需要重新评估**
 
@@ -583,7 +583,7 @@ harness 拉取、缓存、更新的最小粒度就是插件——所以插件层
 
 | 项 | 处理 |
 |---|---|
-| **验证新建 plugin.json 后版本能否被正确解析并更新** | ⚠️ **实施第一步**，见 § 7.3.1。先在 `optimus-mcp-servers` 单点验证，不通过则停下回报 |
+| **验证新建 plugin.json 后版本能否被正确解析并更新** | ⚠️ **实施第一步**，见 § 7.3.1。先在 旧 MCP 插件 单点验证，不通过则停下回报 |
 | **9 个本仓插件**新建 `.claude-plugin/plugin.json` | **本次全部建**，`version` 一律 `1.0.0`——不建则 Claude 侧继续落到 commit SHA，改动只对 devops 一个生效等于没改 |
 | 同 9 个插件的 `.codex-plugin/plugin.json` | `version` 全部改为 `1.0.0`，与上一行**同一次改动内一起写**。这 9 个与上一行完全同一批，无缺口 |
 | **`cangjie-skill`（第 10 个条目）** | ❌ **排除在本机制之外**，见 § 7.7.1 |
@@ -684,7 +684,7 @@ harness 拉取、缓存、更新的最小粒度就是插件——所以插件层
 
 ### 9.4 版本真源下移正确性
 
-- [ ] ⚠️ **首个动作**：新建 `plugin.json` 后版本能被正确解析为 `1.0.0` 并正常更新，已在 `optimus-mcp-servers` 单点验证通过（§ 7.3.1）——**未验证不得推广至其余 8 个**
+- [ ] ⚠️ **首个动作**：新建 `plugin.json` 后版本能被正确解析为 `1.0.0` 并正常更新，已在 旧 MCP 插件 单点验证通过（§ 7.3.1）——**未验证不得推广至其余 8 个**
 - [ ] 9 个本仓插件均有 `.claude-plugin/plugin.json`，各含 `name` + `version: "1.0.0"`；有 agent 的插件另含 `agents` 文件路径数组
 - [ ] 9 个插件的 `.codex-plugin/plugin.json` 的 `version` 均为 `1.0.0`，与同插件 `.claude-plugin/plugin.json` 逐一比对同值
 - [ ] `cangjie-skill` **未被改动**——它是外部 url 源，不建 `plugin.json`、不填 `version`（§ 7.7.1）

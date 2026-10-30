@@ -9,6 +9,8 @@
 
 **特色:** 复合 Skill 采用 Subagent 驱动并行生成，详见 ARCHITECTURE.md。
 
+**内置 MCP（`.mcp.json`）:** Avalonia Docs（HTTP，无需认证）、MasterGo Magic（stdio，`MASTERGO_TOKEN`）。
+
 ---
 
 ## optimus-backend — 后端开发工具集
@@ -83,18 +85,6 @@
 - `hooks/sessionstart/tips.jsonl` — 技巧库
 - `hooks/sessionstart/show-tip.sh` — 轮播脚本
 - `hooks/notification/permission-notify.ps1` — 通知脚本
-
----
-
-## optimus-mcp-servers — MCP 服务器集成
-
-**无 Skills，仅 MCP 配置（.mcp.json）:**
-
-| 服务名 | 连接方式 | 认证 |
-|--------|----------|------|
-| GitHub Copilot | HTTP (api.githubcopilot.com) | GITHUB_TOKEN |
-| MasterGo Magic | stdio (npx @mastergo/magic-mcp) | MASTERGO_TOKEN |
-| Feishu Project | stdio (npx @lark-project/mcp) | FEISHU_PROJECT_TOKEN |
 
 ---
 

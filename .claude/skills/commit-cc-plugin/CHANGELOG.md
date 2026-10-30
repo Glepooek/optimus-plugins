@@ -35,7 +35,7 @@ darwin baseline 评估（79.4）后针对 d7/d4 的第一轮优化，外加一�
 
 ### Changed
 - **第五步的第 2/3/4 步由 GitHub MCP 全面改为 `gh` CLI**：`create_pull_request` → `gh pr create`、`pull_request_read`（`get_check_runs`）→ `gh pr checks --required --watch --fail-fast`、`merge_pull_request` → `gh pr merge --squash`。第一步 CHECKPOINT 查已有 PR 由 `list_pull_requests` 改为 `gh pr list --head <branch> --state open`
-- `compatibility` 由「需 github MCP server（本仓库 `plugins/optimus-mcp-servers/.mcp.json` 内置）」改为「需 GitHub CLI（`gh`，已通过 `gh auth status` 认证）；不依赖任何 MCP server」；`allowed-tools` 由 `Bash github` 收回为 `Bash`。这是 Major 的依据——运行依赖变了，装了本 skill 但没装 `gh` 的环境会直接卡在第五步
+- `compatibility` 由「需 github MCP server（本仓库 `plugins/<旧 MCP 插件>/.mcp.json` 内置）」改为「需 GitHub CLI（`gh`，已通过 `gh auth status` 认证）；不依赖任何 MCP server」；`allowed-tools` 由 `Bash github` 收回为 `Bash`。这是 Major 的依据——运行依赖变了，装了本 skill 但没装 `gh` 的环境会直接卡在第五步
 - 「这是 auto-merge 的等效实现」节改写为「不用 `gh pr merge --auto`」：`gh` 本身支持原生 auto-merge，旧节「MCP 未提供对应工具」的前提已不成立。**新的不采用理由是本仓库 `allow_auto_merge: false`**（2026-09-18 `gh api repos/... --jq .allow_auto_merge` 实测），传 `--auto` 会被服务端拒绝。同时写明打开该开关属仓库配置变更、不在本 skill 职责内
 - 三个静默失效形态的载体随之改写：`commit_message` → `--body-file`、`commit_title` → `--subject`；尖括号那条的成因从「传 JSON 参数时转义」改为「手工拼串或从网页复制时转义」——走 `<<'EOF'` heredoc 写文件不会产生该转义
 
@@ -70,7 +70,7 @@ darwin baseline 评估（79.4）后针对 d7/d4 的第一轮优化，外加一�
 - 删掉第三步「第五步的同步推送复用其结果，不重复 fetch」一句：新第五步的 `git pull --rebase` 发生在 squash merge **之后**，那时 master 已前进，复用旧 fetch 结果会拿到过期状态
 - 「工作区不干净」小节的命令块改为 `stash push <文件>` → `git switch master && git pull --rebase` → `stash pop`（原为 pull + push origin master）
 - 开篇一句从「推送到 master」改为「经特性分支与 PR 合入 master」，并说明这是服务端强制
-- `compatibility` 从「无 MCP 或第三方 CLI 依赖」改为声明需 `github` MCP server（本仓库 `plugins/optimus-mcp-servers/.mcp.json` 内置）；`allowed-tools` 由 `Bash` 改为 `Bash github`
+- `compatibility` 从「无 MCP 或第三方 CLI 依赖」改为声明需 `github` MCP server（本仓库 `plugins/<旧 MCP 插件>/.mcp.json` 内置）；`allowed-tools` 由 `Bash` 改为 `Bash github`
 
 ### Fixed
 - 常见错误表补入「用 `get_status` 轮询 CI」：`get_status` 查的是 legacy commit status，本仓五项是 check run，会返回 `total_count: 0` 的空结果并被误读成「CI 还没开始」。该误读在手工演练 PR #10 时真实发生过一次

@@ -30,7 +30,7 @@
   - **Task 4-5** 新建/改动 `plugin.json` 的 `version` 字段本身 → 按 spec § 7.4 要点 5「只改 `version` 本身不构成再升一次」→ **直接写 `1.0.0`，不额外递增**
   - `marketplace.json` 顶层 `version` **全程保持 `14.0.0`**（spec § 7.4 要点 2/3：仅增删插件时升）
 - **本仓自有插件是 9 个**，不是 10 个。第 10 个 marketplace 条目 `cangjie-skill` 是外部 git url 引用（`source.source: "url"`，`sha` 已固定），不在 `plugins/` 目录下，**全程不得改动**（spec § 7.7.1）。
-- **9 个插件的准确名单**（实测，按字母序）：`optimus-backend-plugin`、`optimus-decision-plugin`、`optimus-devops-plugin`、`optimus-frontend-plugin`、`optimus-mcp-servers`、`optimus-media-plugin`、`optimus-office-plugin`、`optimus-prd-plugin`、`optimus-qa-plugin`。
+- **9 个插件的准确名单**（实测，按字母序）：`optimus-backend-plugin`、`optimus-decision-plugin`、`optimus-devops-plugin`、`optimus-frontend-plugin`、旧 MCP 插件、`optimus-media-plugin`、`optimus-office-plugin`、`optimus-prd-plugin`、`optimus-qa-plugin`。
 - **实施顺序硬约束**：本计划必须**先于** `docs/superpowers/specs/2026-09-05-dotnet-diagnose-agent-design.md` 落地——agent 实施时要用到本计划定义的 `agent-docs/` 目录约定、`plugin.json` 声明方式、agent 版本号载体（spec § 9.6）。
 
 ---
@@ -696,8 +696,8 @@ docs(rules): 新建 agent-conventions.md，agent 改为独立版本化并配套�
 ## Task 4: 单点验证「新建 plugin.json 后版本能否被正确解析并更新」
 
 **Files:**
-- Create: `plugins/optimus-mcp-servers/.claude-plugin/plugin.json`
-- Modify: `plugins/optimus-mcp-servers/.codex-plugin/plugin.json`（`version`: `12.1.8` → `1.0.0`）
+- Create: `plugins/<旧 MCP 插件>/.claude-plugin/plugin.json`
+- Modify: `plugins/<旧 MCP 插件>/.codex-plugin/plugin.json`（`version`: `12.1.8` → `1.0.0`）
 
 **Interfaces:**
 - Consumes: 无（与 Task 1-3 无依赖，可并行；但**必须在 Task 5 之前完成**）
@@ -707,13 +707,13 @@ docs(rules): 新建 agent-conventions.md，agent 改为独立版本化并配套�
 
 ⚠️ **Step 1 会同时证伪一个曾经的担心**：撰写本计划时曾担心「`12.1.8` → `1.0.0` 版本号变小，客户端若按『新值 > 旧值才更新』比较，已安装用户会静默卡住」。**实测该前提不成立**——本仓插件此前没有 `.claude-plugin/plugin.json`，Claude 侧按官方回退链解析到的是 **git commit SHA**（形如 `ae8271959d92`），codex 侧那个 `12.1.8` 从未进入 Claude 侧用户的本地缓存。因此本次不是「降版本」，而是「SHA → 语义化版本」的首次建立，不存在可供比较的旧语义化版本。Step 1 的 `claude plugin list` 输出会直接展示这一点。
 
-**为什么选 `optimus-mcp-servers` 做试点**：它无 `skills/` 目录（只有 `.mcp.json` 与 `scripts/`），改动面最小、影响最低。
+**为什么选 旧 MCP 插件 做试点**：它无 `skills/` 目录（只有 `.mcp.json` 与 `scripts/`），改动面最小、影响最低。
 
 - [ ] **Step 1: 记录改动前的实际状态**
 
 Run:
 ```bash
-echo "=== 当前 codex 侧版本 ===" && cat plugins/optimus-mcp-servers/.codex-plugin/plugin.json
+echo "=== 当前 codex 侧版本 ===" && cat plugins/<旧 MCP 插件>/.codex-plugin/plugin.json
 echo ""
 echo "=== 已安装插件解析到的版本（预期为 commit SHA）==="
 claude plugin list 2>/dev/null | grep -A2 optimus || echo "（本仓插件未安装，Step 6 走路径 B）"
@@ -731,11 +731,11 @@ Expected:
 
 - [ ] **Step 2: 新建 `.claude-plugin/plugin.json`**
 
-Create `plugins/optimus-mcp-servers/.claude-plugin/plugin.json`：
+Create `plugins/<旧 MCP 插件>/.claude-plugin/plugin.json`：
 
 ```json
 {
-  "name": "optimus-mcp-servers",
+  "name": "旧 MCP 插件",
   "version": "1.0.0"
 }
 ```
@@ -748,7 +748,7 @@ Create `plugins/optimus-mcp-servers/.claude-plugin/plugin.json`：
 
 - [ ] **Step 3: 同步改 `.codex-plugin/plugin.json`**
 
-Edit `plugins/optimus-mcp-servers/.codex-plugin/plugin.json`，把 `"version": "12.1.8"` 改为 `"version": "1.0.0"`。
+Edit `plugins/<旧 MCP 插件>/.codex-plugin/plugin.json`，把 `"version": "12.1.8"` 改为 `"version": "1.0.0"`。
 
 ⚠️ **只改 `version` 一个字段**，其余（`name` / `description` / `interface` 等）全部不动。
 
@@ -760,8 +760,8 @@ Run:
 ```bash
 python -c "
 import json
-a = json.load(open('plugins/optimus-mcp-servers/.claude-plugin/plugin.json', encoding='utf-8'))
-b = json.load(open('plugins/optimus-mcp-servers/.codex-plugin/plugin.json', encoding='utf-8'))
+a = json.load(open('plugins/<旧 MCP 插件>/.claude-plugin/plugin.json', encoding='utf-8'))
+b = json.load(open('plugins/<旧 MCP 插件>/.codex-plugin/plugin.json', encoding='utf-8'))
 print('claude 侧:', a)
 print('codex  侧 version:', b['version'])
 print()
@@ -777,7 +777,7 @@ Expected: `PASS: 两份同值 1.0.0，claude 侧字段最小化`
 
 Run:
 ```bash
-claude plugin validate ./plugins/optimus-mcp-servers
+claude plugin validate ./plugins/<旧 MCP 插件>
 ```
 
 Expected: 校验通过，无 error。
@@ -798,15 +798,15 @@ claude plugin marketplace update optimus-plugins-official
 claude plugin list
 
 # 3. 本插件若已安装则直接更新；未安装则装上以验证解析结果
-claude plugin update optimus-mcp-servers \
-  || claude plugin install optimus-mcp-servers@optimus-plugins-official
+claude plugin update 旧 MCP 插件 \
+  || claude plugin install 旧 MCP 插件@optimus-plugins-official
 
 # 4. 再次查看解析到的版本
 claude plugin list
 ```
 
 判定：
-- ✅ **通过** — `plugin list` 显示 `optimus-mcp-servers` 版本为 `1.0.0`（由 SHA 转为语义化版本）
+- ✅ **通过** — `plugin list` 显示 旧 MCP 插件 版本为 `1.0.0`（由 SHA 转为语义化版本）
 - ❌ **不通过** — 版本仍显示 commit SHA / 提示 "already up to date" 且版本未变
 
 ⚠️ **本仓已安装的其他插件可作为对照**：它们尚无 `.claude-plugin/plugin.json`，`plugin list` 里会显示 commit SHA。对其执行 `claude plugin update` 应能正常更新到新 SHA——这印证更新是**按提交拉取**而非按版本号数值比较，与本次改动方向无冲突。
@@ -828,8 +828,8 @@ claude plugin --help 2>&1 | head -20
 
 说「提交」触发 `commit-cc-plugin`。提交范围：
 ```
-plugins/optimus-mcp-servers/.claude-plugin/plugin.json
-plugins/optimus-mcp-servers/.codex-plugin/plugin.json
+plugins/<旧 MCP 插件>/.claude-plugin/plugin.json
+plugins/<旧 MCP 插件>/.codex-plugin/plugin.json
 ```
 
 提交消息建议：
@@ -949,7 +949,7 @@ import json, pathlib
 
 expected = [
     'optimus-backend-plugin', 'optimus-decision-plugin', 'optimus-devops-plugin',
-    'optimus-frontend-plugin', 'optimus-mcp-servers', 'optimus-media-plugin',
+    'optimus-frontend-plugin', '旧 MCP 插件', 'optimus-media-plugin',
     'optimus-office-plugin', 'optimus-prd-plugin', 'optimus-qa-plugin',
 ]
 

@@ -100,10 +100,10 @@ optimus-plugins-official/
   "repository": "https://github.com/Glepooek/optimus-plugins-official"
 }
 ```
-**特判** `plugins/optimus-mcp-servers/`（无 `skills/`）：省略 `skills` 字段，改：
+**特判** `plugins/<旧 MCP 插件>/`（无 `skills/`）：省略 `skills` 字段，改：
 ```json
 {
-  "name": "optimus-mcp-servers",
+  "name": "旧 MCP 插件",
   "version": "12.0.0",
   "description": "MCP 服务器集成：GitHub Copilot、MasterGo、飞书项目",
   "mcpServers": "./.mcp.json",
@@ -148,7 +148,7 @@ test-locally
 | optimus-prd-plugin | Product | PRD 管理 |
 | optimus-office-plugin | Productivity | Office 文档处理 |
 | optimus-devops-plugin | DevOps | CI/CD、周报、agent skills |
-| optimus-mcp-servers | MCP | 仅 MCP，无 skills |
+| 旧 MCP 插件 | MCP | 仅 MCP，无 skills |
 | optimus-media-plugin | Media | 音视频处理 |
 
 ---
@@ -165,7 +165,7 @@ test-locally
 
 | 场景 | 处理 |
 |---|---|
-| `optimus-mcp-servers` 无 skills | plugin.json 省略 `skills`，用 `mcpServers` 指向 `.mcp.json` |
+| 旧 MCP 插件 无 skills | plugin.json 省略 `skills`，用 `mcpServers` 指向 `.mcp.json` |
 | 跨插件 skill 重名 | Codex 自动加 `plugin:` 前缀，天然隔离，无需处理 |
 | Claude hooks（SessionStart/Notification） | Codex 无对应机制，不硬塞；AGENTS.md 注明 |
 | 项目 `.agents/` 与用户 `~/.agents/` | 并存；项目级优先，互不干扰 |

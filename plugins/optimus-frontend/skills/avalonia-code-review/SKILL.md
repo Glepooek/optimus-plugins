@@ -2,9 +2,9 @@
 name: avalonia-code-review
 description: Use when reviewing Avalonia AXAML or C# UI code for framework correctness, binding and styling defects, cross-platform risks, accessibility, performance concerns, or before merging an Avalonia UI change. 触发词："审查 Avalonia 代码"、"Avalonia review"、"AXAML 检查"、"Avalonia PR 审查"。
 license: MIT
-compatibility: 需要安装 optimus-mcp-servers 中无需认证的 Avalonia Docs MCP；支持审查用户粘贴的代码或本地 Avalonia 项目中的已限定文件范围。
+compatibility: 需要 optimus-frontend 内置的无需认证的 Avalonia Docs MCP；支持审查用户粘贴的代码或本地 Avalonia 项目中的已限定文件范围。
 metadata:
-  version: "1.0.3"
+  version: "1.0.4"
   author: desktop client team
   category: quality
 allowed-tools: Read Glob Grep avalonia-docs
@@ -90,7 +90,7 @@ allowed-tools: Read Glob Grep avalonia-docs
 
 | 触发条件 | 一线处理 | 仍失败兜底 |
 |---|---|---|
-| Avalonia Docs MCP 不可用 | 报告 MCP 不可用并检查 `optimus-mcp-servers` 安装/配置 | 停止框架合规判定，不以记忆替代官方依据 |
+| Avalonia Docs MCP 不可用 | 报告 MCP 不可用并检查 `optimus-frontend` 内置的 MCP 是否已启用 | 停止框架合规判定，不以记忆替代官方依据 |
 | 代码不属于 Avalonia 或缺少必要上下文 | 明确说明可见范围和不适用部分 | 只给通用说明或请求最小可复现代码，不编造问题 |
 | 官方资料与目标包版本不匹配 | 从 `.csproj` 确认版本并重新查询 | 标为待确认项，不给确定性修复指令 |
 | 构建/多平台行为无法运行 | 审查静态代码并列出未验证项 | 不将静态审查描述为已通过构建或平台验收 |

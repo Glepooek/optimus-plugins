@@ -1,7 +1,7 @@
 {
   "name": "optimus-plugins",
   "description": "自定义 Claude Code 插件集合，提供前端/后端开发、测试 QA、文档处理、CI/CD、会话增强、权限通知等企业级开发工具链",
-  "version": "15.0.0",
+  "version": "16.0.0",
   "owner": {
     "name": "optimus",
     "url": "https://www.optimus.cn"
@@ -10,7 +10,7 @@
     {
       "name": "optimus-frontend",
       "source": "./plugins/optimus-frontend",
-      "description": "桌面前端开发（WPF + Avalonia）：MasterGo 设计稿转页面与组件库、SVG 转 XAML、XAML/AXAML 代码审查、Avalonia 文档 MCP 路由开发、WPF 迁移 Avalonia 与 Linux deb 发布。内置 PreToolUse Hook：git commit 前门禁校验 .xaml / .axaml 改动是否已审查"
+      "description": "桌面前端开发（WPF + Avalonia）：MasterGo 设计稿转页面与组件库、SVG 转 XAML、XAML/AXAML 代码审查、Avalonia 文档 MCP 路由开发、WPF 迁移 Avalonia 与 Linux deb 发布。内置 Avalonia Docs 与 MasterGo MCP、PreToolUse Hook：git commit 前门禁校验 .xaml / .axaml 改动是否已审查"
     },
     {
       "name": "optimus-backend",
@@ -36,11 +36,6 @@
       "name": "optimus-devops",
       "source": "./plugins/optimus-devops",
       "description": "DevOps：Jenkins 构建、项目分析、周报转写、skill 链接同步、.NET 取证输出解读与根因定位。内置 Hooks：SessionStart（技巧智能轮播）、Notification（Windows权限通知）"
-    },
-    {
-      "name": "optimus-mcp-servers",
-      "source": "./plugins/optimus-mcp-servers",
-      "description": "MCP 服务集成：Avalonia 文档、MasterGo 设计协作、飞书项目"
     },
     {
       "name": "optimus-media",

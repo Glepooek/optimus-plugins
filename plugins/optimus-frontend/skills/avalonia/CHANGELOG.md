@@ -1,3 +1,8 @@
+## [2.1.3] - 2026-10-30
+
+### Changed
+- `compatibility` 与故障表中的 MCP 来源由 旧 MCP 插件 改为 `optimus-frontend` 内置（旧 MCP 插件 插件已删除，其 Avalonia Docs / MasterGo MCP 并入 `optimus-frontend`）；逻辑未改
+
 ## [2.1.2] - 2026-10-30
 
 ### Changed

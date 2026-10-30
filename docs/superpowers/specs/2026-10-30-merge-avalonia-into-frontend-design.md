@@ -18,7 +18,7 @@ Avalonia 与 WPF 同属**桌面端前端 UI 开发**。现状是两者分属 `op
 **非目标**
 - 不修改 4 个 skill 的 SKILL.md 正文逻辑、触发词、`allowed-tools`
 - 不回写历史记录（各 skill CHANGELOG、2026-09-15 spec、todo-list）
-- 不调整 `optimus-mcp-servers`（`avalonia-docs` MCP 与插件归属无关）
+- 不调整 旧 MCP 插件（`avalonia-docs` MCP 与插件归属无关）
 
 **反目标（即使技术上成功也算失败）**
 - 迁移后 skill 的 `/optimus-frontend:<name>` 调用不可用或被重复发现
@@ -69,7 +69,7 @@ Avalonia 与 WPF 同属**桌面端前端 UI 开发**。现状是两者分属 `op
 | `.agents/plugins/marketplace.json` | 删除 `optimus-avalonia` 条目（该文件无顶层 version） |
 | `plugins/optimus-frontend/.claude-plugin/plugin.json` | `version 2.0.0 → 2.1.0`；`description` 加入 Avalonia |
 | `plugins/optimus-frontend/.codex-plugin/plugin.json` | 同上，两份 `version` 必须同值；另有 `interface.shortDescription`、`longDescription`、`defaultPrompt` 三个仅含 WPF 的展示字段，**一并**改为覆盖 Avalonia（我的判断，审查中发现） |
-| `README.md` | 删插件列表行（L14）与外部依赖行（L32）；frontend 的职责与依赖行并入 Avalonia 内容；L69、L123 示例前缀 `optimus-avalonia` → `optimus-frontend`。frontend 的依赖行须保留"Avalonia Docs MCP 由 `optimus-mcp-servers` 提供"这一说明（frontend 自身没有 `.mcp.json`，我的判断） |
+| `README.md` | 删插件列表行（L14）与外部依赖行（L32）；frontend 的职责与依赖行并入 Avalonia 内容；L69、L123 示例前缀 `optimus-avalonia` → `optimus-frontend`。frontend 的依赖行须保留"Avalonia Docs MCP 由 旧 MCP 插件 提供"这一说明（frontend 自身没有 `.mcp.json`，我的判断） |
 | `.gitattributes` | L22 路径改为 `plugins/optimus-frontend/install.sh` |
 | `plugins/optimus-frontend/install.sh` | 头注释"optimus-avalonia 版"→"optimus-frontend 版"，并注明会安装插件内全部 skill |
 | `plugins/optimus-frontend/hooks/pretooluse/review-gate.sh` | 见 §6.4 |

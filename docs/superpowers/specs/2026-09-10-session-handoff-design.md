@@ -168,7 +168,7 @@ plugins/optimus-session-plugin/
 
 **设 `references/templates.md`**——这是与旧版设计的一处改动。三层交接物各有独立模板（含 frontmatter、段落结构、示例），全部内联会把 SKILL.md 推到 300 行以上，超出本仓 skill 的合理体量。参照实现正是因同样原因在 v2.0.0 把模板外移（SKILL.md 662 → 342 行）。
 
-**不设插件根 README**——9 个现有插件中 8 个没有（唯一有的 `optimus-mcp-servers` 不含 skill），那一层无此惯例。`doc-conventions.md` 的六章节规范是对 skill 级 README 的要求。
+**不设插件根 README**——9 个现有插件中 8 个没有（唯一有的 旧 MCP 插件 不含 skill），那一层无此惯例。`doc-conventions.md` 的六章节规范是对 skill 级 README 的要求。
 
 **不设 `known-issues.md`**——那是本仓自用 skill 的惯例（`.claude/skills/*/`），发布产物用 CHANGELOG 记录演进。
 

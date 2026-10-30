@@ -2,9 +2,9 @@
 name: avalonia-wpf-migration
 description: Use when migrating a WPF application to Avalonia, selecting Avalonia XPF versus native Avalonia, or producing a staged, validated migration plan. 触发词："WPF 迁移 Avalonia"、"WPF 跨平台"、"XPF 还是 Avalonia"、"评估 WPF 改造"。
 license: MIT
-compatibility: 需要安装 optimus-mcp-servers 中无需认证的 Avalonia Docs MCP；迁移目标项目须可由本地文件工具读取，实际构建与测试仍依赖目标项目所需的 .NET SDK。
+compatibility: 需要 optimus-frontend 内置的无需认证的 Avalonia Docs MCP；迁移目标项目须可由本地文件工具读取，实际构建与测试仍依赖目标项目所需的 .NET SDK。
 metadata:
-  version: "1.2.3"
+  version: "1.2.4"
   author: desktop client team
   category: workflow
 allowed-tools: Read Glob Grep Write avalonia-docs

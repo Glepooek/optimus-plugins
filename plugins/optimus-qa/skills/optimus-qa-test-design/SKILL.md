@@ -5,7 +5,7 @@ creator: yinxuan@optimus.cn
 metadata:
   author: desktop client team
   category: workflow
-compatibility: 需要 Figma MCP 或 MasterGo MCP 之一已配置（视是否提供设计稿链接；MasterGo 为本仓库内置 mastergo-magic-mcp，Figma 需用户自行配置）。
+compatibility: 需要 Figma MCP 或 MasterGo MCP 之一已配置（视是否提供设计稿链接；MasterGo 由 optimus-frontend 插件提供 mastergo-magic-mcp，Figma 需用户自行配置）。
 allowed-tools: Read Write mastergo-magic-mcp
 ---
 

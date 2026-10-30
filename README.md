@@ -16,7 +16,6 @@
 | [optimus-prd](plugins/optimus-prd) | PRD 全流程：需求文档创建、优化与审查 |
 | [optimus-office](plugins/optimus-office) | 文档处理：Word/Excel/PPT/PDF 生成，网页与本地文件转 Markdown |
 | [optimus-devops](plugins/optimus-devops) | DevOps：Jenkins 构建、项目分析、周报转写、skill 链接同步；内置 SessionStart（技巧轮播）+ Notification hooks |
-| [optimus-mcp-servers](plugins/optimus-mcp-servers) | MCP 服务集成：Avalonia Docs、MasterGo 设计协作、飞书项目 |
 | [optimus-media](plugins/optimus-media) | 音视频处理：分析、转码压缩、裁剪缩放、在线下载与播放预览 |
 | [optimus-decision](plugins/optimus-decision) | 工程决策支持：数据结构、算法策略与复杂度分析 |
 | [optimus-session](plugins/optimus-session) | 跨会话交接：保存进度、决策与恢复上下文 |
@@ -27,13 +26,12 @@
 
 | 插件 | 关键依赖 |
 |---|---|
-| optimus-frontend | MasterGo MCP（设计稿读取）、Python 3；Avalonia 相关 skill 另需 Avalonia Docs MCP（由 `optimus-mcp-servers` 提供，无需认证），实际迁移/构建依赖目标项目的 .NET SDK |
+| optimus-frontend | 自带 Avalonia Docs MCP（无需认证）与 MasterGo Magic MCP（设计稿读取，`MASTERGO_TOKEN`）、Python 3，实际迁移/构建依赖目标项目的 .NET SDK |
 | optimus-backend | superpowers 插件（后端开发流程硬性依赖）、服务注册表 `api-doc-test.optimus.cn`（有本地缓存降级）、Python `requests` + `beautifulsoup4`（接口文档/网页抓取） |
-| optimus-qa | JMeter（性能测试执行）、Playwright + Midscene（UI 自动化）、MasterGo MCP、飞书项目 MCP、Figma MCP + Chrome DevTools MCP（UI 一致性校验，需自行配置）、Python（XMind 生成） |
+| optimus-qa | JMeter（性能测试执行）、Playwright + Midscene（UI 自动化）、MasterGo MCP（由 `optimus-frontend` 提供）、飞书项目 CLI（需自行安装并授权）、Figma MCP + Chrome DevTools MCP（UI 一致性校验，需自行配置）、Python（XMind 生成） |
 | optimus-prd | 无 |
 | optimus-office | markitdown、Playwright CLI（网页转 Markdown）、PptxGenJS（PPT 生成）、reportlab + pypdf（PDF 生成）、pandas + openpyxl（Excel 处理）、LibreOffice（文档转换/重算）、.NET SDK + OpenXML SDK（docx-writer） |
 | optimus-devops | Jenkins（需账号/API Token）、Python `requests` + `pyyaml`、Git（项目分析与周报提取提交记录） |
-| optimus-mcp-servers | Avalonia Docs MCP（无需认证）、MasterGo Magic MCP（`MG_MCP_TOKEN`）、飞书项目 MCP（`MCP_USER_TOKEN`） |
 | optimus-media | ffmpeg/ffprobe（编解码分析与处理）、ffplay（播放预览，需图形显示环境）、yt-dlp（在线视频/音频下载） |
 | optimus-decision | 无 |
 | optimus-session | 无 |
