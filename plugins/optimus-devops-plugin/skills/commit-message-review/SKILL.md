@@ -2,7 +2,7 @@
 name: commit-message-review
 description: 审查拟提交或已有 Git commit message 是否符合随插件分发的 Git 提交信息规则，包括 Conventional Commits、变更意图、破坏性变更和 AI 协作者 footer。用户要求审查、review、检查、改写或生成 Git 提交信息时使用；不执行 git commit、amend、push 或绕过 hook。
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
   author: desktop client team
   category: quality
 compatibility: 审查粘贴的提交信息不需要本地依赖；读取指定 commit 或将信息与暂存改动比对时，需要在 Git 仓库中运行 Git。
@@ -96,7 +96,7 @@ git diff --cached
 
 | 级别 | 规则 | 发现 | 建议 |
 |---|---|---|---|
-| 必须修复 / 建议 | 知识库章节 | 具体问题 | 可执行修正 |
+| 必须修复 / 建议 | 规则（对应 `references/commit-message-rules.md` 的条目） | 具体问题 | 可执行修正 |
 
 ### 建议的完整 message
 ```text
@@ -110,7 +110,7 @@ git diff --cached
 
 结论含义：
 
-- `PASS`：没有发现知识库中的必须修复项；可同时列出不阻塞提交的建议。
+- `PASS`：没有发现规则参考中的必须修复项；可同时列出不阻塞提交的建议。
 - `NEEDS_CHANGES`：存在格式、意图、breaking-change 信号或必需 AI footer 缺失等必须修复项。
 - `ADVISORY`：message 本身可接受，但因为缺少 diff、AI 协作事实或迁移影响等信息而无法完成某些质量判断。
 

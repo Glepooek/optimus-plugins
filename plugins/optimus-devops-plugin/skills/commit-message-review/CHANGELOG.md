@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1] - 2026-10-30
+
+### Changed
+- 输出模板与结论定义中的"知识库"措辞改为指向随 skill 分发的 `references/commit-message-rules.md`，避免安装后模型去寻找不存在的 `knowledge-base/`；README 同步。
+- `references/commit-message-rules.md` 标注摘要来源与同步日期。
+- `known-issues.md` 注明所引流程文档不随插件分发。
+
 ## [1.0.0] - 2026-10-29
 
 ### Added
