@@ -24,3 +24,10 @@ plugins/optimus-frontend/install.sh text eol=lf
 # commit-message-gate.sh 是随插件分发、由 hook 直接执行的 shell 脚本，与 install.sh 同因：
 # CRLF 会让 `set -euo pipefail` 的行尾回车符被当作选项名而报错，门禁随之失效。
 plugins/optimus-devops/hooks/pretooluse/commit-message-gate.sh text eol=lf
+
+# 其余所有 .sh 一律固定 LF，不再逐个文件登记。上面几条具体规则保留是因为注释里记录了
+# 各自的失效机理；本条是兜底，覆盖 review-gate.sh、build-deb.sh 以及今后新增的脚本。
+# 同因：本机 core.autocrlf=true 会在检出时把 LF 换成 CRLF，而 Linux/macOS 上行尾回车符
+# 会让 shebang 报 "bad interpreter"、让 `set -euo pipefail` 报错，**不报错地失效**——
+# 作者机器（Git Bash 会吞掉 \r）上能跑，别人机器上跑不了。
+*.sh text eol=lf
