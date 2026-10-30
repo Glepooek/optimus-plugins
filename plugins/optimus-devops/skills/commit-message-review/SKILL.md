@@ -2,7 +2,7 @@
 name: commit-message-review
 description: 审查拟提交或已有 Git commit message 是否符合随插件分发的 Git 提交信息规则，包括 Conventional Commits、变更意图、破坏性变更和 AI 协作者 footer。用户要求审查、review、检查、改写或生成 Git 提交信息，或在准备 git commit / 提交代码、已拟好 commit message 需要提交前把关时使用；不执行 git commit、amend、push 或绕过 hook。
 metadata:
-  version: "1.0.5"
+  version: "1.0.6"
   author: desktop client team
   category: quality
 compatibility: 审查粘贴的提交信息不需要本地依赖；读取指定 commit 或将信息与暂存改动比对时，需要在 Git 仓库中运行 Git。
@@ -58,6 +58,9 @@ git diff --cached
 | Git 仓库校验失败 | 不执行 Git 读取；请求直接粘贴 message，或让用户在正确的仓库目录重新调用。 |
 | 用户要求核对暂存改动但暂存区为空 | 报告无法验证 message 与提交内容的一致性；仍完成对 message 文本的规则审查。 |
 | message 中只有字面 `\\n` 而非真实换行 | 按单行 message 审查，并提示用户用真实换行提供 body 和 footer 后再复核。 |
+| 粘贴内容或读取到的 message 为空或仅含空白 | 按“未提供完整 message”处理：停止审查，请求有效 message，不输出 PASS。 |
+| 一次提供多条 message | 逐条独立审查，每条单独给出结论表；不合并成一个总体结论，也不拿一条的结果代替另一条。 |
+| message 中疑似含密钥、令牌或密码 | 报告和“建议的完整 message”中用 `<已省略敏感内容>` 代替原文，提示用户移除后再提交；仍完成其余规则审查，并在覆盖范围写明“敏感信息未扫描”。 |
 
 ## Step 2：按规则审查 message
 
@@ -71,7 +74,7 @@ git diff --cached
 | type | 必须是 `feat`、`fix`、`docs`、`style`、`refactor`、`perf`、`test`、`build`、`ci`、`chore` 或 `revert`，且能表达实际变更性质。 | 按实际意图替换 type；不要为了通过格式检查而随意选 `chore`。 |
 | 变更意图 | 标题和 body 能说明变更做了什么、为何需要；不得是 `update`、单独的 `fix`、`wip` 或同等无意义描述。 | 写出对象和结果，必要时在 body 补充原因。 |
 | 破坏性变更 | 若 message 或暂存改动明确移除、改名或改变兼容契约，必须在 header 使用 `!` 或在 footer 写 `BREAKING CHANGE: <迁移说明>`。 | 标记 breaking change，并提供受影响方可执行的迁移说明；两种标记可同时存在但不是强制。 |
-| AI 协作者 | 本次改动或最终 message 由 AI 实质协助时，末尾必须有每位实际模型各一行的 `Co-Authored-By: <实际模型名> <noreply@供应商域名>` footer。 | 不猜测模型名或邮箱；向用户确认当前会话实际模型和供应商域名后再生成 trailer。 |
+| AI 协作者 | 本次改动或最终 message 由 AI 实质协助时，末尾必须有每位实际模型各一行的 `Co-Authored-By: <实际模型名> <noreply@供应商域名>` footer。 | 用户在请求中给出模型名和供应商域名时原样使用；未给出时，“建议的完整 message”中的 trailer 必须写成 `Co-Authored-By: <待确认的实际模型名> <noreply@待确认的供应商域名>`，并要求用户确认。禁止用审查者自身的模型名或常见邮箱填充。 |
 
 ### 建议改进
 
@@ -119,7 +122,7 @@ git diff --cached
 ## 不要做什么
 
 - 不因标题格式通过就判定整个提交安全、原子或已通过 hook；这些结论需要提交内容、hook 或 CI 的独立证据。
-- 不编造 scope、变更原因、issue 编号、迁移步骤、实际模型名或 AI 邮箱来凑一条“完整”message。
+- 不编造 scope、变更原因、issue 编号、迁移步骤、实际模型名或 AI 邮箱来凑一条“完整”message；审查者自身的模型名也不是用户确认过的事实，不得写入 trailer。
 - 不把 `update`、单独的 `fix`、`wip` 等无意义描述换成另一句同样空泛的词；修正必须说明变更对象和结果。
 - 不把新增替代方案直接标为 breaking change；只有旧契约被移除或发生不兼容变化才标记。
 - 不执行 `git add`、`git commit`、`git commit --amend`、`git push`、强制推送或 `--no-verify`。本 skill 只审查，不替用户改写 Git 历史。
