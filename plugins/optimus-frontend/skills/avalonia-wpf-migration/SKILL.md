@@ -4,7 +4,7 @@ description: Use when migrating a WPF application to Avalonia, selecting Avaloni
 license: MIT
 compatibility: 需要安装 optimus-mcp-servers 中无需认证的 Avalonia Docs MCP；迁移目标项目须可由本地文件工具读取，实际构建与测试仍依赖目标项目所需的 .NET SDK。
 metadata:
-  version: "1.2.2"
+  version: "1.2.3"
   author: desktop client team
   category: workflow
 allowed-tools: Read Glob Grep Write avalonia-docs

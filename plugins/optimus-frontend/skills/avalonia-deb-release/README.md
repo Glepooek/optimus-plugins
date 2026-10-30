@@ -1,6 +1,6 @@
 # avalonia-deb-release
 
-> 版本：2.0.1 | 分类：workflow
+> 版本：2.0.3 | 分类：workflow
 
 把已发布好的 Avalonia Linux 产物打成可安装的 `.deb` 包，并完成命令行与图形界面两种安装验收；不负责 publish、Parcel 或对外发布。
 

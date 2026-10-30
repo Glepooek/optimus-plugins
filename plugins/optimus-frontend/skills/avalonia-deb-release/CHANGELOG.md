@@ -1,3 +1,8 @@
+## [2.0.3] - 2026-10-30
+
+### Changed
+- README 版本行与 SKILL.md 的 `metadata.version` 对齐（此前滞后于 SKILL.md）
+
 ## [2.0.2] - 2026-10-30
 
 ### Changed

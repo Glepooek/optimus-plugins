@@ -4,7 +4,7 @@ description: Use when reviewing Avalonia AXAML or C# UI code for framework corre
 license: MIT
 compatibility: 需要安装 optimus-mcp-servers 中无需认证的 Avalonia Docs MCP；支持审查用户粘贴的代码或本地 Avalonia 项目中的已限定文件范围。
 metadata:
-  version: "1.0.2"
+  version: "1.0.3"
   author: desktop client team
   category: quality
 allowed-tools: Read Glob Grep avalonia-docs

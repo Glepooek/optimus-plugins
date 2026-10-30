@@ -4,7 +4,7 @@ description: Use when building, reviewing, or troubleshooting an Avalonia UI app
 license: MIT
 compatibility: 需要安装 optimus-mcp-servers 中无需认证的 Avalonia Docs MCP；实际构建、运行和发布仍依赖目标项目所需的 .NET SDK。
 metadata:
-  version: "2.1.1"
+  version: "2.1.2"
   author: desktop client team
   category: workflow
 allowed-tools: Read Glob Grep avalonia-docs

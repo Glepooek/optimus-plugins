@@ -34,8 +34,23 @@ is_category() {
     return 1
 }
 
+has_staged() {
+    case "$1" in
+        wpf) [[ ${#WPF_FILES[@]} -gt 0 ]] ;;
+        avalonia) [[ ${#AVALONIA_FILES[@]} -gt 0 ]] ;;
+    esac
+}
+
+# 打印某类别的 staged 文件，每行一个。空数组在 bash 3.2 + set -u 下展开会报错，故先判长度。
 staged_files() {
-    git diff --cached --name-only -- "$(gate_pattern "$1")"
+    case "$1" in
+        wpf)
+            if [[ ${#WPF_FILES[@]} -gt 0 ]]; then printf '%s
+' "${WPF_FILES[@]}"; fi ;;
+        avalonia)
+            if [[ ${#AVALONIA_FILES[@]} -gt 0 ]]; then printf '%s
+' "${AVALONIA_FILES[@]}"; fi ;;
+    esac
 }
 
 current_hash() {
@@ -68,10 +83,22 @@ if [[ "${1:-}" == "mark" ]]; then
 fi
 
 # 检测模式：两类都没有 staged 改动，直接放行，不必关心当前命令是不是 git commit
+# 一次 git 调用取全部 staged 路径，再在 bash 里按后缀归类，而不是每类各起一次 git——
+# 本 hook 每次 Bash 调用都会触发，进程数就是成本。-z 让路径不被引号转义，
+# 中文、空格文件名也能按后缀匹配，不会因此漏判。
+WPF_FILES=()
+AVALONIA_FILES=()
+while IFS= read -r -d '' f; do
+    case "$f" in
+        *.xaml) WPF_FILES+=("$f") ;;
+        *.axaml) AVALONIA_FILES+=("$f") ;;
+    esac
+done < <(git diff --cached --name-only -z)
+
 staged_cats=()
-for cat in "${CATEGORIES[@]}"; do
-    if [[ -n "$(staged_files "$cat")" ]]; then
-        staged_cats+=("$cat")
+for category in "${CATEGORIES[@]}"; do
+    if has_staged "$category"; then
+        staged_cats+=("$category")
     fi
 done
 if [[ ${#staged_cats[@]} -eq 0 ]]; then
@@ -88,11 +115,11 @@ if [[ ! "$input" =~ $GIT_COMMIT_RE ]]; then
 fi
 
 blocked=()
-for cat in "${staged_cats[@]}"; do
-    hash_now="$(current_hash "$cat")"
-    hash_marked="$(cat "$MARK_DIR/$cat.hash" 2>/dev/null || true)"
+for category in "${staged_cats[@]}"; do
+    hash_now="$(current_hash "$category")"
+    hash_marked="$(cat "$MARK_DIR/$category.hash" 2>/dev/null || true)"
     if [[ -z "$hash_marked" || "$hash_now" != "$hash_marked" ]]; then
-        blocked+=("$cat")
+        blocked+=("$category")
     fi
 done
 if [[ ${#blocked[@]} -eq 0 ]]; then
@@ -100,12 +127,12 @@ if [[ ${#blocked[@]} -eq 0 ]]; then
 fi
 
 {
-    for cat in "${blocked[@]}"; do
-        echo "检测到 staged 的 $(gate_pattern "$cat") 改动尚未经 $(gate_skill "$cat") 审查（或审查后内容又发生了变化）："
-        staged_files "$cat"
+    for category in "${blocked[@]}"; do
+        echo "检测到 staged 的 $(gate_pattern "$category") 改动尚未经 $(gate_skill "$category") 审查（或审查后内容又发生了变化）："
+        staged_files "$category"
         echo
-        echo "请先调用 $(gate_skill "$cat") 完成审查并修复问题，再执行："
-        echo "  bash \"${BASH_SOURCE[0]}\" mark $cat"
+        echo "请先调用 $(gate_skill "$category") 完成审查并修复问题，再执行："
+        echo "  bash \"${BASH_SOURCE[0]}\" mark $category"
         echo
     done
     echo "标记通过后重新提交。"

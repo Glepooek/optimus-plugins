@@ -4,7 +4,7 @@ description: Use when packaging an already-published Avalonia Linux build into a
 license: MIT
 compatibility: 当前环境需已是 Linux（或 WSL2 Debian/Ubuntu），需已安装或可安装 `dpkg-deb`；图形安装验收需要图形桌面会话，无图形会话时该项验收会如实标注未覆盖。
 metadata:
-  version: "2.0.2"
+  version: "2.0.3"
   author: desktop client team
   category: workflow
 allowed-tools: Read Write Bash Glob Grep

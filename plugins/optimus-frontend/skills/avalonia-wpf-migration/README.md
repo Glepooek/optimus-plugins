@@ -1,6 +1,6 @@
 # avalonia-wpf-migration
 
-> 版本：1.2.1 | 分类：workflow
+> 版本：1.2.3 | 分类：workflow
 
 为 WPF→Avalonia 迁移提供项目分析、XPF/原生路线确认、垂直切片实施和验证记录；官方映射均按需从 Avalonia Docs MCP 查询。
 
