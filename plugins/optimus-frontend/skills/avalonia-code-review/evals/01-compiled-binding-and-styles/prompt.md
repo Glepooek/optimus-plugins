@@ -2,7 +2,7 @@
 name: avalonia-code-review-compiled-binding-and-styles
 description: Review a narrow Avalonia AXAML sample for framework-specific correctness.
 plugins:
-  - optimus-avalonia
+  - optimus-frontend
 runs: 1
 max_turns: 12
 allowed_tools: [Read, Glob, Grep, avalonia-docs]

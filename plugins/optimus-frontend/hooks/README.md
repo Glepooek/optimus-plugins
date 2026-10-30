@@ -1,4 +1,4 @@
-# WPF 代码审查门禁 Hook
+# WPF / Avalonia 代码审查门禁 Hook
 
 ## 规范依据
 
@@ -21,21 +21,29 @@
 
 ## 功能说明
 
-拦截 `git commit`（含 `--amend`），当 staged 改动包含 `.xaml` 文件且尚未经过 `wpf-code-review` skill 审查时阻止提交，提示先调用该 skill 完成审查。
+拦截 `git commit`（含 `--amend`），按文件类型要求先过对应的审查 skill，未审查则阻止提交并提示先调用该 skill：
+
+| 类别 | 触发文件 | 审查 skill | 标记文件 |
+|---|---|---|---|
+| `wpf` | `.xaml` | `wpf-code-review` | `wpf.hash` |
+| `avalonia` | `.axaml` | `avalonia-code-review` | `avalonia.hash` |
+
+两类各自独立判定：审查并标记其中一类，不会放行另一类。
 
 ## 工作原理
 
-- 门禁基于 **staged `.xaml` 内容的哈希**判定是否"已审查"，不是基于文件名——只要内容变化，哈希变化，标记失效，必须重新走审查
-- 标记文件存放在 `.git/optimus-review-marks/wpf.hash`（仓库本地，不会被提交，多仓库互不干扰）
-- 若 staged 区没有 `.xaml` 改动，或当前 Bash 命令不含 `git commit`，直接放行，不产生任何感知
+- 门禁基于 **staged 文件内容的哈希**（按类别分别计算）判定是否"已审查"，不是基于文件名——只要内容变化，哈希变化，标记失效，必须重新走审查
+- 标记文件存放在 `.git/optimus-review-marks/` 下的 `wpf.hash` 与 `avalonia.hash`（仓库本地，不会被提交，多仓库互不干扰）
+- 若某类别在 staged 区没有改动，该类别不拦；两类都没有，或当前 Bash 命令不含 `git commit`，直接放行，不产生任何感知
 
 ## 使用方式
 
-1. 正常修改 `.xaml` 文件、`git add` 后尝试提交
-2. 若命中门禁，Claude 会看到阻塞提示，按提示调用 `wpf-code-review` 完成审查、修复问题
-3. 审查通过后执行：
+1. 正常修改 `.xaml` / `.axaml` 文件、`git add` 后尝试提交
+2. 若命中门禁，Claude 会看到阻塞提示（同一次提交含两类文件时会一并列出），按提示调用对应的 `wpf-code-review` / `avalonia-code-review` 完成审查、修复问题
+3. 审查通过后，**只标记已审查的那一类**（`mark` 必须带类别参数，缺省或非法参数会报错退出）：
    ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/hooks/pretooluse/review-gate.sh" mark
+   bash "${CLAUDE_PLUGIN_ROOT}/hooks/pretooluse/review-gate.sh" mark wpf
+   bash "${CLAUDE_PLUGIN_ROOT}/hooks/pretooluse/review-gate.sh" mark avalonia
    ```
 4. 重新提交即可放行
 

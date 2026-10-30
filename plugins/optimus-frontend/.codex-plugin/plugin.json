@@ -1,7 +1,7 @@
 {
   "name": "optimus-frontend",
-  "version": "2.0.0",
-  "description": "WPF 前端开发：MasterGo 设计稿转页面与组件库、SVG 转 XAML、XAML 代码审查。内置 PreToolUse Hook：git commit 前门禁校验 .xaml 改动是否已审查",
+  "version": "2.1.0",
+  "description": "桌面前端开发（WPF + Avalonia）：MasterGo 设计稿转页面与组件库、SVG 转 XAML、XAML/AXAML 代码审查、Avalonia 文档 MCP 路由开发、WPF 迁移 Avalonia 与 Linux deb 发布。内置 PreToolUse Hook：git commit 前门禁校验 .xaml / .axaml 改动是否已审查",
   "skills": "./skills/",
   "author": {
     "name": "optimus",
@@ -12,15 +12,15 @@
   "license": "MIT",
   "interface": {
     "displayName": "Optimus Frontend",
-    "shortDescription": "WPF 前端开发工具集",
-    "longDescription": "WPF 前端开发：MasterGo 设计稿转页面与组件库、SVG 转 XAML、XAML 代码审查。内置 PreToolUse Hook：git commit 前门禁校验 .xaml 改动是否已审查",
+    "shortDescription": "桌面前端开发工具集（WPF + Avalonia）",
+    "longDescription": "桌面前端开发（WPF + Avalonia）：MasterGo 设计稿转页面与组件库、SVG 转 XAML、XAML/AXAML 代码审查、Avalonia 文档 MCP 路由开发、WPF 迁移 Avalonia 与 Linux deb 发布。内置 PreToolUse Hook：git commit 前门禁校验 .xaml / .axaml 改动是否已审查",
     "developerName": "Optimus",
     "category": "Frontend",
     "capabilities": [
       "Skills"
     ],
     "defaultPrompt": [
-      "开始一段 WPF 前端开发任务"
+      "开始一段 WPF 或 Avalonia 桌面前端开发任务"
     ]
   }
 }

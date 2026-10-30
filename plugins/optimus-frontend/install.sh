@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-# Avalonia Skills Installer — optimus-avalonia 版
+# Avalonia Skills Installer — optimus-frontend 版
 #
 # 两级分发：先把本插件 skills/ 复制到枢纽目录，再从枢纽符号链接到各 agent
 # harness 的用户级 skill 目录，使 skill 在没有插件机制的 harness（如 Kiro）里也能被发现。
+# 本插件整体分发：${PLUGIN_ROOT}/skills 下全部 skill（WPF 与 Avalonia）都会被复制并链接，
+# 不区分技术栈。
 #
 #   ${PLUGIN_ROOT}/skills ──复制──▶ ~/.agents/skills/<name> ──符号链接──▶ claude/codex/kiro
 #     （分发源，须在 checkout 内运行）  （安装后的真源）                  （用户级目录）
