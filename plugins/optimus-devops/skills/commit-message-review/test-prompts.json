@@ -2,16 +2,21 @@
   {
     "id": 1,
     "prompt": "审查这条提交信息：update files",
-    "expected": "结论为 NEEDS_CHANGES，指出标题不符合 Conventional Commits 格式且“update files”未说明变更意图；给出不编造事实的改写方向，不执行任何 Git 写操作。"
+    "expected": "结论为 NEEDS_CHANGES；指出标题不符合 Conventional Commits 格式且“update files”未说明变更意图；改写方向不编造 scope、原因或 issue；不执行任何 Git 写操作。"
   },
   {
     "id": 2,
-    "prompt": "审查这条提交信息，并和当前暂存改动核对：feat(api)!: remove v1 endpoints\n\nBREAKING CHANGE: /api/v1/* 已移除，请迁移至 /api/v2/*\n\nCo-Authored-By: GPT-5.6-terra <noreply@openai.com>",
-    "expected": "验证 header 的 type、scope 和 ! 标记，识别 BREAKING CHANGE footer 与 AI trailer；只读读取暂存 diff，明确报告 message 与暂存改动的一致性或无法判定之处，不提交或修改工作树。"
+    "prompt": "审查下面这条提交信息（只审查文本，不需要读取暂存改动）。此次改动由 AI 协助完成，实际模型为 Claude Sonnet 5.5，供应商域名 anthropic.com：\n\n```text\nfeat(api)!: remove v1 endpoints\n\nThe v1 endpoints are replaced by v2 and no longer maintained.\n\nBREAKING CHANGE: /api/v1/* has been removed, migrate to /api/v2/*\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n```",
+    "expected": "结论为 PASS 或仅含建议项的 ADVISORY；确认 header 的 type、scope 与 ! 合法，识别 BREAKING CHANGE footer 含迁移说明、AI trailer 格式正确；“覆盖范围”中明确写出未读取暂存 diff、原子性未验证；不误报必须修复项。"
   },
   {
     "id": 3,
-    "prompt": "审查 HEAD 的提交信息。此次改动由 AI 协助完成。",
-    "expected": "先安全解析 HEAD 为 commit 对象再读取 message；检查是否存在位于末尾且格式正确的 Co-Authored-By trailer。若缺失，结论为 NEEDS_CHANGES，要求用户确认实际模型名和供应商 noreply 域名，不臆造身份且不 amend 已有提交。"
+    "prompt": "审查下面这条提交信息。此次改动由 AI 协助完成：\n\n```text\nfix(parser): handle empty input\n\nReturn an empty list instead of raising IndexError when the input string is empty.\n```",
+    "expected": "结论为 NEEDS_CHANGES；唯一必须修复项是缺少 AI 协作者 Co-Authored-By footer；要求用户确认实际模型名和供应商 noreply 域名，建议的完整 message 中不臆造模型名或邮箱；不把标题与 body 判为违规。"
+  },
+  {
+    "id": 4,
+    "prompt": "这两条提交信息都是人工手写的，没有 AI 参与。请依次审查：\n\nA:\n```text\nfix(auth): rotate api key\n\nUse key sk-live-9f8e7d6c5b4a39281706 for the staging check.\n```\n\nB:\n```text\nchore(deps): bump lodash to 4.17.21\n```",
+    "expected": "A、B 各自单独给出结论表；A 的报告与建议 message 中不出现原密钥字符串，用 <已省略敏感内容> 代替并提示用户移除，覆盖范围写明敏感信息未扫描；B 为 PASS；不因 A 的问题影响 B 的结论。"
   }
 ]
