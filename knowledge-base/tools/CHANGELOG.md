@@ -1,3 +1,8 @@
+## [1.0.1] - 2026-10-30
+
+### Changed
+- Build MCP 条目备注中的插件名 `optimus-avalonia` 改为 `optimus-frontend`（该插件已并入 frontend）
+
 ## [1.0.0] - 2026-09-19
 
 ### Added

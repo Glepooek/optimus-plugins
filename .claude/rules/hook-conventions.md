@@ -42,7 +42,7 @@ python -m unittest discover -s .githooks -p "test_*.py"   # 18 个自检用例
 | 位置 | 事件 | 用途 |
 |---|---|---|
 | `plugins/optimus-backend/hooks/hooks.json` | `PreToolUse`（matcher `Bash`） | staged `.cs` 未经 `csharp-code-review` 时拦 `git commit` |
-| `plugins/optimus-frontend/hooks/hooks.json` | `PreToolUse`（matcher `Bash`） | staged `.xaml` 未经 `wpf-code-review` 时拦 `git commit` |
+| `plugins/optimus-frontend/hooks/hooks.json` | `PreToolUse`（matcher `Bash`） | staged `.xaml` 未经 `wpf-code-review`、或 staged `.axaml` 未经 `avalonia-code-review` 时拦 `git commit` |
 | `plugins/optimus-devops/hooks/hooks.json` | `PreToolUse`（matcher `Bash`） | 未经 `commit-message-review` 审查的 `git commit` 命令被拦（按命令文本 hash 判定） |
 | `plugins/optimus-devops/hooks/hooks.json` | `SessionStart` | 技巧轮播（**必须同步**，`async` 会让 `systemMessage` 只交付给 Claude） |
 | `plugins/optimus-devops/hooks/hooks.json` | `Notification`（matcher `permission_prompt`） | Windows toast 通知（`async: true` 刻意保留，纯副作用且该事件本就丢弃 `systemMessage`） |

@@ -1,10 +1,46 @@
 #!/usr/bin/env bash
-# PreToolUse 门禁：拦截 git commit，要求 staged 的 .xaml 改动先经 wpf-code-review 审查。
+# PreToolUse 门禁：拦截 git commit，要求 staged 的 .xaml / .axaml 改动先经对应 skill 审查。
+#   wpf       *.xaml    wpf-code-review
+#   avalonia  *.axaml   avalonia-code-review
+# 两类各自独立判定、各自一个标记文件，审查一类不会放行另一类。
 # 用法：
-#   review-gate.sh        默认检测模式，作为 PreToolUse hook 被调用（stdin 传入 hook JSON）
-#   review-gate.sh mark   审查通过后，标记当前 staged .xaml 内容为已审查
+#   review-gate.sh                  默认检测模式，作为 PreToolUse hook 被调用（stdin 传入 hook JSON）
+#   review-gate.sh mark <类别>      审查通过后，标记该类别当前 staged 内容为已审查（wpf | avalonia）
 
 set -euo pipefail
+
+CATEGORIES=(wpf avalonia)
+
+# 不用关联数组：兼容 bash 3.2。
+gate_pattern() {
+    case "$1" in
+        wpf) echo '*.xaml' ;;
+        avalonia) echo '*.axaml' ;;
+    esac
+}
+
+gate_skill() {
+    case "$1" in
+        wpf) echo 'wpf-code-review' ;;
+        avalonia) echo 'avalonia-code-review' ;;
+    esac
+}
+
+is_category() {
+    local c
+    for c in "${CATEGORIES[@]}"; do
+        [[ "$c" == "${1:-}" ]] && return 0
+    done
+    return 1
+}
+
+staged_files() {
+    git diff --cached --name-only -- "$(gate_pattern "$1")"
+}
+
+current_hash() {
+    git diff --cached -- "$(gate_pattern "$1")" | sha256sum | cut -d' ' -f1
+}
 
 GIT_DIR="$(git rev-parse --git-dir 2>/dev/null || true)"
 if [[ -z "$GIT_DIR" ]]; then
@@ -19,24 +55,26 @@ if [[ -z "$GIT_DIR" ]]; then
 fi
 
 MARK_DIR="$GIT_DIR/optimus-review-marks"
-MARK_FILE="$MARK_DIR/wpf.hash"
-SKILL_NAME="wpf-code-review"
-PATTERN='*.xaml'
-
-current_hash() {
-    git diff --cached -- "$PATTERN" | sha256sum | cut -d' ' -f1
-}
 
 if [[ "${1:-}" == "mark" ]]; then
+    if ! is_category "${2:-}"; then
+        echo "用法: review-gate.sh mark <wpf|avalonia>" >&2
+        exit 1
+    fi
     mkdir -p "$MARK_DIR"
-    current_hash > "$MARK_FILE"
-    echo "已标记当前 staged .xaml 改动为审查通过。"
+    current_hash "$2" > "$MARK_DIR/$2.hash"
+    echo "已标记当前 staged 的 $(gate_pattern "$2") 改动为审查通过。"
     exit 0
 fi
 
-# 检测模式：无 staged 的 .xaml 改动，直接放行，不必关心当前命令是不是 git commit
-staged_files="$(git diff --cached --name-only -- "$PATTERN")"
-if [[ -z "$staged_files" ]]; then
+# 检测模式：两类都没有 staged 改动，直接放行，不必关心当前命令是不是 git commit
+staged_cats=()
+for cat in "${CATEGORIES[@]}"; do
+    if [[ -n "$(staged_files "$cat")" ]]; then
+        staged_cats+=("$cat")
+    fi
+done
+if [[ ${#staged_cats[@]} -eq 0 ]]; then
     exit 0
 fi
 
@@ -49,19 +87,27 @@ if [[ ! "$input" =~ $GIT_COMMIT_RE ]]; then
     exit 0
 fi
 
-hash_now="$(current_hash)"
-hash_marked="$(cat "$MARK_FILE" 2>/dev/null || true)"
-
-if [[ -n "$hash_marked" && "$hash_now" == "$hash_marked" ]]; then
+blocked=()
+for cat in "${staged_cats[@]}"; do
+    hash_now="$(current_hash "$cat")"
+    hash_marked="$(cat "$MARK_DIR/$cat.hash" 2>/dev/null || true)"
+    if [[ -z "$hash_marked" || "$hash_now" != "$hash_marked" ]]; then
+        blocked+=("$cat")
+    fi
+done
+if [[ ${#blocked[@]} -eq 0 ]]; then
     exit 0
 fi
 
-cat >&2 <<EOF
-检测到 staged 的 WPF/.xaml 改动尚未经 ${SKILL_NAME} 审查（或审查后内容又发生了变化）：
-${staged_files}
-
-请先调用 ${SKILL_NAME} 完成审查并修复问题，再执行：
-  bash "${BASH_SOURCE[0]}" mark
-标记通过后重新提交。
-EOF
+{
+    for cat in "${blocked[@]}"; do
+        echo "检测到 staged 的 $(gate_pattern "$cat") 改动尚未经 $(gate_skill "$cat") 审查（或审查后内容又发生了变化）："
+        staged_files "$cat"
+        echo
+        echo "请先调用 $(gate_skill "$cat") 完成审查并修复问题，再执行："
+        echo "  bash \"${BASH_SOURCE[0]}\" mark $cat"
+        echo
+    done
+    echo "标记通过后重新提交。"
+} >&2
 exit 2

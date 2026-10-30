@@ -18,4 +18,4 @@
   claude mcp add --transport http avalonia-docs https://docs-mcp.avaloniaui.net/mcp
   ```
   VS Code / Cursor / Windsurf / Gemini CLI / Rider / Visual Studio 均为在各自 MCP 配置文件中写入同一 URL；Claude Desktop 通过 "Customize → Connectors" 界面手动添加自定义连接器。
-- **备注**：`analyze_wpf_project`、`migrate_to_xpf`、`migrate_to_avalonia`、`lookup_wpf_to_avalonia_mapping` 四个工具与本仓库 `optimus-avalonia`（WPF→Avalonia 迁移场景）直接相关，是潜在的补充方案，尚未集成。官方文档未给出更新或卸载命令——远程托管无需本地更新，卸载即在对应编辑器的 MCP 配置文件中删除 `avalonia-docs` 条目。
+- **备注**：`analyze_wpf_project`、`migrate_to_xpf`、`migrate_to_avalonia`、`lookup_wpf_to_avalonia_mapping` 四个工具与本仓库 `optimus-frontend`（WPF→Avalonia 迁移场景）直接相关，是潜在的补充方案，尚未集成。官方文档未给出更新或卸载命令——远程托管无需本地更新，卸载即在对应编辑器的 MCP 配置文件中删除 `avalonia-docs` 条目。

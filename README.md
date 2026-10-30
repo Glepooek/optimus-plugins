@@ -10,8 +10,7 @@
 
 | 插件 | 职责 |
 |---|---|
-| [optimus-frontend](plugins/optimus-frontend) | WPF 前端开发：MasterGo 设计稿转页面与组件库、SVG 转 XAML、XAML 代码审查 |
-| [optimus-avalonia](plugins/optimus-avalonia) | Avalonia 跨平台 UI：通过官方 Avalonia Docs MCP 路由开发与代码审查，提供 WPF 项目分析、XPF/原生路线选型与迁移编排 |
+| [optimus-frontend](plugins/optimus-frontend) | 桌面前端开发（WPF + Avalonia）：MasterGo 设计稿转页面与组件库、SVG 转 XAML、XAML/AXAML 代码审查、Avalonia 文档 MCP 路由开发与 WPF 迁移 Avalonia、Linux deb 发布 |
 | [optimus-backend](plugins/optimus-backend) | 后端开发：需求到实现全流程、公司服务 API 对接、C# 代码审查 |
 | [optimus-qa](plugins/optimus-qa) | 测试 QA：用例设计与报告、JMeter 与 UI 自动化、设计稿一致性校验、飞书项目同步 |
 | [optimus-prd](plugins/optimus-prd) | PRD 全流程：需求文档创建、优化与审查 |
@@ -28,8 +27,7 @@
 
 | 插件 | 关键依赖 |
 |---|---|
-| optimus-frontend | MasterGo MCP（设计稿读取）、Python 3 |
-| optimus-avalonia | Avalonia Docs MCP（由 `optimus-mcp-servers` 提供，无需认证）；实际迁移/构建依赖目标项目的 .NET SDK |
+| optimus-frontend | MasterGo MCP（设计稿读取）、Python 3；Avalonia 相关 skill 另需 Avalonia Docs MCP（由 `optimus-mcp-servers` 提供，无需认证），实际迁移/构建依赖目标项目的 .NET SDK |
 | optimus-backend | superpowers 插件（后端开发流程硬性依赖）、服务注册表 `api-doc-test.optimus.cn`（有本地缓存降级）、Python `requests` + `beautifulsoup4`（接口文档/网页抓取） |
 | optimus-qa | JMeter（性能测试执行）、Playwright + Midscene（UI 自动化）、MasterGo MCP、飞书项目 MCP、Figma MCP + Chrome DevTools MCP（UI 一致性校验，需自行配置）、Python（XMind 生成） |
 | optimus-prd | 无 |
@@ -66,7 +64,7 @@ git clone https://github.com/Glepooek/optimus-plugins-official ~/.claude/plugins
 /optimus-frontend:mastergo-to-wpf-page
 
 # 分析 WPF 迁移到 Avalonia 时应选 XPF 还是原生 Avalonia
-/optimus-avalonia:avalonia-wpf-migration
+/optimus-frontend:avalonia-wpf-migration
 
 # 音视频压缩、分辨率转换、片段截取
 /optimus-media:media-compress
@@ -120,7 +118,7 @@ Codex 中可用自然语言触发，或以 `@plugin:skill` 明确调用：
 @optimus-frontend:mastergo-to-wpf-page
 
 # 评估 WPF→Avalonia 的迁移路线
-@optimus-avalonia:avalonia-wpf-migration
+@optimus-frontend:avalonia-wpf-migration
 
 # 分析音视频编码/分辨率/码率/时长
 @optimus-media:media-analyze

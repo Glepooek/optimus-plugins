@@ -1,3 +1,8 @@
+## [1.0.2] - 2026-10-30
+
+### Changed
+- 本 skill 随 `optimus-avalonia` 并入 `optimus-frontend`，调用前缀改为 `/optimus-frontend:avalonia-code-review`；eval 的 `plugins` 字段同步为 `optimus-frontend`
+
 ## [1.0.1] - 2026-10-30
 
 ### Changed
