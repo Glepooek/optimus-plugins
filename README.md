@@ -10,17 +10,17 @@
 
 | 插件 | 职责 |
 |---|---|
-| [optimus-frontend-plugin](plugins/optimus-frontend-plugin) | WPF 前端开发：MasterGo 设计稿转页面与组件库、SVG 转 XAML、XAML 代码审查 |
-| [optimus-avalonia-plugin](plugins/optimus-avalonia-plugin) | Avalonia 跨平台 UI：通过官方 Avalonia Docs MCP 路由开发与代码审查，提供 WPF 项目分析、XPF/原生路线选型与迁移编排 |
-| [optimus-backend-plugin](plugins/optimus-backend-plugin) | 后端开发：需求到实现全流程、公司服务 API 对接、C# 代码审查 |
-| [optimus-qa-plugin](plugins/optimus-qa-plugin) | 测试 QA：用例设计与报告、JMeter 与 UI 自动化、设计稿一致性校验、飞书项目同步 |
-| [optimus-prd-plugin](plugins/optimus-prd-plugin) | PRD 全流程：需求文档创建、优化与审查 |
-| [optimus-office-plugin](plugins/optimus-office-plugin) | 文档处理：Word/Excel/PPT/PDF 生成，网页与本地文件转 Markdown |
-| [optimus-devops-plugin](plugins/optimus-devops-plugin) | DevOps：Jenkins 构建、项目分析、周报转写、skill 链接同步；内置 SessionStart（技巧轮播）+ Notification hooks |
+| [optimus-frontend](plugins/optimus-frontend) | WPF 前端开发：MasterGo 设计稿转页面与组件库、SVG 转 XAML、XAML 代码审查 |
+| [optimus-avalonia](plugins/optimus-avalonia) | Avalonia 跨平台 UI：通过官方 Avalonia Docs MCP 路由开发与代码审查，提供 WPF 项目分析、XPF/原生路线选型与迁移编排 |
+| [optimus-backend](plugins/optimus-backend) | 后端开发：需求到实现全流程、公司服务 API 对接、C# 代码审查 |
+| [optimus-qa](plugins/optimus-qa) | 测试 QA：用例设计与报告、JMeter 与 UI 自动化、设计稿一致性校验、飞书项目同步 |
+| [optimus-prd](plugins/optimus-prd) | PRD 全流程：需求文档创建、优化与审查 |
+| [optimus-office](plugins/optimus-office) | 文档处理：Word/Excel/PPT/PDF 生成，网页与本地文件转 Markdown |
+| [optimus-devops](plugins/optimus-devops) | DevOps：Jenkins 构建、项目分析、周报转写、skill 链接同步；内置 SessionStart（技巧轮播）+ Notification hooks |
 | [optimus-mcp-servers](plugins/optimus-mcp-servers) | MCP 服务集成：Avalonia Docs、MasterGo 设计协作、飞书项目 |
-| [optimus-media-plugin](plugins/optimus-media-plugin) | 音视频处理：分析、转码压缩、裁剪缩放、在线下载与播放预览 |
-| [optimus-decision-plugin](plugins/optimus-decision-plugin) | 工程决策支持：数据结构、算法策略与复杂度分析 |
-| [optimus-session-plugin](plugins/optimus-session-plugin) | 跨会话交接：保存进度、决策与恢复上下文 |
+| [optimus-media](plugins/optimus-media) | 音视频处理：分析、转码压缩、裁剪缩放、在线下载与播放预览 |
+| [optimus-decision](plugins/optimus-decision) | 工程决策支持：数据结构、算法策略与复杂度分析 |
+| [optimus-session](plugins/optimus-session) | 跨会话交接：保存进度、决策与恢复上下文 |
 
 ## 🔧 外部依赖
 
@@ -28,17 +28,17 @@
 
 | 插件 | 关键依赖 |
 |---|---|
-| optimus-frontend-plugin | MasterGo MCP（设计稿读取）、Python 3 |
-| optimus-avalonia-plugin | Avalonia Docs MCP（由 `optimus-mcp-servers` 提供，无需认证）；实际迁移/构建依赖目标项目的 .NET SDK |
-| optimus-backend-plugin | superpowers 插件（后端开发流程硬性依赖）、服务注册表 `api-doc-test.optimus.cn`（有本地缓存降级）、Python `requests` + `beautifulsoup4`（接口文档/网页抓取） |
-| optimus-qa-plugin | JMeter（性能测试执行）、Playwright + Midscene（UI 自动化）、MasterGo MCP、飞书项目 MCP、Figma MCP + Chrome DevTools MCP（UI 一致性校验，需自行配置）、Python（XMind 生成） |
-| optimus-prd-plugin | 无 |
-| optimus-office-plugin | markitdown、Playwright CLI（网页转 Markdown）、PptxGenJS（PPT 生成）、reportlab + pypdf（PDF 生成）、pandas + openpyxl（Excel 处理）、LibreOffice（文档转换/重算）、.NET SDK + OpenXML SDK（docx-writer） |
-| optimus-devops-plugin | Jenkins（需账号/API Token）、Python `requests` + `pyyaml`、Git（项目分析与周报提取提交记录） |
+| optimus-frontend | MasterGo MCP（设计稿读取）、Python 3 |
+| optimus-avalonia | Avalonia Docs MCP（由 `optimus-mcp-servers` 提供，无需认证）；实际迁移/构建依赖目标项目的 .NET SDK |
+| optimus-backend | superpowers 插件（后端开发流程硬性依赖）、服务注册表 `api-doc-test.optimus.cn`（有本地缓存降级）、Python `requests` + `beautifulsoup4`（接口文档/网页抓取） |
+| optimus-qa | JMeter（性能测试执行）、Playwright + Midscene（UI 自动化）、MasterGo MCP、飞书项目 MCP、Figma MCP + Chrome DevTools MCP（UI 一致性校验，需自行配置）、Python（XMind 生成） |
+| optimus-prd | 无 |
+| optimus-office | markitdown、Playwright CLI（网页转 Markdown）、PptxGenJS（PPT 生成）、reportlab + pypdf（PDF 生成）、pandas + openpyxl（Excel 处理）、LibreOffice（文档转换/重算）、.NET SDK + OpenXML SDK（docx-writer） |
+| optimus-devops | Jenkins（需账号/API Token）、Python `requests` + `pyyaml`、Git（项目分析与周报提取提交记录） |
 | optimus-mcp-servers | Avalonia Docs MCP（无需认证）、MasterGo Magic MCP（`MG_MCP_TOKEN`）、飞书项目 MCP（`MCP_USER_TOKEN`） |
-| optimus-media-plugin | ffmpeg/ffprobe（编解码分析与处理）、ffplay（播放预览，需图形显示环境）、yt-dlp（在线视频/音频下载） |
-| optimus-decision-plugin | 无 |
-| optimus-session-plugin | 无 |
+| optimus-media | ffmpeg/ffprobe（编解码分析与处理）、ffplay（播放预览，需图形显示环境）、yt-dlp（在线视频/音频下载） |
+| optimus-decision | 无 |
+| optimus-session | 无 |
 
 ## 🚀 快速开始
 
@@ -63,15 +63,15 @@ git clone https://github.com/Glepooek/optimus-plugins-official ~/.claude/plugins
 
 ```bash
 # MasterGo 设计稿转 WPF 页面
-/optimus-frontend-plugin:mastergo-to-wpf-page
+/optimus-frontend:mastergo-to-wpf-page
 
 # 分析 WPF 迁移到 Avalonia 时应选 XPF 还是原生 Avalonia
-/optimus-avalonia-plugin:avalonia-wpf-migration
+/optimus-avalonia:avalonia-wpf-migration
 
 # 音视频压缩、分辨率转换、片段截取
-/optimus-media-plugin:media-compress
-/optimus-media-plugin:media-resize
-/optimus-media-plugin:media-trim
+/optimus-media:media-compress
+/optimus-media:media-resize
+/optimus-media:media-trim
 ```
 
 ### Codex CLI 安装与使用
@@ -85,7 +85,7 @@ git clone https://github.com/Glepooek/optimus-plugins-official ~/.claude/plugins
 codex plugin marketplace add Glepooek/optimus-plugins-official
 
 # 手动安装单个插件（AVAILABLE）
-codex plugin add optimus-frontend-plugin@optimus-plugins-official
+codex plugin add optimus-frontend@optimus-plugins-official
 
 # 查看可用插件与已安装状态
 codex plugin list --available --json
@@ -96,7 +96,7 @@ codex plugin list --available --json
 ```bash
 # 从仓库根目录添加本地 marketplace
 codex plugin marketplace add ./
-codex plugin add optimus-frontend-plugin@optimus-plugins-official
+codex plugin add optimus-frontend@optimus-plugins-official
 ```
 
 **更新已安装的插件：**
@@ -117,13 +117,13 @@ Codex 中可用自然语言触发，或以 `@plugin:skill` 明确调用：
 
 ```bash
 # MasterGo 设计稿转 WPF 页面
-@optimus-frontend-plugin:mastergo-to-wpf-page
+@optimus-frontend:mastergo-to-wpf-page
 
 # 评估 WPF→Avalonia 的迁移路线
-@optimus-avalonia-plugin:avalonia-wpf-migration
+@optimus-avalonia:avalonia-wpf-migration
 
 # 分析音视频编码/分辨率/码率/时长
-@optimus-media-plugin:media-analyze
+@optimus-media:media-analyze
 ```
 
 此外，本仓库维护流程类 skill（如 `commit-cc-plugin`、`test-locally`）也会通过 `.agents/skills/` 镜像暴露给 Codex。

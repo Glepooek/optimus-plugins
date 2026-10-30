@@ -1,0 +1,69 @@
+# Changelog
+
+## [1.3.2] - 2026-10-30
+
+### Changed
+- 插件目录重命名：`optimus-devops-plugin` → `optimus-devops`，本 skill 正文中的调用前缀与路径引用同步更新
+
+## [1.3.1] - 2026-09-13
+
+### Removed
+- `evals/` 整个目录（20 个 case、40 个文件）。按用户裁决删除，一并消解了 `docs/todo-list/2026-09-12-todo.md` 的 A1（`09-trigger` 期望标注可疑）——不再需要在「改 skill 的 description」与「改 case 的期望」之间选
+- ⚠️ **删除后本仓不再有任何可被 `claude plugin eval` 发现的 case**：`wpf-code-review/evals/` 是非官方格式、产出 0 个。`AGENTS.md`「新增 skill 必须带 eval case」那条因此失去活体样本，已就地改为指向文件形态规范
+- 原始语料未随之丢失：skill 根下 `trigger-eval.json` 仍是完整的 20 条 `{query, should_trigger}`（实测 10 正 / 10 负），重建时可按 `docs/superpowers/specs/2026-09-13-pr-flow-and-free-ci-design.md` § 5.9.1「目录与文件形态」机械迁回
+
+## [1.3.0] - 2026-09-13
+
+### Added
+- 20 个官方格式 eval case（`evals/<NN>-trigger/` 10 个正例 + `evals/<NN>-no-trigger/` 10 个负例，各含 `prompt.md` + `graders/triggered.md`），可被 `claude plugin eval` 直接发现并运行——已实测确认该 skill 目录下的 `evals/` 在 plugin 级调用时能被发现
+- 负例 grader 显式写 `min: 0` 与 `max: 0` 两项：`tool_used` 的 `min` 默认为 1，只写 `max: 0` 会得到空区间 `1..0`，10 条负例会全部无法通过且不报错
+
+### Removed
+- `evals/trigger-eval.json`（自定义 20 元素数组格式，无任何工具消费，`claude plugin eval` 在它上面找到 0 个 case）。20 条 query 已逐条迁入上述 case，删除前从落盘文件反向核对每条恰好命中一处。实测该数据集为 10 正 + 10 负，与 `[1.2.0]` 条目所记的「11 条不应触发」不符
+
+## [1.2.2] - 2026-07-10
+
+### Added
+- 反例黑名单新增一条：项目级/用户级配置同时存在时未确认实际命中路径就直接触发（darwin-skill dim9 反例黑名单优化）
+
+## [1.2.1] - 2026-07-10
+
+### Changed
+- "使用方法"章节重组为显式编号 Step 1-6（确认前置条件/定位配置文件/CHECKPOINT确认/执行触发/等待轮询/输出摘要），每步补充输入/输出说明，替代此前的非线性小节结构（darwin-skill dim2 工作流清晰度优化）
+
+## [1.2.0] - 2026-07-03
+
+### Added
+- 新增触发条件评测数据集 `evals/trigger-eval.json`（10 条应触发 + 11 条不应触发场景），用于验证 description 的触发准确率
+
+## [1.1.0] - 2026-06-30
+
+### Added
+- 构建完成后输出结构化摘要表格（Job / 构建号 / 结果 / 耗时 / 构建地址 / 配置来源）
+- 失败处理表格新增"未找到配置文件"条目
+- 反例黑名单新增两条：job path 编码错误、跳过 run.sh 直接运行 main.py
+- 新增三段式 `jenkins-config.yaml.example`（配置模板 + 配置示例 + 查找优先级说明）
+- `version` 字段写入 SKILL.md frontmatter
+
+### Changed
+- 配置文件重命名：`config.yaml` → `jenkins-config.yaml`，支持两级路径查找（项目级 / 用户级 `~/.claude/`）
+- venv 固定至 `~/.claude/cache/jenkins-build/.venv`，脱离 SKILL_DIR，不污染插件仓库
+- `run.sh` 删除 `cp` 配置同步逻辑，配置查找由 `main.py` 的 `CONFIG_SEARCH_PATHS` 负责
+- description 按 writing-skills SDO 原则重写：改为 "Use when..." 触发条件格式，删除工作流摘要
+- 合并"注意事项"章节内容进"反例黑名单"，消除重复
+- 构建完成后通知从调用 `optimus-ci-notify-api-change` skill 改为直接输出摘要表格
+- `.example` 文件中重复的查找优先级列表改为引用 SKILL.md
+
+### Removed
+- `disable-model-invocation: true` frontmatter 限制
+- `globs: ["jenkins_build/**"]` 自动触发配置
+- 外层多余的 `__init__.py`
+- 旧的 `config.yaml`（本地凭证文件，已迁移至 `~/.claude/jenkins-config.yaml`）
+- 旧的 `config.yaml.example`（内容合并至新的 `jenkins-config.yaml.example`）
+- 对 `optimus-ci-notify-api-change` skill 的依赖
+
+## [1.0.0] - 初始版本
+
+- 基础 Jenkins 构建触发功能
+- 支持指定 job 名称和构建参数
+- 自动等待构建启动并轮询结果

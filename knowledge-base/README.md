@@ -178,7 +178,7 @@ skill 需要引用某条规范/知识时，先用 Grep 在对应领域的 `index
 
 `architecture`、`design-patterns`、`data-structures-algorithms`、`mcp`、`host-diagnostics`、`csharp` 尚无 skill 或脚本引用（`csharp` 原有的消费方已改为读插件内 `references/`）。这是**已知状态而非缺陷**——知识库是跨插件共享资产，供人类查阅与 agent 临时检索本身即成立。但新建领域前应按 `AGENTS.md` 的「引导器/传感器」自检问一句：这份内容有没有配对的消费方，还是只造轮子不造刹车。
 
-⚠️ 一处易误认的目录：`plugins/optimus-frontend-plugin/skills/wpf-project-conventions` 虽在 `skills/` 下，**按设计不是 skill** ——它无 `SKILL.md`，只有 `CONVENTIONS.md`（项目工程约定的事实来源，由用户填写）与 `SAMPLE.md`，被 `mastergo-to-wpf-components` 与 `mastergo-to-wpf-page` 在生成前强制读取，缺失或关键项为空则拒绝生成。设计依据见 `docs/superpowers/plans/2026-08-19-wpf-visual-skills.md`。它**不检索本知识库**。
+⚠️ 一处易误认的目录：`plugins/optimus-frontend/skills/wpf-project-conventions` 虽在 `skills/` 下，**按设计不是 skill** ——它无 `SKILL.md`，只有 `CONVENTIONS.md`（项目工程约定的事实来源，由用户填写）与 `SAMPLE.md`，被 `mastergo-to-wpf-components` 与 `mastergo-to-wpf-page` 在生成前强制读取，缺失或关键项为空则拒绝生成。设计依据见 `docs/superpowers/plans/2026-08-19-wpf-visual-skills.md`。它**不检索本知识库**。
 
 ### 承载仓库专属约定的资产（不属于本知识库）
 

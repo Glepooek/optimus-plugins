@@ -14,4 +14,4 @@
   - AI Agent 自动安装（推荐）：对 Agent 说"阅读说明并帮我安装 Apifox CLI：https://apifox.com/apifox-cli-installation-guide.md"，由其自主完成安装、登录、配置
   - 手动安装：参考帮助文档 https://docs.apifox.com/cli-command-options
 - **更新方式**：`npm install apifox-cli@latest -g`（官方文档"更新 Apifox CLI"章节明确给出）
-- **备注**：与本仓库 `optimus-qa-plugin` 下 `optimus-qa-jmeter-scripts`、`optimus-qa-test-design` 两个 skill 当前依赖的 `apifox-mcp-server`（MCP方式）同属 Apifox 生态，是获取 OpenAPI 规范/生成 JMeter 脚本的潜在替代或补充方案，尚未集成。
+- **备注**：与本仓库 `optimus-qa` 下 `optimus-qa-jmeter-scripts`、`optimus-qa-test-design` 两个 skill 当前依赖的 `apifox-mcp-server`（MCP方式）同属 Apifox 生态，是获取 OpenAPI 规范/生成 JMeter 脚本的潜在替代或补充方案，尚未集成。

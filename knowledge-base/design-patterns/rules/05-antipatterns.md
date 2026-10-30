@@ -34,7 +34,7 @@
 - **必须**：一个类型承担三类以上无关职责时拆分，拆分依据是**变更来源**而非方法数量
 - **禁止**：用「拆了要改很多调用点」为唯一理由保留上帝对象
 - **应该**：拆分从最容易独立的职责开始（通常是基础设施访问），而非一次性重构
-- **必须**：SOLID 层面的判据见 `knowledge-base/architecture/rules/02-design-principles.md § 1. SOLID 原则的可执行检查项`。C# 侧的 review 禁令见 `optimus-backend-plugin` 的 `csharp-code-review` skill 中「03 · 面向对象与设计原则」的第 1 节 SOLID 原则落地——该规范随插件分发，不在本库
+- **必须**：SOLID 层面的判据见 `knowledge-base/architecture/rules/02-design-principles.md § 1. SOLID 原则的可执行检查项`。C# 侧的 review 禁令见 `optimus-backend` 的 `csharp-code-review` skill 中「03 · 面向对象与设计原则」的第 1 节 SOLID 原则落地——该规范随插件分发，不在本库
 
 ## 3. 贫血领域模型
 
@@ -56,7 +56,7 @@
 - **必须**：依赖通过构造契约显式声明，不通过全局访问点获取
 - **禁止**：新代码引入服务定位器；存量代码改造时逐个类型收敛，不做全局替换
 - **禁止**：以「构造函数参数太多」为理由改用服务定位器——参数过多说明该类型职责过重（见 § 2），是另一个问题
-- **必须**：装配层面的通用约束见 `knowledge-base/architecture/rules/09-composition-root.md § 1. 组合根的唯一性`。C# 侧落地见 `optimus-backend-plugin` 的 `csharp-code-review` skill 中「03 · 面向对象与设计原则」的第 6 节 依赖注入；WPF 侧落地见 `optimus-frontend-plugin` 的 `wpf-code-review` skill 中「03 · MVVM 架构」的第 5 节 依赖注入与组合根——两份规范均随各自插件分发，不在本库
+- **必须**：装配层面的通用约束见 `knowledge-base/architecture/rules/09-composition-root.md § 1. 组合根的唯一性`。C# 侧落地见 `optimus-backend` 的 `csharp-code-review` skill 中「03 · 面向对象与设计原则」的第 6 节 依赖注入；WPF 侧落地见 `optimus-frontend` 的 `wpf-code-review` skill 中「03 · MVVM 架构」的第 5 节 依赖注入与组合根——两份规范均随各自插件分发，不在本库
 
 ## 5. 单例滥用
 
@@ -68,7 +68,7 @@
 - **禁止**：单例持有可变业务状态——它是进程级共享资源，业务状态放在这里会跨操作泄漏
 - **禁止**：以「只需要一个实例」为唯一理由使用单例模式；只需要一个实例的正确做法是注册单一生命周期，而非类型自我强制
 - **可以**：物理上确实唯一且无法通过装配表达的资源（进程级互斥体、硬件句柄）使用单例
-- **必须**：模式层面的完整判据见 `rules/02-creational.md § 1. 单例`。C# 侧的 DI 容器禁令见 `optimus-backend-plugin` 的 `csharp-code-review` skill 中「03 · 面向对象与设计原则」的第 7 节 设计模式适度使用——该规范随插件分发，不在本库
+- **必须**：模式层面的完整判据见 `rules/02-creational.md § 1. 单例`。C# 侧的 DI 容器禁令见 `optimus-backend` 的 `csharp-code-review` skill 中「03 · 面向对象与设计原则」的第 7 节 设计模式适度使用——该规范随插件分发，不在本库
 
 ## 6. 模式套模式
 

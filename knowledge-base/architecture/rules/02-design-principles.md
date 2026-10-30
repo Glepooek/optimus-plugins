@@ -2,7 +2,7 @@
 
 > 更新历史：2026-08-29 创建。
 
-本篇给出与架构决策直接相关的设计原则及其可执行检查项，语言无关。C# 侧的落地形态（类型选择、review 表述）见 `optimus-backend-plugin` 的 `csharp-code-review` skill 中「03 · 面向对象与设计原则」的第 1 节 SOLID 原则落地——该规范随插件分发，不在本库。
+本篇给出与架构决策直接相关的设计原则及其可执行检查项，语言无关。C# 侧的落地形态（类型选择、review 表述）见 `optimus-backend` 的 `csharp-code-review` skill 中「03 · 面向对象与设计原则」的第 1 节 SOLID 原则落地——该规范随插件分发，不在本库。
 
 ## 1. SOLID 原则的可执行检查项
 

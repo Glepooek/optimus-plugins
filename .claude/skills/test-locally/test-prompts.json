@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "prompt": "我刚改完 optimus-qa-plugin 下的一个 skill，怎么在本地测试这个改动？",
+    "prompt": "我刚改完 optimus-qa 下的一个 skill，怎么在本地测试这个改动？",
     "expected": "给出 claude --plugin-dir . 命令，说明需在仓库根目录执行；提到新会话直接输入触发词即可验证，无需重启/重装"
   },
   {
@@ -11,8 +11,8 @@
   },
   {
     "id": 3,
-    "prompt": "我只想测试 optimus-devops-plugin 这一个插件，不想加载全部 8 个，应该怎么做？",
-    "expected": "给出 claude --plugin-dir ./plugins/optimus-devops-plugin 单插件加载命令，说明相对路径需在仓库根目录下执行"
+    "prompt": "我只想测试 optimus-devops 这一个插件，不想加载全部 8 个，应该怎么做？",
+    "expected": "给出 claude --plugin-dir ./plugins/optimus-devops 单插件加载命令，说明相对路径需在仓库根目录下执行"
   },
   {
     "id": 4,

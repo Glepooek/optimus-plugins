@@ -1,9 +1,9 @@
 # dependabot 只开 github-actions 一个生态。
 #
 # 🔴 判据不是「本仓没有别的依赖」——实际有三处：
-#      plugins/optimus-office-plugin/skills/docx-writer/scripts/dotnet/
+#      plugins/optimus-office/skills/docx-writer/scripts/dotnet/
 #        ×2 个 .csproj（System.CommandLine 2.0.5、DocumentFormat.OpenXml 3.5.1）
-#      plugins/optimus-qa-plugin/skills/optimus-qa-ui-scripts/assets/templates/
+#      plugins/optimus-qa/skills/optimus-qa-ui-scripts/assets/templates/
 #        package.json
 #    判据是**版本矩阵**：那三处都落在 plugins/*/skills/<name>/ 内，按
 #    AGENTS.md 矩阵第一行，改动它们必须同时升该插件两份 plugin.json 与该

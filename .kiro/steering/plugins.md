@@ -1,6 +1,6 @@
 # 插件详情
 
-## optimus-frontend-plugin — 前端开发工具集
+## optimus-frontend — 前端开发工具集
 
 **Skills:**
 - `optimus-fe-dev` — 前端全流程开发（唯一复合 Skill，5阶段：需求收集→分析规划→代码生成→交付物生成→验证完成）
@@ -11,7 +11,7 @@
 
 ---
 
-## optimus-backend-plugin — 后端开发工具集
+## optimus-backend — 后端开发工具集
 
 **Skills:**
 - `optimus-backend-dev` — 后端开发（架构设计、API开发）
@@ -22,7 +22,7 @@
 
 ---
 
-## optimus-qa-plugin — 测试 QA 工具集
+## optimus-qa — 测试 QA 工具集
 
 **Skills（7个，最多的插件）:**
 - `optimus-qa-test-design` — 测试用例设计
@@ -35,7 +35,7 @@
 
 ---
 
-## optimus-prd-plugin — PRD 管理工具集
+## optimus-prd — PRD 管理工具集
 
 **Skills:**
 - `prd-creator` — PRD 文档创建
@@ -53,7 +53,7 @@
 
 ---
 
-## optimus-office-plugin — Office 文档处理工具集
+## optimus-office — Office 文档处理工具集
 
 **Skills（7个）:**
 - `docx-writer` — Word 文档生成（含模板和脚本）
@@ -66,7 +66,7 @@
 
 ---
 
-## optimus-devops-plugin — DevOps 工具集
+## optimus-devops — DevOps 工具集
 
 **Skills（4个）:**
 - `jenkins-build` — Jenkins CI/CD 构建触发

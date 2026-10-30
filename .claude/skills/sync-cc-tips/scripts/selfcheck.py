@@ -217,7 +217,7 @@ def run(skill_dir, tips_path):
 
 
 DEFAULT_SKILL_DIR = ".claude/skills/sync-cc-tips"
-DEFAULT_TIPS = "plugins/optimus-devops-plugin/hooks/sessionstart/tips.jsonl"
+DEFAULT_TIPS = "plugins/optimus-devops/hooks/sessionstart/tips.jsonl"
 
 
 def main(argv):

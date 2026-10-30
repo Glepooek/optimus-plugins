@@ -172,7 +172,7 @@ Minor/Major 升级前必须用 `darwin-skill` 给改动的 skill 评分：新分
 
 **六个必需检查的 job 名**——`ci.yml` 的五项（`gates-hooks`、`gates-tests`、`gates-data`、`plugin-validate`、`new-skill-eval-case`）加 `actionlint.yml` 的 `actionlint`——**由服务端 ruleset `master-protection` 要求，而它不在版本库里、改动不留 diff**。🔴 **改 job 名必须同步改 ruleset**，否则那项检查会静默不再被要求——属「不报错的失效形态」。⚠️ **反方向同样会漂移**：`actionlint` 被勾选为第六项后，本文件与 `commit-cc-plugin/SKILL.md`、`actionlint.yml` 三处都还写着「五项」，直到 2026-09-18 用 `gh api repos/:owner/:repo/rulesets/23134670` 对账才发现。**项数声明处处是副本，真源只有那条 API。**
 
-**新增 skill 必须带 eval case**：`plugins/<plugin>/skills/<skill>/evals/<case>/` 下需有 `prompt.md`（或 `case.yaml`），由 `new-skill-eval-case` job 强制，**存量不回溯**。**活体样本是 `plugins/optimus-frontend-plugin/skills/wpf-code-review/evals/` 的 6 个 case**（`01-listbox-virtualization` 等），照它写即可；规范条款见 `knowledge-base/skill-authoring/rules/03-skill-evaluation.md` § 1。⚠️ 门禁只查 case **存在**，不查内容有没有意义——质量属人工评审。⚠️ 那 6 条的判据是付费 `llm` grader，而 `skill-eval.yml` 缺 `ANTHROPIC_API_KEY`，因此**形态合规但在 CI 里一次都跑不了**——别把它当作「eval 已在 CI 里生效」的证据。
+**新增 skill 必须带 eval case**：`plugins/<plugin>/skills/<skill>/evals/<case>/` 下需有 `prompt.md`（或 `case.yaml`），由 `new-skill-eval-case` job 强制，**存量不回溯**。**活体样本是 `plugins/optimus-frontend/skills/wpf-code-review/evals/` 的 6 个 case**（`01-listbox-virtualization` 等），照它写即可；规范条款见 `knowledge-base/skill-authoring/rules/03-skill-evaluation.md` § 1。⚠️ 门禁只查 case **存在**，不查内容有没有意义——质量属人工评审。⚠️ 那 6 条的判据是付费 `llm` grader，而 `skill-eval.yml` 缺 `ANTHROPIC_API_KEY`，因此**形态合规但在 CI 里一次都跑不了**——别把它当作「eval 已在 CI 里生效」的证据。
 
 **pre-commit 具体拦什么**（与 skill 分工明确）：每插件两份 `plugin.json` 版本同值、`plugins/*/hooks/hooks.json` 与 Claude Code 契约相符、marketplace 外部引用条目锁 40 位 `sha` 且不写 `version`、台账「已接入」表与条目 sha 一致、`.kiro`/`.agents` 符号链接镜像完整且以 `120000` 模式入库。**新克隆的仓库需执行一次 `git config core.hooksPath .githooks`**（该配置是本机的，不随仓库分发）。
 
@@ -202,10 +202,10 @@ python -m unittest discover -s .claude/skills/sync-cc-tips/scripts -p "test_*.py
 python -m unittest discover -s .githooks -p "test_*.py"
 
 # 插件内脚本
-python -m unittest discover -s plugins/optimus-frontend-plugin/skills/mastergo-icon-expoter/scripts -p "test_*.py"
-python -m unittest discover -s plugins/optimus-frontend-plugin/skills/mastergo-to-wpf-components/scripts -p "test_*.py"
-python -m unittest discover -s plugins/optimus-frontend-plugin/skills/mastergo-to-wpf-page/scripts -p "test_*.py"
-python -m unittest discover -s plugins/optimus-frontend-plugin/skills/svg-to-xaml-path/scripts -p "test_*.py"
+python -m unittest discover -s plugins/optimus-frontend/skills/mastergo-icon-expoter/scripts -p "test_*.py"
+python -m unittest discover -s plugins/optimus-frontend/skills/mastergo-to-wpf-components/scripts -p "test_*.py"
+python -m unittest discover -s plugins/optimus-frontend/skills/mastergo-to-wpf-page/scripts -p "test_*.py"
+python -m unittest discover -s plugins/optimus-frontend/skills/svg-to-xaml-path/scripts -p "test_*.py"
 python -m unittest discover -s plugins/optimus-mcp-servers/scripts -p "test_*.py"
 ```
 

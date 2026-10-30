@@ -90,7 +90,7 @@ class TestExtractRejectsNoise(unittest.TestCase):
             ('.claude/settings.json', '/settings'),
             ('~/.claude', '/claude'),
             ('github.com/example/repo', '/example'),
-            ('plugins/optimus-devops-plugin/hooks', '/hooks'),
+            ('plugins/optimus-devops/hooks', '/hooks'),
         )
         for text, wrong in cases:
             with self.subTest(text=text):

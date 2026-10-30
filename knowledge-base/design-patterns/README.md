@@ -4,7 +4,7 @@
 
 > 面向团队的设计模式**判断层**规范。**语言无关**——本领域回答「该不该用这个模式、什么信号说明用错了」，不回答「怎么写」。
 
-本领域负责模式的选用判据与误用识别；架构风格的选型（分层/六边形/整洁/DDD）归 `knowledge-base/architecture/`，模式的语言落地见 `optimus-backend-plugin` 的 `csharp-code-review` skill，WPF 中的特有形态见 `optimus-frontend-plugin` 的 `wpf-code-review` skill（两者均随插件分发）。需要判断「这段代码该不该改成某模式」时用本领域，需要「在 C# 里怎么写」时引用前者。
+本领域负责模式的选用判据与误用识别；架构风格的选型（分层/六边形/整洁/DDD）归 `knowledge-base/architecture/`，模式的语言落地见 `optimus-backend` 的 `csharp-code-review` skill，WPF 中的特有形态见 `optimus-frontend` 的 `wpf-code-review` skill（两者均随插件分发）。需要判断「这段代码该不该改成某模式」时用本领域，需要「在 C# 里怎么写」时引用前者。
 
 ## 文档目的
 
@@ -89,8 +89,8 @@
 ## 与仓库已有资产的关系
 
 - `knowledge-base/architecture/`：架构风格选型与设计原则。「模式成本与复杂度匹配」的权威在该领域 `rules/06-style-selection.md`
-- `csharp-code-review` skill（`optimus-backend-plugin`）：模式的 C# 落地。其 `references/03-design-principles.md` 第 7 节保留 DI 容器时代单例的 C# 侧禁令，通用判据在本领域。⚠️ 随插件分发，本库不持有副本
-- `wpf-code-review` skill（`optimus-frontend-plugin`）：WPF 中模式的具体形态（`ICommand` 承载命令、事件聚合器承载观察者、Behavior 承载交互策略），与本领域是判断层 vs 落地层的分层关系，同样随插件分发
+- `csharp-code-review` skill（`optimus-backend`）：模式的 C# 落地。其 `references/03-design-principles.md` 第 7 节保留 DI 容器时代单例的 C# 侧禁令，通用判据在本领域。⚠️ 随插件分发，本库不持有副本
+- `wpf-code-review` skill（`optimus-frontend`）：WPF 中模式的具体形态（`ICommand` 承载命令、事件聚合器承载观察者、Behavior 承载交互策略），与本领域是判断层 vs 落地层的分层关系，同样随插件分发
 
 ## 权威参考
 

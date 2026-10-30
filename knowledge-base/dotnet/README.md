@@ -33,8 +33,8 @@
 | 判断 WPF 能否在 ARM64 / x86 / x64 上原生运行 | `reference/wpf-cpu-architecture-support.md` |
 | 选择项目目标框架和 SDK | 本文档 + `csharp-code-review` skill 的「01 · 环境与技术选型 + 解决方案与项目结构」 |
 | 进行 .NET Framework 到现代 .NET 迁移 | 支持矩阵 reference + 迁移类 skill 的具体流程 |
-| 开发 C# 代码 | `csharp-code-review` skill（`optimus-backend-plugin`，规范随插件分发） |
-| 开发 WPF 桌面界面 | `wpf-code-review` skill（`optimus-frontend-plugin`，规范随插件分发） |
+| 开发 C# 代码 | `csharp-code-review` skill（`optimus-backend`，规范随插件分发） |
+| 开发 WPF 桌面界面 | `wpf-code-review` skill（`optimus-frontend`，规范随插件分发） |
 
 ## 内容类型
 

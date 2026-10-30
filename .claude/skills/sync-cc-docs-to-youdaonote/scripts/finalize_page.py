@@ -18,7 +18,7 @@ from pathlib import Path
 
 from resolve_category import MAP_PATH, REPO_ROOT, load_folder_map, save_folder_map, youdaonote_list
 
-WEB_TO_MD_SCRIPTS = REPO_ROOT / "plugins" / "optimus-office-plugin" / "skills" / "web-to-markdown" / "scripts"
+WEB_TO_MD_SCRIPTS = REPO_ROOT / "plugins" / "optimus-office" / "skills" / "web-to-markdown" / "scripts"
 POST_PROCESS = WEB_TO_MD_SCRIPTS / "post_process.py"
 VERIFY = WEB_TO_MD_SCRIPTS / "verify.py"
 VERIFY_QUALITY = WEB_TO_MD_SCRIPTS / "verify_quality.py"

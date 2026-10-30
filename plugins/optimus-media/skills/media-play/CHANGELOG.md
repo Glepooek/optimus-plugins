@@ -1,0 +1,31 @@
+# Changelog
+
+## [1.2.3] - 2026-10-30
+
+### Changed
+- 插件目录重命名：`optimus-media-plugin` → `optimus-media`，本 skill 正文中的调用前缀与路径引用同步更新
+
+## [1.2.1] - 2026-08-28
+
+### Fixed
+- `media-stream-basics.md §1` 引用补上标题文本「一个媒体文件由什么构成」，使其可被 `knowledge-base-maintain` 的 `check_refs.py` 交叉校验——裸章节号在规范文件重编号后会静默失效
+
+## [1.2.0] - 2026-08-26
+
+### Added
+- HLS（m3u8）多档主清单支持指定清晰度播放：Step 3 先用 `ffprobe -select_streams v` 探测主清单各视频档位（分辨率），再按档位序号用 `-vst v:<n>` / `-ast a:<n>` 选档播放（含同档音频流），用户口语描述（"720p""最高清晰度"）按探测结果就近匹配
+- 明确清晰度选择仅适用于 HLS 多档主清单：本地文件、HTTP 直链 mp4、RTMP/RTSP 均为单档流，加 `-vst`/`-ast` 无意义
+- 失败处理新增"HLS 指定清晰度时 ffprobe 探测失败"场景；不要做什么补充"不要臆测档位序号，必须先探测"反例
+- 触发词补充"指定清晰度播放/高清播放"
+
+## [1.1.0] - 2026-08-26
+
+### Added
+- 新增网络流播放支持：播放目标区分为"本地文件播放"与"网络流播放"两种形态；Step 2 按含 `://` 协议头判断类型并走对应校验路径（本地文件→存在性校验，网络流 URL→格式校验）；Step 3 按类型选择命令模板（HLS/RTMP 网络流、RTSP 加 `-rtsp_transport tcp`）
+- 失败处理新增网络流特有场景：连接失败/无法解析、RTSP 花屏（改 TCP）、RTMP 构建缺协议、DRM 不可解密、直播流不可回拖
+- 触发词补充"播放这个链接/播放网络流/播放m3u8/播放rtsp流"；网络流协议概念引用 `knowledge-base/media/reference/streaming-protocols.md`
+
+## [1.0.0] - 2026-08-13
+
+### Added
+- 新增 media-play skill：基于 ffplay 播放单个音视频文件，后台非阻塞启动播放窗口，播放结束自动关闭

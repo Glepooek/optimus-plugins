@@ -7,13 +7,13 @@
 tips.jsonl 是已入库文件，**git 本身就是回滚基线**，无需另存副本：
 
 ```bash
-git status --short plugins/optimus-devops-plugin/hooks/sessionstart/tips.jsonl   # 应为空（干净）
+git status --short plugins/optimus-devops/hooks/sessionstart/tips.jsonl   # 应为空（干净）
 ```
 
 - 输出为空 → 直接改，出错时 `git restore <path>` 即可回到本轮起点
 - 输出非空**且与前置校验所见相同** → 用户已在前置校验的 CHECKPOINT 同意带脏基线继续，**据此直接放行，不要二次询问**——再问一次等于作废用户刚给出的同意
 - 输出非空**且与前置校验所见不同** → 中途又被别的操作改过，前次同意不覆盖新出现的改动，回到前置校验那个 CHECKPOINT 重新确认
-- 需要与改动前对比时用 `git show HEAD:plugins/optimus-devops-plugin/hooks/sessionstart/tips.jsonl`
+- 需要与改动前对比时用 `git show HEAD:plugins/optimus-devops/hooks/sessionstart/tips.jsonl`
 
 ⚠️ 本探测在「执行前置校验」已做过一次，此处是**紧邻破坏性写入前的复检**，不是重复——两次之间隔着抓取、判定、生成三个阶段，其间工作区状态可能被别的操作改变。复检的作用是**比对与前次是否相同**，不是重新征求同意。
 
@@ -30,7 +30,7 @@ Write: .claude/skills/sync-cc-tips/scripts/_apply_sync.py   （下划线前缀�
 脚本要点：`json.loads` 逐行读入 → 按 `id` 匹配处理 → `json.dumps(ensure_ascii=False)` 写回，`io.open(..., newline="\n")` 固定换行符；结尾自校验「旧数 − 删除 + 新增 == 实得」并在不符时 `sys.exit` 报错。**用后必须删除该脚本**，不要留在 `scripts/` 里污染正式脚本目录。
 
 ```
-Edit: plugins/optimus-devops-plugin/hooks/sessionstart/tips.jsonl   （改动 ≤ 2 条时直接用）
+Edit: plugins/optimus-devops/hooks/sessionstart/tips.jsonl   （改动 ≤ 2 条时直接用）
 ```
 
 - **新增**：追加到文件末尾，每条为一行合法 JSON 对象

@@ -37,7 +37,7 @@ import re
 import statistics
 import sys
 
-DEFAULT_TIPS = "plugins/optimus-devops-plugin/hooks/sessionstart/tips.jsonl"
+DEFAULT_TIPS = "plugins/optimus-devops/hooks/sessionstart/tips.jsonl"
 
 REQUIRED_FIELDS = ("id", "category", "title", "body")
 

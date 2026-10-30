@@ -8,38 +8,38 @@
   },
   "plugins": [
     {
-      "name": "optimus-frontend-plugin",
-      "source": "./plugins/optimus-frontend-plugin",
+      "name": "optimus-frontend",
+      "source": "./plugins/optimus-frontend",
       "description": "WPF 前端开发：MasterGo 设计稿转页面与组件库、SVG 转 XAML、XAML 代码审查。内置 PreToolUse Hook：git commit 前门禁校验 .xaml 改动是否已审查"
     },
     {
-      "name": "optimus-avalonia-plugin",
-      "source": "./plugins/optimus-avalonia-plugin",
+      "name": "optimus-avalonia",
+      "source": "./plugins/optimus-avalonia",
       "description": "Avalonia 跨平台 UI：通过官方 Avalonia Docs MCP 路由开发和代码审查，提供 WPF 项目分析、XPF/原生路线选型与迁移编排"
     },
     {
-      "name": "optimus-backend-plugin",
-      "source": "./plugins/optimus-backend-plugin",
+      "name": "optimus-backend",
+      "source": "./plugins/optimus-backend",
       "description": "后端开发：需求到实现全流程、公司服务 API 对接、C# 代码审查。内置 PreToolUse Hook：git commit 前门禁校验 .cs 改动是否已审查"
     },
     {
-      "name": "optimus-qa-plugin",
-      "source": "./plugins/optimus-qa-plugin",
+      "name": "optimus-qa",
+      "source": "./plugins/optimus-qa",
       "description": "测试 QA：用例设计与报告、JMeter 与 UI 自动化、设计稿一致性校验、飞书项目同步"
     },
     {
-      "name": "optimus-prd-plugin",
-      "source": "./plugins/optimus-prd-plugin",
+      "name": "optimus-prd",
+      "source": "./plugins/optimus-prd",
       "description": "PRD 全流程：需求文档创建、优化与审查"
     },
     {
-      "name": "optimus-office-plugin",
-      "source": "./plugins/optimus-office-plugin",
+      "name": "optimus-office",
+      "source": "./plugins/optimus-office",
       "description": "文档处理：Word/Excel/PPT/PDF 生成，网页与本地文件转 Markdown"
     },
     {
-      "name": "optimus-devops-plugin",
-      "source": "./plugins/optimus-devops-plugin",
+      "name": "optimus-devops",
+      "source": "./plugins/optimus-devops",
       "description": "DevOps：Jenkins 构建、项目分析、周报转写、skill 链接同步、.NET 取证输出解读与根因定位。内置 Hooks：SessionStart（技巧智能轮播）、Notification（Windows权限通知）"
     },
     {
@@ -48,18 +48,18 @@
       "description": "MCP 服务集成：Avalonia 文档、MasterGo 设计协作、飞书项目"
     },
     {
-      "name": "optimus-media-plugin",
-      "source": "./plugins/optimus-media-plugin",
+      "name": "optimus-media",
+      "source": "./plugins/optimus-media",
       "description": "音视频处理：分析、转码压缩、裁剪缩放、音轨提取与音频转换、视频截图、在线下载与播放预览"
     },
     {
-      "name": "optimus-decision-plugin",
-      "source": "./plugins/optimus-decision-plugin",
+      "name": "optimus-decision",
+      "source": "./plugins/optimus-decision",
       "description": "决策支持型工具：把书籍蒸馏出的方法论转化为工程实践中的选型决策依据（数据结构/算法策略/复杂度分析）"
     },
     {
-      "name": "optimus-session-plugin",
-      "source": "./plugins/optimus-session-plugin",
+      "name": "optimus-session",
+      "source": "./plugins/optimus-session",
       "description": "跨会话交接：会话结束前分三层保存进度与决策，新会话恢复上下文接着干"
     },
     {
