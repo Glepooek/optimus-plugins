@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "prompt": "审查这条提交信息：update files",
+    "expected": "结论为 NEEDS_CHANGES，指出标题不符合 Conventional Commits 格式且“update files”未说明变更意图；给出不编造事实的改写方向，不执行任何 Git 写操作。"
+  },
+  {
+    "id": 2,
+    "prompt": "审查这条提交信息，并和当前暂存改动核对：feat(api)!: remove v1 endpoints\n\nBREAKING CHANGE: /api/v1/* 已移除，请迁移至 /api/v2/*\n\nCo-Authored-By: GPT-5.6-terra <noreply@openai.com>",
+    "expected": "验证 header 的 type、scope 和 ! 标记，识别 BREAKING CHANGE footer 与 AI trailer；只读读取暂存 diff，明确报告 message 与暂存改动的一致性或无法判定之处，不提交或修改工作树。"
+  },
+  {
+    "id": 3,
+    "prompt": "审查 HEAD 的提交信息。此次改动由 AI 协助完成。",
+    "expected": "先安全解析 HEAD 为 commit 对象再读取 message；检查是否存在位于末尾且格式正确的 Co-Authored-By trailer。若缺失，结论为 NEEDS_CHANGES，要求用户确认实际模型名和供应商 noreply 域名，不臆造身份且不 amend 已有提交。"
+  }
+]
