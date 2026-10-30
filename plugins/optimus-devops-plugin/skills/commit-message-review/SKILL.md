@@ -1,8 +1,8 @@
 ---
 name: commit-message-review
-description: 审查拟提交或已有 Git commit message 是否符合随插件分发的 Git 提交信息规则，包括 Conventional Commits、变更意图、破坏性变更和 AI 协作者 footer。用户要求审查、review、检查、改写或生成 Git 提交信息时使用；不执行 git commit、amend、push 或绕过 hook。
+description: 审查拟提交或已有 Git commit message 是否符合随插件分发的 Git 提交信息规则，包括 Conventional Commits、变更意图、破坏性变更和 AI 协作者 footer。用户要求审查、review、检查、改写或生成 Git 提交信息，或在准备 git commit / 提交代码、已拟好 commit message 需要提交前把关时使用；不执行 git commit、amend、push 或绕过 hook。
 metadata:
-  version: "1.0.1"
+  version: "1.0.3"
   author: desktop client team
   category: quality
 compatibility: 审查粘贴的提交信息不需要本地依赖；读取指定 commit 或将信息与暂存改动比对时，需要在 Git 仓库中运行 Git。
@@ -126,6 +126,7 @@ git diff --cached
 
 ## 边界与交接
 
+- 插件的 `PreToolUse` 提交门禁（仅 Claude Code）会要求 `git commit` 前先运行本 skill；PASS / ADVISORY 后由调用方按拦截提示执行 `mark` 并重新提交，本 skill 自身不写标记、不提交。
 - 该 skill 不执行 `git commit`、`git commit --amend`、`git push`、`git add`、`git stash` 或 `--no-verify`。用户确认 message 后，将实际提交交给所在仓库既有的提交工作流。
 - 不因 message 合规而宣称 hook、原子性、敏感信息或大文件检查已通过。提交内容安全检查仍由仓库 hook 与 CI 承担，且不得绕过。
 - 已推送提交若缺 AI footer 或存在其他 message 问题，不建议擅自改写历史；说明问题并让用户决定后续修复方式。
