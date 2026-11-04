@@ -16,7 +16,7 @@
 └─────────────┘
 ```
 
-本 skill 负责已有限范围的质量审查；`avalonia` 负责一般开发问题路由，`avalonia-wpf-migration` 负责迁移编排。
+本 skill 负责已有限范围的质量审查；`avalonia-wpf-migration` 负责迁移编排。
 
 ## 触发词 / 调用方式
 

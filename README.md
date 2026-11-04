@@ -10,7 +10,7 @@
 
 | 插件 | 职责 |
 |---|---|
-| [optimus-frontend](plugins/optimus-frontend) | 桌面前端开发（WPF + Avalonia）：MasterGo 设计稿转页面与组件库、SVG 转 XAML、XAML/AXAML 代码审查、Avalonia 文档 MCP 路由开发与 WPF 迁移 Avalonia、Linux deb 发布 |
+| [optimus-frontend](plugins/optimus-frontend) | 桌面前端开发（WPF + Avalonia）：MasterGo 设计稿转页面与组件库、SVG 转 XAML、XAML/AXAML 代码审查、WPF 迁移 Avalonia、Linux deb 发布 |
 | [optimus-backend](plugins/optimus-backend) | 后端开发：需求到实现全流程、公司服务 API 对接、C# 代码审查 |
 | [optimus-qa](plugins/optimus-qa) | 测试 QA：用例设计与报告、JMeter 与 UI 自动化、设计稿一致性校验、飞书项目同步 |
 | [optimus-prd](plugins/optimus-prd) | PRD 全流程：需求文档创建、优化与审查 |
