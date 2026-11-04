@@ -1,3 +1,12 @@
+## [1.3.1] - 2026-11-04
+
+### Added
+- Step 2 映射主题清单补 `navigation`（Frame/Page 导航迁移），此前与 `lookup_wpf_to_avalonia_mapping` 的 16 项主题枚举相比漏列一项
+- 失败处理表补「Avalonia Docs MCP 不可用」一行（原 `avalonia` 入口 skill 删除后，该兜底不再有处可查）
+
+### Changed
+- `allowed-tools` 补 `Edit`、`Bash`：正文要求改写 `.xaml`/`.axaml`、运行构建与测试，原清单（Read Glob Grep Write avalonia-docs）与实际调用不符
+
 ## [1.3.0] - 2026-10-30
 
 ### Added
