@@ -19,7 +19,7 @@
 
 ## 触发词 / 调用方式
 
-WPF 迁移 Avalonia、WPF 跨平台、XPF 还是 Avalonia、评估 WPF 改造；也可由 `avalonia` 入口在识别到迁移任务时转入。
+WPF 迁移 Avalonia、WPF 跨平台、XPF 还是 Avalonia、评估 WPF 改造。
 
 ## 业务逻辑流程图
 
