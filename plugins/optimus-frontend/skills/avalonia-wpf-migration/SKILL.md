@@ -4,10 +4,10 @@ description: Use when migrating a WPF application to Avalonia, selecting Avaloni
 license: MIT
 compatibility: 需要 optimus-frontend 内置的无需认证的 Avalonia Docs MCP；迁移目标项目须可由本地文件工具读取，实际构建与测试仍依赖目标项目所需的 .NET SDK。
 metadata:
-  version: "1.3.0"
+  version: "1.3.1"
   author: desktop client team
   category: workflow
-allowed-tools: Read Glob Grep Write avalonia-docs
+allowed-tools: Read Glob Grep Write Edit Bash avalonia-docs
 ---
 
 # WPF → Avalonia 企业迁移编排
@@ -33,7 +33,7 @@ allowed-tools: Read Glob Grep Write avalonia-docs
 - **XPF 路线**：调用 `migrate_to_xpf`，按其 NuGet 源、SDK 切换、许可证、版本冲突和排障流程执行。
 - **原生 Avalonia 路线**：调用 `migrate_to_avalonia`，从可运行基线和一个垂直切片开始；不得把迁移与架构重构混在同一批改动中。
 
-对于原生迁移，仅在当前切片需要时调用 `lookup_wpf_to_avalonia_mapping`：`namespaces`、`controls`、`properties`、`styling`、`bindings`、`templates`、`events`、`resources`、`layout`、`threading`、`windows`、`animations`、`custom-controls`、`mvvm` 或 `gotchas`。不要把整套映射复制进项目文档。
+对于原生迁移，仅在当前切片需要时调用 `lookup_wpf_to_avalonia_mapping`：`namespaces`、`controls`、`properties`、`styling`、`bindings`、`templates`、`events`、`resources`、`layout`、`threading`、`windows`、`animations`、`custom-controls`、`mvvm`、`navigation`（Frame/Page 导航迁移）或 `gotchas`。不要把整套映射复制进项目文档。
 
 ## Step 3：迁移一个可验证垂直切片
 
@@ -63,6 +63,7 @@ allowed-tools: Read Glob Grep Write avalonia-docs
 
 | 触发条件 | 一线处理 | 仍失败兜底 |
 |---|---|---|
+| Avalonia Docs MCP 不可用（工具调用失败或未启用） | 报告 MCP 不可用，请用户检查 `optimus-frontend` 内置的 `avalonia-docs` 是否已启用 | 停在分析阶段，不以记忆替代官方迁移结论 |
 | MCP 无法分析项目或缺少项目根目录 | 说明缺失项，停止在分析阶段 | 要求提供最小可读取项目副本或关键 `.csproj` / XAML 文件，不猜测引用关系 |
 | XPF 路线因许可证、NuGet 源或版本冲突受阻 | 依 `migrate_to_xpf` 的排障步骤定位 | 回到 🔴 CHECKPOINT，重新评估原生路线；未经确认不切换 |
 | 原生迁移遇到不确定 API/控件映射 | 调用对应主题的 `lookup_wpf_to_avalonia_mapping` 或 `lookup_avalonia_api` | 标为阻塞项，保留原实现或隔离适配层，禁止虚构等价 API |
