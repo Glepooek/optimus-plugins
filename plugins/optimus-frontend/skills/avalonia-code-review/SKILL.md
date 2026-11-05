@@ -4,7 +4,7 @@ description: Use when reviewing Avalonia AXAML or C# UI code for framework corre
 license: MIT
 compatibility: 需要 optimus-frontend 内置的无需认证的 Avalonia Docs MCP；支持审查用户粘贴的代码或本地 Avalonia 项目中的已限定文件范围。
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
   author: desktop client team
   category: quality
 allowed-tools: Read Glob Grep avalonia-docs
@@ -56,8 +56,19 @@ allowed-tools: Read Glob Grep avalonia-docs
 - **🟡 重要**：已确认违反 Avalonia 模型，或存在明确的性能、可维护性、跨平台或可访问性风险，但需要特定输入/配置才会失效。
 - **🟢 建议**：不改变正确性、仅提升可读性、一致性或未来维护性的优化。
 - 无法从可见代码和 MCP 资料确认的事项，列入“待确认项”，不得作为缺陷计数。
+- **例外：XAML 语法层面的结构错误**可由语法直接判定，不依赖 Avalonia 版本或 API，不因 MCP 无结果而降入待确认项。仅限三类：属性元素（`<UserControl.Styles>` 这类 `<类型.属性>`）不是其所属类型元素的直接子级；同一元素的内容被重复赋值（如 `Border` 已有 `Child` 又出现第二个子元素）；标签未闭合或嵌套错位。判为 🔴 构建失败，“官方依据”栏写“XAML 语法”，验证写“未构建”。先调用一次 `search_avalonia_docs` 查该类型的属性元素写法，有结果则一并引用；无结果也照此判定。
 
 仅当同时满足以下两条时才提供最小修正片段：已看到问题元素或成员的完整定义；已知 Avalonia 主版本，或在片段旁明确写出版本假设。缺哪一条就在“修正后代码”中写明缺哪一条。任何情况下都不生成声称可直接替换整个文件的代码。审查默认只读；用户明确要求修复时，先确认拟修改的文件和范围，并在修改后重新审查该范围。
+
+## 发现核验与复审收敛
+
+报告里的每一条都要经得起追问，同一范围反复审查时要能收敛：
+
+1. **出报告前逐条核验**：每个候选问题回到源码确认——位置真实存在；风险能由可见代码和已查询的官方依据解释；不是纯风格或顺手清理。任一不满足 → 丢弃，或降入“待确认项”，不计入缺陷数。
+2. **审 diff 时标注归属**：问题所在行不是本次改动引入的，标“既有”并单列，不算作者本次必须修复。
+3. **同根因合并**：同一根因在多处出现，只列一项并写全所有位置，让作者一次修完。
+4. **复审收敛**：同一范围的第 2 轮起，只审上轮修改涉及的 diff，不重复已报告的发现。第 3 轮仍有新的 🔴/🟡 时，不再逐条追加，改为提示作者退一步重新考虑整体方案，并指出反复出现的问题类别。
+   - **轮次与上轮报告的来源**：只认用户明确告知的轮次，或当前对话里已有的上轮报告。两者都没有时，按首轮审查，并在“审查摘要”的“未验证项”注明“未获上轮报告，按首轮审查，可能与此前发现重复”；不得凭猜测假定已是第 2 轮而缩小审查范围。
 
 ## 报告格式
 
@@ -102,7 +113,7 @@ allowed-tools: Read Glob Grep avalonia-docs
 
 - 不扫描范围外文件、编造问题，或为了让报告“有产出”而把正确实现标为缺陷。
 - 不把 WPF `Style.Triggers`、`DependencyProperty`、`pack://`、`Visibility` 或 `Dispatcher` 语义直接套到 Avalonia。
-- 不在没有 MCP 官方依据时给出确定性的 Avalonia API、版本或兼容性结论。
+- 不在没有 MCP 官方依据时给出确定性的 Avalonia API、版本或兼容性结论；Step 3 列出的三类 XAML 语法错误除外，其余一律不得借“语法”之名绕过此条。
 - 不把配置依赖的推断、未运行的构建或未测试的平台行为标记为已验证。
 - 不把 WPF 独有 API 降级为 🟡/🟢。按根因计数：同一语法块只列一项（如 `Style.Triggers` 与其内的 `Trigger`/`IsMouseOver`，或 `DependencyProperty` 声明与其 `Register`/`PropertyMetadata`）；根因不同的 WPF API（如 `Visibility` 与 `DependencyProperty`）分别列项。
 - 不为让报告“显得完整”而添加 🟢 建议；没有可查证的依据就不列。
