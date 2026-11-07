@@ -39,3 +39,4 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-11-05T13:00	pending	wpf-code-review	70.3	76.1	keep	dim3+dim8	补“无轮次/上轮报告则按首轮”失败分支后的重评(覆盖12:00两行)。新判官盲评配对，dim8场景改为(a)普通审查+(b)无上轮报告的再审，不再专为新节设计；增益来自dim8(6->8)与dim3(8->9)，其余持平；算术已逐项复核	dry_run
 2026-11-05T13:00	pending	avalonia-code-review	74.6	79.2	keep	dim8	补失败分支后的重评(覆盖12:00两行)。新判官盲评配对，场景同上；仅dim8 6->8，其余8维持平(判官认为失败分支已在新节内、表本身未改故dim3不加分)；算术已逐项复核	dry_run
 2026-11-05T14:00	pending	avalonia-code-review	71.7	78.0	keep	dim8+dim3	加“XAML语法层面结构错误”例外后的重评(覆盖13:00行)。新判官盲评配对，dim8场景增加(c)UserControl.Styles嵌套且MCP无结果；dim7 8->7、dim9 8->7(例外条款有被扩大解释的口子，已限定三类)，dim3 8->9，dim8 5->8；算术已复核。判官间绝对分不可比	dry_run
+2026-11-07T12:00	pending	wpf-code-review	76.1	76.1	keep	-	仅改references/11-testing.md与SKILL.md的metadata.version；九维rubric只读SKILL.md正文，正文未变故沿用上次分数，未重跑判官，不构成"新分≥旧分"的信息量比较	carried
