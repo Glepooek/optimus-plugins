@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.4.0] - 2026-11-07
+
+### Added
+- 第 11 章「单元层 · Converter」：纯函数测法（不建窗口、不依赖 `Application`）、`null` / 类型不符 / `parameter` / `culture` 四类输入、`ConvertBack` 往返与 `Binding.DoNothing`、`IMultiValueConverter` 的 `values` 长度校验、无状态验证、`Freezable` 跨线程陷阱
+- 第 11 章「组件层 · 线程模型」：`[Fact]` / `[StaFact]` / `[WpfFact]` / `[UIFact]` 对照表，`[WpfFact]` 的语义（STA + `DispatcherSynchronizationContext`，**不创建 `Application`**、测试结束关闭该线程 `Dispatcher`）、`await` 场景为何不能用 `[StaFact]`、集合级 fixture 共享 UI 线程、xUnit v2/v3 与包版本匹配提示
+- 第 11 章「组件层 · View 与控件」：绑定错误零容忍（`PresentationTraceSources` 监听 + `Measure`/`Arrange`/`UpdateLayout`）、`Border` 作根免 `Show()`、DP 与模板 `PART_*` 契约、视觉状态组位于模板根、截图回归的固定渲染参数
+- 第 11 章「测试项目结构」补分层命名约定：同一被测单元同时有单元与集成测试时，项目名加层限定（`<被测>.Tests` / `<被测>.IntegrationTests` / `App.Component.Tests` / `App.E2E.Tests`）；同一类型两侧都测时集成侧加 `Integration` 后缀，避免 CI 报告与堆栈无法区分
+- 第 11 章「反模式速查」表（7 条误测模式及替代做法）
+
+### Changed
+- 第 11 章由 10 节扁平列表重组为分层结构：**分层模型**（边界表 + 项目结构）→ **单元层**（ViewModel / Converter / 调度器替身）→ **组件层**（线程模型 / View / 控件 / XAML 资源 / 视觉回归）→ **集成层** → **UI 自动化层** → **跨层规范**（数据确定性 / 覆盖率 / 执行）→ **反模式**；每层补一句「不变量」
+- 原「测试 UI 线程」并入 3.1，「测试结构」并入 1.2，「XAML / 资源验证」「集成测试」「覆盖率」「测试执行」分别归位到组件层、集成层、跨层规范；章节编号与正文交叉引用同步更新
+- 覆盖率补「排除生成代码」；UI 自动化补交互式桌面会话、显式等待、失败截图三条；测试执行补单元测试秒级与 `[Trait]` 过滤
+
+### Fixed
+- 旧稿中的 `[StaThread]`（不存在的特性名）改为 `[WpfFact]` / `[StaFact]`
+
 ## [2.3.0] - 2026-11-05
 
 ### Added
