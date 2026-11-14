@@ -1,6 +1,6 @@
 # 02 · 命名规范 + 编码风格 + 语言特性准则
 
-> 更新历史：2026-08-21 创建。
+> 更新历史：2026-08-21 创建；2026-11-14 新增类内成员顺序与 `using` 规则。
 
 本篇是团队编码层面的权威依据，`csharp-code-review` skill 的审查项与本章一一对应。版本中立的落地方式见第 3 章"语言特性三问"。
 
@@ -55,7 +55,7 @@ public bool isLoaded = File.Exists(path);            // "文件存在"，同名�
 
 // ✅ 各用各的名，语义唯一
 public bool IsLoaded => _state == State.Loaded;
-public bool FileExists => File.Exists(path);
+public bool HasFile => File.Exists(path);
 ```
 
 ### 1.3 布尔命名
@@ -88,9 +88,62 @@ if (HasItems) { ... }
 - **必须**：Allman 大括号风格，`{` 另起一行
 - **必须**：4 空格缩进，不使用制表符
 - **必须**：每行一条语句、每行一个声明
-- **必须**：成员间保留空行（字段 → 构造函数 → 属性 → 方法）
+- **必须**：成员间保留空行
+- **应该**：类内成员按类别顺序排列：字段 → 构造函数 → 属性 → 命令（仅 MVVM / UI 代码）→ 公开方法 → 受保护方法 → 私有方法 → 事件处理方法；某类不存在则略过。其中「字段 → 构造函数 → 属性 → 方法」的先后与 StyleCop SA1201 一致，命令、按可访问性分组、事件处理方法置后是团队约定，不是微软官方规范
+- **可以**：用 `#region` / `#endregion` 按上述类别分组，但**不要求**——微软文档把它定位为编辑器折叠工具，StyleCop SA1124 更把它列为应避免项（折叠会藏住代码）。若使用，区域名取 `Fields`、`Constructor`、`Properties`、`Commands`、`PublicMethods`、`ProtectedMethods`、`PrivateMethods`、`EventHandlers`（英文 PascalCase），不建空区域
+- **禁止**：靠 `#region` 把一个过大的类「折叠得整齐」来代替拆分；区域多到需要靠它导航时，应拆类而不是加区域
 - **应该**：行过长时在运算符之前换行
-- **必须**：文件作用域命名空间 `namespace X;`（若目标框架支持），`using` 指令置于命名空间之外，`System.*` 优先排序
+- **必须**：文件作用域命名空间 `namespace X;`（若目标框架支持），`using` 指令置于命名空间之外
+- **禁止**：用 `#region` 对 `using` 分区或包裹，`using` 保持一个连续块
+- **必须**：移除未使用的 `using`；保留的 `using` 排序与 IDE「Remove and Sort Usings」默认一致：`System.*` 优先（对应 `dotnet_sort_system_directives_first`，默认 `true`），其余按字母升序（大小写次序以 IDE 为准）
+- **应该**：审查只判定可目视核对的项（`System.*` 不在最前、其余明显非升序、存在无用项）；大小写次序，以及 `global using`、`using static`、别名 `using` 的分组与排序，交给 IDE「Remove and Sort Usings」或 `dotnet format` 自动整理，审查时不据此判违规
+
+```csharp
+// ❌ using 被 region 包裹、含无用项、排序不符合规则
+#region Usings
+using System.Text;
+using Contoso.Orders;
+using System;
+using System.Linq;          // 文件内从未使用
+#endregion
+
+// ✅ 单个连续块，无无用项，System.* 在前、其余按字母升序
+using System;
+using System.Text;
+using Contoso.Orders;
+```
+
+成员顺序示例（不要求 `#region`；若团队使用，区域名取上述类别名）：
+
+```csharp
+// 字段 → 构造函数 → 属性 → 命令 → 公开方法 → 受保护方法 → 私有方法 → 事件处理方法
+public class OrderViewModel
+{
+    private readonly IOrderService _orderService;
+
+    public OrderViewModel(IOrderService orderService) => _orderService = orderService;
+
+    public string Title { get; set; }
+
+    public ICommand SubmitCommand { get; }
+
+    public void Refresh()
+    {
+    }
+
+    protected virtual void OnRefreshed()
+    {
+    }
+
+    private void Validate()
+    {
+    }
+
+    private void OnOrderChanged(object sender, EventArgs e)
+    {
+    }
+}
+```
 
 ### 2.2 类型与运算符
 
@@ -100,10 +153,16 @@ if (HasItems) { ... }
 
 ```csharp
 // ❌ == null：读者要花半秒确认不是某个重载了 == 的类型
-if (user == null) { throw new ArgumentNullException(nameof(user)); }
+if (user == null)
+{
+    throw new ArgumentNullException(nameof(user));
+}
 
 // ✅ is null：显式模式匹配，编译器可识别，分析器友好
-if (user is null) { throw new ArgumentNullException(nameof(user)); }
+if (user is null)
+{
+    throw new ArgumentNullException(nameof(user));
+}
 ```
 
 ### 2.3 字符串处理
@@ -117,10 +176,12 @@ if (user is null) { throw new ArgumentNullException(nameof(user)); }
 
 ```csharp
 // ❌ 循环内 += ：每次拼接都新建字符串并复制，O(n²) 分配，大量垃圾
-string result = "";
+var result = "";
 foreach (var item in items)
     result += $"{item.Name},";          // 1000 项 = 1000 次全量复制
+```
 
+```csharp
 // ✅ StringBuilder：原地追加，O(n)，无中间垃圾
 var sb = new StringBuilder();
 foreach (var item in items)
@@ -131,7 +192,7 @@ var result = sb.ToString();
 ### 2.4 `var` 与对象创建
 
 - **应该**：类型从右侧立即可见时用 `var`：`var user = new User();`
-- **禁止**：右侧返回 `object` / 基类 / 匿名无法推断时用 `var` 掩盖真实类型：`object data = GetComplexData();`
+- **禁止**：右侧返回 `object` / 基类 / 匿名无法推断时用 `var` 掩盖真实类型：`var report = GetComplexData();`
 - **应该**：字段 / 局部变量优先目标类型 `new()`：`User user = new();`
 - **禁止**：冗余类型重复：`User user = new User();`
 
@@ -218,9 +279,12 @@ var lower = username.ToLowerInvariant();
 | `public string userName;` | 公共字段 + 错误命名 | `public string UserName { get; set; }` |
 | `if (x > 0 & y > 0)` | 位运算符误用 | `if (x > 0 && y > 0)` |
 | `result = result + item`（循环内） | 低效拼接 | 使用 `StringBuilder` |
-| `var data = GetComplexData();` | var 掩盖类型 | `object data = GetComplexData();` |
+| `var report = GetComplexData();` | var 掩盖类型 | `OrderReport report = GetComplexData();` |
 | `interface DataService` | 缺少 `I` 前缀 | `IDataService` |
 | `private string userName` | 私有字段缺前缀 | `private string _userName` |
 | `private static int MaxUsers` | 静态字段缺前缀 | `private static int s_maxUsers` |
 | `String userName` | BCL 类型名 | `string userName` |
 | `x == null` | 判空写法 | `x is null` |
+| 类内成员顺序错乱（如私有方法在构造函数之前、字段夹在方法之间） | 成员顺序偏离建议顺序（应该级） | 按 字段 → 构造函数 → 属性 → 命令 → 公开 → 受保护 → 私有 → 事件处理 排列；`#region` 可选，不因未使用 region 而报问题 |
+| `#region Usings` 包裹 `using` | using 被分区 | 去掉 region，`using` 合成一个连续块 |
+| 文件内未使用的 `using`，或 `System.*` 不在最前、其余明显非升序 | using 冗余 / 乱序 | 移除无用项，`System.*` 在前，其余按字母升序；大小写与 `global`/`static`/别名次序交 IDE 整理 |
