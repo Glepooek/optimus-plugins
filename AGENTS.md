@@ -134,7 +134,7 @@
 
 | 层级 | Major | Minor | Patch |
 |---|---|---|---|
-| 插件 `plugin.json`（两份同步） | 删除/重命名用户可见功能 | 新增 skill / agent / hook / command；**标记废弃但未删除** | 修改或修复已有内容 |
+| 插件 `plugin.json`（两份同步） | 删除/重命名用户可见功能 | 新增 skill / agent / hook / command / MCP server；**标记废弃但未删除** | 修改或修复已有内容 |
 | `SKILL.md` `metadata.version` | 接口不兼容、删除用户可见功能 | 新增功能 / 章节 / 参数；**标记废弃但未删除** | 修改、修复、文档优化、重构 |
 | agent CHANGELOG | 删除或重命名 agent、破坏调用契约 | 新增能力 / 章节 / 扩大适用范围；**标记废弃但未删除** | 修改已有行为、修复措辞 |
 | marketplace 顶层 | 删除插件 | 新增插件 | **无对应场景** |

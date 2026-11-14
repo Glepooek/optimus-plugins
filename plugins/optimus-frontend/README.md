@@ -1,6 +1,6 @@
 # Optimus Frontend 内置 MCP 服务
 
-`optimus-frontend` 插件自带两个 MCP（Model Context Protocol）服务器，安装插件后由 Claude Code 自动加载。MCP 配置**仅面向 Claude Code**，不提供 Codex 版本。
+`optimus-frontend` 插件自带三个 MCP（Model Context Protocol）服务器，安装插件后由 Claude Code 自动加载。MCP 配置**仅面向 Claude Code**，不提供 Codex 版本。
 
 ## 包含的 MCP 服务器
 
@@ -9,7 +9,12 @@
 - **功能**: 提供 Avalonia UI 官方文档查询
 - **环境变量**: 无需认证
 
-### 2. MasterGo Magic MCP
+### 2. Microsoft Learn MCP
+- **类型**: HTTP
+- **功能**: 提供 Microsoft Learn 官方文档查询（.NET、WPF、Azure 等）
+- **环境变量**: 无需认证
+
+### 3. MasterGo Magic MCP
 - **类型**: stdio
 - **功能**: MasterGo 设计协作工具集成
 - **环境变量**: `MASTERGO_TOKEN`
@@ -42,7 +47,7 @@
    如果需要手动管理，在项目 `.claude/settings.json` 中添加：
    ```json
    {
-     "enabledMcpjsonServers": ["avalonia-docs", "mastergo-magic-mcp"]
+     "enabledMcpjsonServers": ["avalonia-docs", "microsoft-learn", "mastergo-magic-mcp"]
    }
    ```
 
