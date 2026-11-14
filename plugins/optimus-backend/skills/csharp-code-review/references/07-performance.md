@@ -13,7 +13,7 @@
 ## 2. 热点路径识别
 
 - **认知**：热点路径 = 循环内部、高频调用、请求处理主干、大数据集处理
-- **必须**：热点路径避免分配（allocation-free）、避免 LINQ 大对象与匿名类型装箱
+- **必须**：热点路径避免分配（allocation-free）、避免 LINQ 中间集合分配与逐元素匿名类型分配（匿名类型是引用类型，每个实例都是堆分配，不是装箱；可考虑 `ValueTuple` / 结构体）
 - **应该**：热点路径用 `Span`、预分配、缓存（见 `06` 章）
 
 ## 3. LINQ 边界
@@ -41,7 +41,7 @@ foreach (var x in snapshot) { /* ... */ }
 ## 4. 字符串
 
 - **必须**：循环 / 多次拼接用 `StringBuilder`
-- **应该**：固定数量拼接用字符串插值（编译器优化为 `StringBuilder`）
+- **应该**：固定数量拼接用字符串插值（编译器按目标类型生成 `DefaultInterpolatedStringHandler` / `String.Format` / `String.Concat` 调用，不会生成 `StringBuilder`）
 - **必须**：字符串比较显式指定 `StringComparison`（`Ordinal` / `OrdinalIgnoreCase`），避免文化差异带来的开销与错误
 - **禁止**：热路径逐次 `new Regex(pattern)`——复用静态编译正则或使用 Regex Source Generator
 

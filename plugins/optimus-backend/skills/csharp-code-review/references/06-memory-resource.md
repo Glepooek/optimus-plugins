@@ -12,10 +12,11 @@
 
 ## 2. IDisposable 正确实现
 
-- **必须**：实现 `IDisposable` 时同时实现 `Dispose(bool)`，并在 `Dispose()` 中调用 `Dispose(true)` + `GC.SuppressFinalize(this)`
+- **必须**：非密封类实现 `IDisposable` 时采用标准 dispose 模式：`Dispose()` 调用 `protected virtual Dispose(bool)`，有终结器时再 `GC.SuppressFinalize(this)`；密封类可直接在 `Dispose()` 中清理（无终结器时 `SuppressFinalize` 无效果）
 - **必须**：`Dispose` 幂等（可安全多次调用）
 - **必须**：释放后再调用实例方法应抛 `ObjectDisposedException`
-- **禁止**：仅为"清理托管字段"实现 `IDisposable`——托管内存归 GC 管，画蛇添足
+- **必须**：类拥有（创建并持有）`IDisposable` 字段时，自身也必须实现 `IDisposable` 并级联 `Dispose`；字段只是借用（非所有者）时不应实现
+- **禁止**：为纯托管内存（无 `IDisposable` 字段、无非托管资源）实现 `IDisposable`——托管内存归 GC 管，画蛇添足
 - **禁止**：泄漏非托管资源（未释放的句柄 / 连接 / 流）
 
 ## 3. using 用法
@@ -93,6 +94,7 @@ private static readonly MemoryCache _cache =
     new(new MemoryCacheOptions { SizeLimit = 1000 });   // 上限 + 滑动过期
 public Report GetReport(int id) => _cache.GetOrCreate(id, entry =>
 {
+    entry.SetSize(1);                                      // 设了 SizeLimit 后每个条目必须指定 Size（单位自定，此处按条目数计 1），否则抛 InvalidOperationException
     entry.SetSlidingExpiration(TimeSpan.FromMinutes(10));  // 过期策略
     return _repo.Load(id);
 });
@@ -109,7 +111,7 @@ public Report GetReport(int id) => _cache.GetOrCreate(id, entry =>
 | 类型 | 特性 | 场景 |
 |---|---|---|
 | `Span<T>` | `ref struct`，仅栈上 / 同步，不可装箱、不可进异步状态机字段 | 高性能同步切片、解析 |
-| `Memory<T>` | 可跨 `await` 边界，不可进 `class` 字段 | 异步场景的切片 |
+| `Memory<T>` | 不是 ref struct，可跨 `await` 边界，也可作为 `class` 字段 | 异步场景的切片 |
 | `ArrayPool<T>` | 租借数组缓冲，用后归还 | 高频缓冲复用 |
 
 - **必须**：`ArrayPool` 租借的数组在 `finally` / `using` 中归还

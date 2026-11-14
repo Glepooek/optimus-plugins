@@ -7,7 +7,7 @@ WPF 应用的异常发生在 UI 线程会冻结界面或直接崩溃。本篇约
 ## 1. UI 线程异常
 
 - **必须**：事件处理器 / 命令中不吞异常——让异常按既定路径上报（全局兜底或命令错误处理）
-- **必须**：`async void` 事件处理器异常**必**进 `TaskScheduler.UnobservedTaskException` 或应用级兜底，**禁止**裸 `async void` 不设兜底（异常导致进程崩溃）
+- **必须**：`async void` 事件处理器内部自行 `try/catch` 兜底：其异常没有 `Task` 可观察，不会进入 `TaskScheduler.UnobservedTaskException`，而是回到方法启动时捕获的 `SynchronizationContext`（WPF 即 UI 线程）重新抛出，未处理则终止进程；**禁止**裸 `async void` 不设兜底
 - **应该**：命令执行包一层错误处理（catch 后转用户可读提示 + 日志），**禁止**命令内裸抛让 UI 冻结
 - **禁止**：`catch (Exception) { }` 空吞异常（联不动手排查，问题掩盖）
 
@@ -54,8 +54,8 @@ private async void SaveButton_Click(object sender, RoutedEventArgs e)
 ## 2. 全局兜底（App 级）
 
 - **必须**：`App.xaml.cs` 订阅 `DispatcherUnhandledException`，统一记录未处理异常（日志 + 用户友好提示 + 是否终止决策）
-- **必须**：`TaskScheduler.UnobservedTaskException` 订阅，观测后台任务未处理异常（记录 + 遏制）
-- **应该**：`AppDomain.CurrentDomain.UnhandledException` 兜底非 UI 线程崩溃（记录 + 崩溃转储）
+- **必须**：`TaskScheduler.UnobservedTaskException` 订阅，仅用于记录后台任务未观察到的异常（诊断 / 遥测）：它在出错的 `Task` 被 GC 终结时才触发，时机不确定，现代 .NET 默认不会因此终止进程，不能当作及时的全局兜底，也不能替代异步流程里的正常异常处理
+- **应该**：`AppDomain.CurrentDomain.UnhandledException` 兜底非 UI 线程崩溃（只能记录 + 保存现场 / 崩溃转储，无法阻止进程终止；对栈溢出等破坏进程状态的异常默认不触发）
 - **禁止**：全局兜底吞掉致命异常静默继续（数据损坏风险）——记录后按策略终止或恢复
 
 ```csharp

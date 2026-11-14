@@ -747,7 +747,7 @@ public void ConfigureServices(IServiceCollection services)
     services.AddRefitClient<ISomeThirdPartyApi>()
         .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.example.com"))
         .AddHttpMessageHandler<AuthHeaderHandler>();
-        // 你可以在此处添加 Polly 来处理 HTTP 429 / HTTP 503 等
+        // 你可以在此处链式调用 .AddStandardResilienceHandler()（包：Microsoft.Extensions.Http.Resilience）处理 HTTP 429 / HTTP 503 等；旧的 Microsoft.Extensions.Http.Polly 包已被官方弃用
 }
 
 // 你的应用程序代码
@@ -768,10 +768,10 @@ public class SomeImportantBusinessLogic
 }
 ```
 
-如果你不使用依赖注入，可以通过以下方式实现相同的效果：
+如果你不使用依赖注入，可以通过以下方式实现相同的效果（此时必须手动给处理程序设置 `InnerHandler`，否则发请求会抛 `InvalidOperationException`；仅限非 DI 场景，DI 下由 `HttpClientFactory` 自动链接）：
 
 ```csharp
-var api = RestService.For<ISomeThirdPartyApi>(new HttpClient(new AuthHeaderHandler(tenantProvider, authTokenStore))
+var api = RestService.For<ISomeThirdPartyApi>(new HttpClient(new AuthHeaderHandler(tenantProvider, authTokenStore) { InnerHandler = new HttpClientHandler() })
     {
         BaseAddress = new Uri("https://api.example.com")
     }
@@ -1208,7 +1208,7 @@ public interface IApiClient
 }
 ```
 
-Refit 生成的类型将实现 `IApiClient.GetInternal` 方法。如果在调用之前或之后需要额外逻辑，它不应该直接暴露，因此可以通过标记为 `internal` 来对使用者隐藏。默认接口方法 `IApiClient.Get` 将被实现 `IApiClient` 的所有类型继承，包括 - 当然 - Refit 生成的类型。`IApiClient` 的使用者将调用公共的 `Get` 方法，并从其实现中提供的额外逻辑中受益（可选地，在此情况下，借助私有静态辅助方法 `FormatResponse`）。为了支持没有 DIM 支持的运行时（.NET Core 2.x 及以下或 .NET Standard 2.0 及以下），相同的解决方案需要两个额外的类型。
+Refit 生成的类型将实现 `IApiClient.GetInternal` 方法。如果在调用之前或之后需要额外逻辑，它不应该直接暴露，因此可以通过标记为 `internal` 来对使用者隐藏。默认接口方法 `IApiClient.Get` 将被实现 `IApiClient` 的所有类型继承，包括 - 当然 - Refit 生成的类型。`IApiClient` 的使用者将调用公共的 `Get` 方法，并从其实现中提供的额外逻辑中受益（可选地，在此情况下，借助私有静态辅助方法 `FormatResponse`）。为了支持没有 DIM 支持的运行时（.NET Framework 全版本、.NET Core 2.x 及以下，以及 .NET Standard 2.0 及以下），相同的解决方案需要两个额外的类型。
 
 ```csharp
 internal interface IApiClientInternal
@@ -1416,7 +1416,7 @@ catch (ApiExceptionBase exception)
 // ...
 ```
 
-Refit 也可以抛出 `ValidationApiException`，除了 `ApiException` 上的信息外，当服务实现了 [RFC 7807](https://tools.ietf.org/html/rfc7807) 问题详细信息规范且响应内容类型为 `application/problem+json` 时，它还包含 `ProblemDetails`。
+Refit 也可以抛出 `ValidationApiException`，除了 `ApiException` 上的信息外，当服务实现了 [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html)（取代 RFC 7807） 问题详细信息规范且响应内容类型为 `application/problem+json` 时，它还包含 `ProblemDetails`。
 
 要获取验证异常的问题详细信息的具体信息，只需捕获 `ValidationApiException`：
 
@@ -1450,7 +1450,7 @@ var nullTask = Task.FromResult<Exception>(null);
 
 var gitHubApi = RestService.For<IGitHubApi>("https://api.github.com",
     new RefitSettings {
-        ExceptionFactory = httpResponse => nullTask;
+        ExceptionFactory = httpResponse => nullTask
     });
 ```
 
@@ -1465,7 +1465,7 @@ var nullTask = Task.FromResult<Exception>(null);
 
 var gitHubApi = RestService.For<IGitHubApi>("https://api.github.com",
     new RefitSettings {
-        DeserializationExceptionFactory = (httpResponse, exception) => nullTask;
+        DeserializationExceptionFactory = (httpResponse, exception) => nullTask
     });
 ```
 

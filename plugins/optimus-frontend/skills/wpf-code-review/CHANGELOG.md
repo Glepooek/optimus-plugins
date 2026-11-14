@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.4.1] - 2026-11-14
+
+### Fixed
+- 依 Microsoft Learn 官方文档核对并修正 references 中的事实性错误：StaticResource 在 XAML 加载时解析（非编译期）；合并字典重复键合法（后者遮蔽）；WPF 无需 `desktop` workload；`Binding.Mode` 默认为 `Default`；WPF 无 `DeviceDpi`（改用 `OnDpiChanged` / `VisualTreeHelper.GetDpi`）；Toolkit `NotifyCanExecuteChanged` 与 Prism `RaiseCanExecuteChanged` 区分；`async void` 异常回到捕获的 `SynchronizationContext`；WPF 不支持裁剪；`useRestrictiveXamlReader` 仅为纵深防御；移除不存在的 `AutomationProperties.AccessibilityView` 说法；SecureString、BitmapEffect 等措辞；多处示例随之订正
+
 ## [2.4.0] - 2026-11-07
 
 ### Added

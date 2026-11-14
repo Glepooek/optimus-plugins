@@ -21,7 +21,7 @@ MVVM 是 WPF 的默认架构形态。本篇约束框架选型、View/ViewModel �
 
 - **必须**：ViewModel 继承团队选定的基类（`BindableBase` / `ObservableObject`），实现 `INotifyPropertyChanged`
 - **必须**：可绑定属性用属性设置器触发变更通知，**禁止**直接操作公共字段
-- **必须**：属性变更通知写法统一（`SetProperty` / `SetObservableProperty`），不手写样板 `if (field != value)` 重复块
+- **必须**：属性变更通知写法统一（`SetProperty`，或 CommunityToolkit.Mvvm 的 `[ObservableProperty]` 源生成），不手写样板 `if (field != value)` 重复块
 - **禁止**：在 ViewModel 中声明 UI 类型（`Brush`、`Visibility` 用 `bool` 或枚举表达，由 Converter 转换，联动 `05` 章）
 
 ```csharp
@@ -65,24 +65,24 @@ public class LoginViewModel
 ## 3. 命令（ICommand）
 
 - **必须**：操作一律走 `ICommand`（`DelegateCommand` / `RelayCommand`），**禁止**在 code-behind 里直接实现业务操作
-- **必须**：命令定义携带 `CanExecute`，执行状态随属性变更自动刷新（`RaiseCanExecuteChanged`）
+- **必须**：命令定义携带 `CanExecute`，执行状态随属性变更自动刷新（CommunityToolkit.Mvvm 用 `NotifyCanExecuteChanged()`，Prism `DelegateCommand` 用 `RaiseCanExecuteChanged()`）
 - **应该**：命令构造用框架提供的强类型命令，减少自写 `ICommand`
 - **禁止**：命令体内吞异常（联动 `12` 章）；长时间操作命令内做异步并禁用期间交互
 
 ```csharp
 // ❌ 无 CanExecute：按钮永远可点，空提交 / 重复提交
 public ICommand SaveCommand { get; }
-public LoginViewModel() => SaveCommand = new RelayCommand(_ => Save(), _ => true);
+public LoginViewModel() => SaveCommand = new RelayCommand(Save);
 
-// ✅ CanExecute 联动：输入为空时按钮禁用，输入变化时刷新状态
-public ICommand SaveCommand { get; }
+// ✅ CanExecute 联动（CommunityToolkit.Mvvm）：输入为空时按钮禁用，输入变化时刷新状态
+public IRelayCommand SaveCommand { get; }
 public LoginViewModel()
 {
     SaveCommand = new RelayCommand(Save, CanSave);
 }
-private bool CanSave(object _) => !string.IsNullOrWhiteSpace(UserName) && !IsSaving;
+private bool CanSave() => !string.IsNullOrWhiteSpace(UserName) && !IsSaving;
 private void Save() { IsSaving = true; /* ... */ }
-// 在 UserName / IsSaving 的 setter 中调用 (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
+// 在 UserName / IsSaving 的 setter 中调用 SaveCommand.NotifyCanExecuteChanged();
 ```
 
 ## 4. View 与 ViewModel 配对

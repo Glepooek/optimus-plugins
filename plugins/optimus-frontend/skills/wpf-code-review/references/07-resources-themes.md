@@ -15,7 +15,7 @@
 
 - **必须**：`x:Key` 用 PascalCase，禁止空格与 `/`（与 `wpf-project-conventions` skill 第 5 节一致）
 - **应该**：键名语义化并带类型提示（`ButtonPrimaryStyle`、`ErrorBrush`、`LoginDataTemplate`），**禁止**通用名（`Style1`、`Color1`）
-- **必须**：资源键全局唯一（应用级），跨字典冲突在合并时报错 / 遮蔽——用前缀区分模块（`Login_ErrorBrush` 或命名空间级前缀）
+- **必须**：资源键全局唯一（应用级）。同一字典内重复 key 会报错；跨合并字典的同名 key 合法但不报错，后合并的字典会静默遮蔽先合并的——用前缀区分模块（`Login_ErrorBrush` 或命名空间级前缀）以避免意外遮蔽
 
 ## 3. 样式体系
 

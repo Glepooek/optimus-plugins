@@ -76,7 +76,7 @@
 
 - **必须**：WPF 应用声明 `PerMonitorV2` DPI 感知（`app.manifest` 的 `dpiAwareness`），避免跨显示器缩放模糊
 - **必须**：布局用相对单位（`*` 比例、`Auto`、控件系统度量），**禁止**硬编码像素尺寸做自适应
-- **必须**：图形坐标随 DPI 缩放——`DeviceDpi` 变化时重算布局，避免文字/图形模糊
+- **必须**：图形坐标随 DPI 缩放——`OnDpiChanged` / `DpiChanged` 触发时用 `VisualTreeHelper.GetDpi` 取新的 `DpiScale` 并刷新布局与位图资源，避免文字/图形模糊
 - **禁止**：用 DIP（设备无关像素）硬编码窗口最小尺寸而不考虑高 DPI 缩放（字体可读性问题，联动 `14` 章）
 - **应该**：多显示器高 DPI 场景用系统 DPI 感知 API 监听 `WM_DPICHANGED` 或 WPF `DpiChanged` 事件刷新
 
@@ -99,7 +99,7 @@
 
 - **必须**：图层合成用 `Opacity` / 平移 / 缩放等 GPU 友好属性，**禁止**逐帧改布局（`LayoutTransform` / 重排）
 - **必须**：元素 `Opacity` 替代透明画刷的场景正确选择（元素级透明度需临时表面，`Brush` 的 Alpha 更高效，联动 `wpf-code-review` 性能专项诊断速查之资源）
-- **禁止**：`BitmapEffect`（已过时，性能差），用 `Effect`（`DropShadowEffect` 等）
+- **禁止**：`BitmapEffect`（已过时，.NET Framework 4 起不再正常生效），用 `Effect`（`DropShadowEffect` 等）
 
 ```xml
 <!-- ❌ 元素级 Opacity：为半透明临时渲染到离屏表面，开销大 -->
@@ -109,12 +109,12 @@
 
 <!-- ✅ 画刷 Alpha：直接在画刷上控制透明度，无需临时表面 -->
 <Border>
-  <Rectangle Fill="#80000000" />   <!-- Alpha=0x80，约 50% 透明 -->
+  <Rectangle Fill="#800000FF" />   <!-- Alpha=0x80，约 50% 透明的蓝色 -->
 </Border>
 ```
 
 ```xml
-<!-- ❌ BitmapEffect：已过时，CPU 软件渲染，性能极差 -->
+<!-- ❌ BitmapEffect：已过时，.NET Framework 4 起不再正常生效 -->
 <Button>
   <Button.BitmapEffect><DropShadowBitmapEffect /></Button.BitmapEffect>
 </Button>
