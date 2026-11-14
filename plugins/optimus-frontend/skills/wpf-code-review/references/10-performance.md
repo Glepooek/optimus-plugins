@@ -85,7 +85,7 @@ public object Convert(object value, Type t, object p, CultureInfo c)
 - **必须**：静态图形用 `Path` + `StreamGeometry`（只读快，联动 `08` 章第 7 节）
 - **必须**：动态高频图形用 `DrawingVisual` / `DrawingGroup`（批量绘制、非 UI 元素）
 - **必须**：`Brush` / `Pen` 循环外创建并 `Freeze()` 共享（联动 `07` 章第 5 节）
-- **禁止**：`BitmapEffect`（过时）；`Opacity` 优先于透明画刷场景用 Brush Alpha（联动 `08` 章第 8 节）
+- **禁止**：`BitmapEffect`（已过时，.NET Framework 4 起不再正常生效）；仅需半透明填充时优先用 `Brush.Opacity` / 带 Alpha 的画刷，避免元素级 `Opacity`（会创建临时表面，联动 `08` 章第 8 节）
 - **应该**：重绘频繁区域用 `CacheMode="BitmapCache"`，注意缓存命中权衡
 
 ## 6. 启动时间
@@ -113,7 +113,7 @@ public object Convert(object value, Type t, object p, CultureInfo c)
 
 ## 9. 静态资源与 DynamicResource 权衡
 
-- **必须**：默认 `StaticResource`（构建期解析、快），**禁止**无理由 `DynamicResource`（运行期查找，联动 `04` 章第 2 节）
+- **必须**：默认 `StaticResource`（XAML 加载时解析一次、快），**禁止**无理由 `DynamicResource`（运行期查找，联动 `04` 章第 2 节）
 - **必须**：主题敏感资源才用 `DynamicResource`（联动 `07` 章第 4 节）
 - **应该**：页面加载时的资源查找路径短（就近定义），避免长链查找
 

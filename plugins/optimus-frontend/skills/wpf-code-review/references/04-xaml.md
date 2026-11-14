@@ -16,7 +16,7 @@ XAML 是 WPF 的声明式 UI 语言。本篇约束命名空间、资源引用、
 
 | 类型 | 时机 | 特点 |
 |---|---|---|
-| `StaticResource` | 值**编译后不再变** | 构建期解析一次，快；找不到资源编译报错 |
+| `StaticResource` | 值**加载后不再变** | XAML 加载时解析一次，快；找不到资源在加载时抛异常（不是编译期报错） |
 | `DynamicResource` | 值**运行期可变**（主题切换、动态加载） | 运行期解析，跟随资源变更；略慢，找不到时静默 |
 
 - **必须**：默认用 `StaticResource`，仅当需要响应资源运行时变化（主题切换、皮肤）才用 `DynamicResource`（联动 `07` 章）
@@ -27,7 +27,7 @@ XAML 是 WPF 的声明式 UI 语言。本篇约束命名空间、资源引用、
 <!-- ❌ 无理由 DynamicResource：运行期查找慢，key 拼错静默不显示 -->
 <Button Background="{DynamicResource ButtonBrush}" />
 
-<!-- ✅ 编译期资源用 StaticResource：key 找不到构建即报错，性能好 -->
+<!-- ✅ 值不会变的资源用 StaticResource：key 找不到则加载 XAML 时抛异常，性能好 -->
 <Button Background="{StaticResource ButtonBrush}" />
 ```
 
@@ -61,7 +61,7 @@ XAML 是 WPF 的声明式 UI 语言。本篇约束命名空间、资源引用、
 <LinearGradientBrush x:Name="MyBrush">
   <GradientStop Color="Blue" Offset="0"/>
 </LinearGradientBrush>
-<Button Background="{StaticResource MyBrush}"/>   <!-- 编译错：x:Name 不是资源键 -->
+<Button Background="{StaticResource MyBrush}"/>   <!-- 资源应以 x:Key 定义，不要依赖 x:Name 充当键 -->
 
 <!-- ✅ 资源用 x:Key：可被 StaticResource 正确引用，无多余字段 -->
 <LinearGradientBrush x:Key="MyBrush">

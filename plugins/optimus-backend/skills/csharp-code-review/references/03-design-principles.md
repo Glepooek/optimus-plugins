@@ -24,7 +24,7 @@
 
 C# 侧的附加要求：
 
-- **必须**：`public` 接口不暴露调用方不需要的成员——C# 接口新增成员会破坏所有实现者，胖接口的演进成本在这里被放大
+- **必须**：`public` 接口不暴露调用方不需要的成员——新增无默认实现的接口成员会破坏所有实现者，胖接口的演进成本在这里被放大（C# 8+ 可用默认接口方法兼容演进，但需 .NET Core 3.0+ 运行时，.NET Framework 不支持）
 - **应该**：DIP 的抽象归属内层项目，由组合根注入（见 `01` 章第 6 节）
 - **禁止**：上帝类（单类数百行、混杂数据 + 行为 + 基础设施访问）通过 review
 
@@ -40,9 +40,9 @@ C# 侧的附加要求：
 
 | 维度 | 接口 | 抽象类 |
 |---|---|---|
-| 成员 | 契约（无状态） | 可含共享实现与字段 |
+| 成员 | 契约（无实例状态） | 可含共享实现与字段 |
 | 多重继承 | 支持 | 不支持 |
-| 演进成本 | 新增成员破坏所有实现者 | 可加默认实现，破坏面小 |
+| 演进成本 | 新增无默认实现的成员破坏所有实现者（C# 8+ 默认接口方法可缓解，需 .NET Core 3.0+ 运行时） | 可加带实现的成员，破坏面小 |
 | 场景 | 能力契约、跨层边界 | 共享基类逻辑 |
 
 - **必须**：契约（服务、策略、跨层边界）用接口；共享实现用抽象类
@@ -132,8 +132,8 @@ public class Order
 C# 侧的附加要求：
 
 - **必须**：依赖通过构造函数注入；禁止属性注入与 `IServiceProvider` 直接注入——构造函数签名即依赖清单
-- **必须**：三种生命周期的对应关系是 `Transient`（短命状态）/ `Scoped`（请求级上下文）/ `Singleton`（复用连接与客户端）
-- **必须**：`HttpClient` 等设计为复用的客户端注册为 `Singleton`（类型化 / 命名客户端），禁止逐次 `new`
+- **必须**：三种生命周期的对应关系是 `Transient`（短命状态）/ `Scoped`（请求级上下文）/ `Singleton`（全应用共享的无状态或线程安全服务）
+- **必须**：`HttpClient` 用 `IHttpClientFactory` 管理（`AddHttpClient`，类型化 / 命名客户端），禁止逐次 `new`；类型化客户端本身注册为 `Transient`，不要把它注入 `Singleton` 服务（会长期持有同一连接、丢失 DNS 变更）；确需长期持有时用单例 `HttpClient` 并配置 `SocketsHttpHandler.PooledConnectionLifetime`
 - **应该**：昂贵依赖用 `Lazy<T>` 惰性推迟，而非在构造函数内提前构造
 
 ```csharp
@@ -177,7 +177,7 @@ public class WeatherClient
     }
 }
 
-// ✅ 注册为 Singleton / 类型化客户端：连接池复用，由 DI 管理生命周期
+// ✅ 用 IHttpClientFactory 注册类型化客户端：底层连接池由工厂管理并复用
 services.AddHttpClient<WeatherClient>()
         .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.example.com"));
 ```

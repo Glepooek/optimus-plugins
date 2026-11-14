@@ -22,7 +22,7 @@ WPF 侧的附加要求：
 ## 2. SDK 与工具链
 
 - **必须**：用 `global.json` 固定 SDK 主版本，保证本地与 CI 一致
-- **必须**：SDK 安装 Windows Desktop workload（WPF 项目依赖），CI 用 `dotnet workload install desktop` 或带 Desktop 的镜像
+- **必须**：WPF 项目用 `Microsoft.NET.Sdk` + `net*-windows` 目标框架 + `UseWPF` 构建，.NET SDK 自带 Desktop 支持，不需要额外安装 `desktop` workload；CI 使用带 .NET SDK 的 Windows 镜像即可（仅 Visual Studio 安装器里才有「.NET 桌面开发」workload 的概念）
 - **应该**：统一 IDE 与编辑器配置（`.editorconfig` + `.vscode` / Visual Studio 共享设置），编辑器的差异不改变产出物
 - **应该**：启用 XAML 设计器与 XAML 编译（BAML）的默认校验，设计期错误不拖到运行期
 
@@ -100,6 +100,6 @@ WPF 侧的附加要求：
 
 WPF 侧的附加要求：
 
-- **必须**：CI 环境安装 Desktop workload，否则 WPF 项目无法构建
-- **应该**：除 NuGet 包外一并缓存 workload，缩短还原时间
+- **必须**：CI 使用带 .NET SDK 的 Windows 镜像，目标框架为 `net*-windows` 并启用 `UseWPF`；不需要也不应写 `dotnet workload install desktop`
+- **应该**：缓存 NuGet 包目录，缩短还原时间
 - **禁止**：构建依赖本地设计器——XAML 编译不需要设计器，依赖它会让 CI 无法复现

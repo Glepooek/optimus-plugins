@@ -143,20 +143,28 @@ public class OrderController
 
 ## 附录：Directory.Build.props 落地模板
 
-本模板对应本篇第 1–3 节的约束，可直接作为仓库级 `Directory.Build.props` 的起点。条件属性（`Condition`）用于按项目类型差异化设置。
+本模板对应本篇第 1–3 节的约束，可直接作为仓库级 `Directory.Build.props` 的起点。⚠️ 依赖项目自身属性的条件设置（`IsTestProject`、`OutputType` 等）**不能**放在 `Directory.Build.props`：它在 `Microsoft.Common.props` 早期导入，项目文件及之后导入的内容里定义的属性对它不可见，条件会求值为空而不生效。这类差异化设置放进 `Directory.Build.targets`（模板见下）。
 
 ```xml
 <Project>
 
   <!-- 公共属性：全仓库统一，项目内不重复 -->
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>          <!-- 由团队统一决策，见第 1 节 -->
+    <TargetFramework>net10.0</TargetFramework>         <!-- 由团队统一决策，选仍受支持的 LTS，见第 1 节 -->
     <Nullable>enable</Nullable>                        <!-- 必须，见第 2 节 -->
     <ImplicitUsings>enable</ImplicitUsings>            <!-- 必须，见第 2 节 -->
     <AnalysisLevel>latest</AnalysisLevel>              <!-- 内置分析器，见第 3 节 -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors> <!-- 门禁，见第 3 节 -->
     <Deterministic>true</Deterministic>                <!-- 可复现构建 -->
   </PropertyGroup>
+
+</Project>
+```
+
+`Directory.Build.targets`（在项目文件之后导入，可读取项目自身属性）：
+
+```xml
+<Project>
 
   <!-- 测试项目差异化：不打包、采集覆盖率 -->
   <PropertyGroup Condition="'$(IsTestProject)' == 'true'">

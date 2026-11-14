@@ -9,7 +9,7 @@
 - **必须**：关键交互元素配 `AutomationProperties.Name`（屏幕阅读器读出的名称），**禁止**图标按钮 / 纯图形无名称
 - **必须**：纯装饰元素 `AutomationProperties.AutomationId` 唯一且 `Focusable="False"`（不进焦点 / 读屏）
 - **必须**：组合控件（`ComboBox`、`ListBox`）提供可读的自动化名称与项文本
-- **应该**：动态区域（状态文本、进度）用 `AutomationProperties.LiveSetting` 提示读屏器轮询
+- **应该**：动态区域（状态文本、进度）用 `AutomationProperties.LiveSetting`（`Polite` / `Assertive`）声明该区域变更的通知级别
 - **禁止**：用图片当文字且无 `AutomationProperties.Name`（读屏无法读出）
 
 ```xml

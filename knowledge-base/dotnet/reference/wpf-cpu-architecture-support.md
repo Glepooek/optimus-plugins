@@ -6,17 +6,17 @@
 >
 > 状态：调研资料整理稿（部分内容由 AI 生成），涉及具体版本和日期的内容须以 Microsoft 官方页面复核为准
 >
-> 最近审阅：2026-09-03
+> 最近审阅：2026-11-14
 >
 > 相关：本文件按 **CPU 架构轴**组织；按 **Windows 版本轴**判断能装哪个 .NET 见 `windows-dotnet-support-matrix.md`。两份矩阵维度互补，判断「某台设备能不能跑这个 WPF 应用」时通常需同时查阅。
 
 **核心结论：**
 
-**.NET Framework**：4.8 及更早版本仅支持 x86/x64；**4.8.1 首次支持原生 ARM64**（含 WPF），但仅限 Windows 11+。从未支持 ARM32。
+**.NET Framework**：4.8 及更早版本的 WPF 仅支持 x86/x64；**4.8.1 首次支持原生 ARM64**（含 WPF），但仅限 Windows 11+。.NET Framework 仅随 Windows RT / 8.1 ARM 提供过 4.5/4.5.1（ARM32，不含 WPF）。
 
 **.NET 5**：5.0.0~5.0.7 的 ARM64 SDK 不含 WPF；**5.0.8（2021.07）起首次支持 WPF on ARM64**。
 
-**.NET 6+**：完整支持 x86、x64、ARM64，.NET 7 起 ARM64 性能追平 x64。
+**.NET 6+**：完整支持 x86、x64、ARM64；.NET 7 起官方将其列为 Arm64 支持框架（「性能追平 x64」仅见第三方幻灯片，未经官方确认）。
 
 **ARM32**：WPF 从未支持 ARM32。
 
@@ -27,7 +27,7 @@
 |版本|x86|x64|ARM32|ARM64|关键说明|
 |---|---|---|---|---|---|
 |3.0 ~ 3.5 SP1|✅|✅|❌|❌|仅 x86/x64|
-|4.0 ~ 4.7.2|✅|✅|❌|❌|仅 x86/x64|
+|4.0 ~ 4.7.2|✅|✅|❌|❌|WPF 仅 x86/x64（4.5/4.5.1 仅随 Windows RT / 8.1 ARM 提供，ARM32 且无 WPF）|
 |4.8|✅|✅|❌|❌|仅 x86/x64|
 |**4.8.1**|✅|✅|❌|**✅**|**首个支持原生 ARM64 的 .NET Framework 版本**（含 WPF/WinForms），仅限 Windows 11+|
 
@@ -38,10 +38,11 @@
 |.NET 5.0.0 ~ 5.0.7|✅|✅|❌|⚠️|SDK 支持 ARM64，但 **WPF 不包含在 ARM64 中**|
 |**.NET 5.0.8+**|✅|✅|❌|**✅**|2021.07 起，ARM64 首次包含 WPF/WinForms|
 |.NET 6|✅|✅|❌|✅|完整支持 WPF on ARM64|
-|.NET 7|✅|✅|❌|✅|ARM64 功能与性能和 x64 持平|
-|.NET 8|✅|✅|❌|✅|微软推荐用于原生 ARM64 执行|
-|.NET 9|✅|✅|❌|✅|完整支持|
-|.NET 10|✅|✅|❌|✅|完整支持|
+|.NET 7|✅|✅|❌|✅|官方列为 Arm64 支持框架|
+|.NET 8|✅|✅|❌|✅|官方文档：.NET 8+ 支持原生 Arm64 执行（已于 2026.11.10 结束支持）|
+|.NET 9|✅|✅|❌|✅|完整支持（已于 2026.11.10 结束支持）|
+|.NET 10|✅|✅|❌|✅|完整支持（LTS）|
+|.NET 11|✅|✅|❌|✅|STS，2026.11.10 发布（支持至 2028.11.14）；本表架构列按 .NET 10 的延续性填写，未逐项核实|
 
 ✅ = 原生支持　⚠️ = 部分支持（运行时支持但 WPF 不可用）　❌ = 不支持
 
@@ -58,7 +59,7 @@
 
 **背景**：.NET Core 3.0/3.1 时代 WPF 首次引入 .NET Core 平台，但 Windows Desktop Runtime 仅提供 x86/x64，不支持任何 ARM 架构。
 
-- **.NET 5.0.0 ~ 5.0.7**（2020.11 ~ 2021.06）：SDK 已支持 Windows ARM64，但 **ARM64 SDK 中不包含 WinForms 和 WPF**，只能运行控制台、ASP.NET Core 等非桌面应用。
+- **.NET 5.0.0 ~ 5.0.7**（2020.11 ~ 2021.06）：SDK 已支持 Windows ARM64，但 **ARM64 SDK 中不包含 WinForms 和 WPF**，WPF 应用此前只能以 x86 模拟方式运行。
 - **.NET 5.0.8（2021 年 7 月 13 日）** 是关键转折点：微软在该版本的 Windows ARM64 SDK 中**首次加入了 WinForms 和 WPF**，从此 WPF 应用可以原生运行在 Windows ARM64 设备上。
 - 从 5.0.8 起，.NET 5 Desktop Runtime 提供 `x64 | x86 | Arm64` 三种安装包。
 - 发布方式：在 x64 开发机上 targeting ARM64 时，使用 `dotnet publish -r win-arm64` 即可生成原生 ARM64 应用（支持 framework-dependent 和 self-contained 两种部署模式）。
@@ -66,13 +67,13 @@
 ## 3. .NET 6 及以后的成熟支持
 
 - **.NET 6**：WPF on ARM64 进入稳定支持阶段，ARM 官方学习路径明确推荐使用 .NET 6 构建原生 Windows on ARM WPF 应用，发布时指定 `-r win-arm64` 即可。
-- **.NET 7**：ARM64 的功能完整度和性能达到与 x64 持平的水平。
-- **.NET 8/9/10**：持续完整支持 x86、x64、ARM64 三种架构，微软官方推荐 .NET 8+ 用于原生 ARM64 开发，并配合 ARM 原生 Visual Studio 2022 17.4+。
+- **.NET 7**：官方 Arm64 支持框架列表开始包含 .NET 7；「功能与性能和 x64 持平」仅见第三方幻灯片（依据 10），未经官方确认。
+- **.NET 8+**：官方文档称 .NET 8+ 支持原生 Arm64 执行；.NET 8/9/10/11 均提供 x86、x64、ARM64 三种架构，开发可配合原生 Arm64 的 Visual Studio 2022 17.4+（首个 GA 的原生 Arm64 版本）。其中 .NET 8/9 已于 2026.11.10 结束支持，新项目应选受支持的版本。
 - .NET 6+ 的 Windows Desktop Runtime 下载均提供 `x86 | x64 | Arm64` 三种架构。
 
 ## 4. ARM32 支持情况
 
-- **WPF 从未支持 ARM32**。
+- **WPF 从未支持 ARM32**（.NET Framework 仅在 Windows RT / 8.1 ARM 上随系统提供过 4.5/4.5.1，不含 WPF）。
 - .NET Core 2.1/2.2/3.0/3.1 的基础运行时曾支持 Windows ARM32（用于 IoT 场景），但 Windows Desktop Runtime（WPF）始终不提供 ARM32 版本。
 - .NET 5 起，微软不再提供 Windows ARM32 的运行时支持，全面转向 ARM64。
 
@@ -92,7 +93,7 @@
 |**2021.07**|**.NET 5.0.8：WPF 首次支持 Windows ARM64**|
 |2021.11|.NET 6：WPF on ARM64 稳定成熟|
 |**2022.08**|**.NET Framework 4.8.1：.NET Framework 首次支持原生 ARM64（含 WPF）**|
-|2022.11+|.NET 7/8/9/10：持续完善 ARM64 支持，性能追平 x64|
+|2022.11+|.NET 7/8/9/10/11：持续完善 ARM64 支持（「性能追平 x64」仅见第三方幻灯片）|
 
 # 四、依据来源
 

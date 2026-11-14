@@ -73,8 +73,8 @@ public async Task<Order> GetAsync(int id)
 
 - **必须**：独立异步操作用 `Task.WhenAll` 并行等待；只需其一完成用 `Task.WhenAny`
 - **禁止**：为"省事"对上千个任务 `Task.WhenAll`——用分区 / `SemaphoreSlim` 限制并发度
-- **必须**：`SemaphoreSlim` 等可异步等待的原语配套 `await using` 或 `finally` 释放
-- **禁止**：同步 `lock` 内 `await`（死锁）；需要异步互斥用 `SemaphoreSlim` 或 `Channel<T>`
+- **必须**：`SemaphoreSlim` 的 `WaitAsync()` 成功后，必须在 `finally` 中 `Release()`（`SemaphoreSlim` 本身只实现 `IDisposable`，不是 `IAsyncDisposable`，不能 `await using`）
+- **禁止**：`lock` 内 `await`（编译器直接报 CS1996；`lock` 是线程亲和的，无法跨 `await` 持有）；需要异步互斥用 `SemaphoreSlim`
 
 ```csharp
 // ❌ 循环内串行 await 独立请求：一个接一个，N 个请求 N 倍延迟
@@ -137,6 +137,6 @@ public async void OnSaveClick(object? sender, RoutedEventArgs e)
 
 ## 9. 资源与泄漏
 
-- **必须**：`SemaphoreSlim`、`Channel<T>`、`CancellationTokenSource` 等可释放的异步原语用 `using` / `await using` 释放
+- **必须**：`SemaphoreSlim`、`CancellationTokenSource` 等实现 `IDisposable` 的同步原语用 `using` 释放（二者均不是 `IAsyncDisposable`）；`Channel<T>` 不实现 `IDisposable`，生产结束时调用 `Writer.Complete()` 通知消费者
 - **应该**：长生命周期对象持有的 `CancellationTokenSource` 用后释放，防句柄 / 内存泄漏
 - **禁止**：fire-and-forget 的裸 `Task`（不 await 不观察）——后台任务必须登记到生命周期管理并记录异常

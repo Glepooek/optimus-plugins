@@ -123,7 +123,7 @@ public void Invoice_IsLate_WhenPastDue()
 |---|---|---|---|---|
 | **xUnit** | `[Theory]` / `[InlineData]` / `[MemberData]` | 内置并行（程序集级） | 无 `[SetUp]`，构造函数即初始化 | 最流行，.NET 生态事实标准 |
 | **NUnit** | `[TestCase]` / `[TestCaseSource]` | 受限，需显式配置 | `[SetUp]` / `[TearDown]` | 老牌，特性丰富 |
-| **MSTest** | `[DataTestMethod]` / `[DataRow]` | 手动控制 | `[TestInitialize]` / `[TestCleanup]` | Visual Studio 集成好 |
+| **MSTest** | `[TestMethod]` + `[DataRow]`（`[DataTestMethod]` 仅为向后兼容，MSTest 3.10+ 分析器 MSTEST0044 默认警告） | 手动控制 | `[TestInitialize]` / `[TestCleanup]` | Visual Studio 集成好 |
 
 **主要差异**：xUnit 用构造函数做初始化、`IDisposable` 做清理，天然鼓励不可变、可复用的测试实例；NUnit/MSTest 用 `[SetUp]` 特性。并行方面 xUnit 默认并行各测试类，是团队默认推荐。
 
@@ -268,7 +268,7 @@ public class CalculatorTests
     public void Add_TwoNumbers_ReturnsSum()
         => Assert.AreEqual(3, new Calculator().Add(1, 2));
 
-    [DataTestMethod]                // 数据驱动
+    [TestMethod]                    // 数据驱动：[TestMethod] + [DataRow]（[DataTestMethod] 已不推荐）
     [DataRow(1, 2, 3)]
     [DataRow(-1, 1, 0)]
     public void Add_Parameters_ReturnsExpected(int a, int b, int expected)
@@ -303,9 +303,9 @@ Assert.That(async () => await service.CreateAsync(-1),
 
 | 命令 | 作用 |
 |---|---|
-| `dotnet test` | 从当前目录向上查找 `.sln`，构建并运行全部测试 |
-| `dotnet test <path-to-sln>` | 指定解决方案运行 |
-| `dotnet test --project <csproj>` | 只运行指定测试项目 |
+| `dotnet test` | 在当前目录查找项目或解决方案（不会向上查找），构建并运行全部测试 |
+| `dotnet test <path-to-sln>` | VSTest 模式：指定解决方案运行（MTP 模式写作 `dotnet test --solution <path-to-sln>`） |
+| `dotnet test <csproj>` | VSTest 模式：只运行指定测试项目（MTP 模式写作 `dotnet test --project <csproj>`；用哪种模式由 `global.json` / SDK 版本决定） |
 | `dotnet test --no-build` | 复用上次构建产物快速重跑（改过被测代码须先 build） |
 | `dotnet test -c Release` | 以 Release 配置构建并测试 |
 

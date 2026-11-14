@@ -7,7 +7,7 @@
 ## 1. 敏感数据处理
 
 - **必须**：密码、令牌、连接串等敏感信息用系统凭据库（`Windows Credential Manager` / `DPAPI`）或安全存储，**禁止**硬编码在代码 / XAML / 配置文件
-- **必须**：内存中的敏感字符串用完即清（`SecureString` 或不可变替换），**禁止**长期持有明文密码
+- **必须**：内存中的敏感字符串缩短明文生命周期（用完即覆盖 `char[]` / 不长期持有），**禁止**长期持有明文密码；不要为新代码引入 `SecureString`（官方已不建议在 .NET (Core) 新开发中使用，推荐把凭据放在进程外，代码中只持有不透明句柄）
 - **必须**：日志与错误消息脱敏（密码、令牌、个人信息不落日志），**禁止**日志中打印连接串（联动 `12` 章第 6 节）
 - **禁止**：把敏感数据写进资源字典 / XAML 字符串资源（`x:Key` 资源被反编译可见）
 
@@ -49,12 +49,11 @@ _logger.Info($"连接数据库：{MaskConnectionString(conn)}");
 var xaml = await httpClient.GetStringAsync("https://evil.example/template.xaml");
 var element = (FrameworkElement)XamlReader.Parse(xaml);   // 不可信内容直接解析
 
-// ✅ 只解析可信来源，并限制类型：明确白名单程序集 / 已验证来源
+// ✅ 只解析可信来源：
 // 1. 仅加载已签名 / 应用自带的模板资源
-// 2. 用 XamlSchemaContext 限制允许的类型（只允许自带控件，禁止任意 Type）
-var allowed = new XamlSchemaContext();   // 按需配置 AllowPublicTypes 等限制
-using var reader = XmlReader.Create(new StringReader(trustedXaml));
-var element = (FrameworkElement)XamlReader.Load(reader, new ParserContext { XamlTypeMapper = ... });
+// 2. 确需解析外部来源时，至少启用受限读取器（useRestrictiveXamlReader: true），限制潜在危险类型的实例化；
+//    它只是纵深防御，不是安全沙箱——不可信标记仍应隔离在低权限边界或直接拒绝
+var element = (FrameworkElement)XamlReader.Parse(trustedXaml, useRestrictiveXamlReader: true);
 ```
 
 ## 4. 认证与授权

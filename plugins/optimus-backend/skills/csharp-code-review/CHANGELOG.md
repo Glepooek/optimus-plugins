@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.7.1] - 2026-11-14
+
+### Fixed
+- 依 Microsoft Learn 官方文档核对并修正 references 中的事实性错误：`lock` 内 `await` 为 CS1996；typed HttpClient 为 Transient；`Memory<T>` 非 ref struct；MemoryCache `SizeLimit` 须配 `entry.SetSize`；`ConcurrentDictionary` 委托在锁外执行且枚举器非快照；字符串插值不会编译为 StringBuilder；匿名类型为堆上引用类型；`Directory.Build.props` 早期导入故项目属性条件应放 `.targets`；日志参数始终先求值（须 `IsEnabled` 守卫）；序列化器安全清单；MSTest `DataTestMethod` 已不推荐；`dotnet test` 不向上查找、MTP 用 `--project/--solution`
+
 ## [1.7.0] - 2026-11-14
 
 ### Added

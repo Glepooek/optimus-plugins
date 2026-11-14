@@ -49,7 +49,7 @@ var client = new PaymentClient(apiKey);
 - **必须**：JSON 反序列化设深度与大小限制（防反序列化攻击与资源耗尽）
 - **禁止**：把用户可控数据反序列化到危险类型（类型混淆攻击）
 - **应该**：明确反序列化允许的类型集合（如 `TypeNameHandling` 仅允许安全白名单）
-- **禁止**：用默认宽松配置的 `JavaScriptSerializer` / 旧 `XmlSerializer` 处理不可信数据
+- **禁止**：用 `BinaryFormatter` / `SoapFormatter` / `NetDataContractSerializer` / `LosFormatter` / `ObjectStateFormatter` 处理不可信数据（均执行不受限的多态反序列化）；`JavaScriptSerializer` 禁止配合 `SimpleTypeResolver` 使用（`XmlSerializer` 与不带 `SimpleTypeResolver` 的 `JavaScriptSerializer` 官方归入较安全的序列化器）
 
 ```csharp
 // ❌ 宽松反序列化：TypeNameHandling.All 让载荷里的类型名任意实例化，可远程执行代码

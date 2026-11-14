@@ -2,6 +2,12 @@
 
 本领域自 7.2.1 起使用**独立版本号**。7.2.0 及之前为知识库统一全局版本号时代，相关条目见下方「全局版本时代」，其版本号为当时的全局版本。
 
+## [7.3.1] - 2026-11-14
+
+### Fixed
+- `reference/windows-dotnet-support-matrix.md`：依 Microsoft Learn 官方页修正——.NET 7 终止日 2024.05.14；STS 支持期 24 个月（.NET 7 及更早为 18 个月）；.NET 8/9 状态改「已终止」并补 .NET 11 行；Win10 21H2 / 22H2 不再写「最终版本（Ent/Edu 至 2028.10）/ 全版本支持」，改为官方仅列 LTSC/Enterprise；Win10 1607 LTSB 已于 2026.10.13 结束；Win11 26H1 不再写「预览」，补 26H1/26H2 行与日期口径说明；删除无官方出处的「4.8.1 为最终版本」
+- `reference/wpf-cpu-architecture-support.md`：「.NET Framework 从未支持 ARM32」收窄为「WPF 从未支持 ARM32」（Windows RT/8.1 ARM 随系统提供过 4.5/4.5.1，不含 WPF）；「.NET 5.0.0~5.0.7 只能运行控制台/ASP.NET Core」改为「WPF 以 x86 模拟运行」；「.NET 7 起性能追平 x64」「推荐 .NET 8+」改为官方原文措辞并注明出处；补 .NET 11 行、.NET 8/9 已终止
+
 ## [7.3.0] - 2026-09-03
 
 ### Added

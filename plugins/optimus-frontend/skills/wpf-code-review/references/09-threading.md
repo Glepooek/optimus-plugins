@@ -12,9 +12,8 @@ WPF 是线程亲和模型——UI 只能由 UI 线程操作。本篇约束 Dispa
 - **应该**：识别后台线程是否持有 UI 引用，封装"UI 更新"逻辑统一走调度，不散布 `Dispatcher` 调用
 
 ```csharp
-// ❌ 后台线程直接改 UI：跨线程访问 DependencyObject，抛 InvalidOperationException
-var result = await Task.Run(() => DoWork());
-StatusText.Text = result;       // 后台上下文？在 Task.Run 回调内 = 违规
+// ❌ 后台线程直接改 UI：Task.Run 委托在线程池线程执行，其中访问 DependencyObject 抛 InvalidOperationException
+await Task.Run(() => { StatusText.Text = DoWork(); });
 
 // ✅ Dispatcher 编组：把 UI 更新调度回 UI 线程
 var result = await Task.Run(() => DoWork());

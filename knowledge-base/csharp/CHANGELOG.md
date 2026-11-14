@@ -2,6 +2,11 @@
 
 本领域自 7.2.1 起使用**独立版本号**。7.2.0 及之前为知识库统一全局版本号时代，相关条目见下方「全局版本时代」，其版本号为当时的全局版本。
 
+## [8.0.1] - 2026-11-14
+
+### Fixed
+- `reference/refit.md`：对象初始化器中 lambda 末尾多余的 `;`（`ExceptionFactory` / `DeserializationExceptionFactory` 示例）；非 DI 的 `AuthHeaderHandler` 示例补 `InnerHandler = new HttpClientHandler()`；DIM 不可用运行时补列 .NET Framework；Polly 提示指向 `Microsoft.Extensions.Http.Resilience`（旧 `Microsoft.Extensions.Http.Polly` 已弃用）；RFC 7807 引用改为取代它的 RFC 9457
+
 ## [8.0.0] - 2026-10-27
 
 ### 不兼容性

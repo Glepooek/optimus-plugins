@@ -17,14 +17,14 @@
 - **必须**：锁对象为私有只读字段：`private readonly object _lock = new();`
 - **禁止**：锁 `this`、锁 `typeof(...)`、锁字符串字面量（公共对象易被外部意外锁住，导致死锁 / 误锁）
 - **必须**：锁内只做最小临界区工作；禁止锁内 I/O、慢操作、嵌套锁
-- **禁止**：锁内 `await`（`Monitor` 不支持异步重入，必死锁；需要异步互斥用 `SemaphoreSlim`）
+- **禁止**：`lock` 内 `await`（编译器直接报 CS1996；`lock` 是线程亲和的，`await` 之后恢复的线程不一定是加锁线程；需要异步互斥用 `SemaphoreSlim`）
 - **必须**：涉及多个锁时，全仓库统一获取顺序（防死锁，见第 8 节）
 
 ```csharp
-// ❌ lock 内 await：Monitor 是线程持锁，await 释放线程后锁无人持、也无人可再进 → 死锁
+// ❌ lock 内 await：编译器直接拒绝（CS1996）。lock 是线程亲和的，await 之后恢复的线程可能不是加锁的线程
 lock (_lock)
 {
-    var data = await _repo.GetAsync();   // 持锁线程被 await 放走，锁永远释放不了
+    var data = await _repo.GetAsync();   // 无法通过编译
 }
 
 // ✅ 异步互斥用 SemaphoreSlim：可 await 等待，不绑定线程
@@ -82,14 +82,14 @@ public class Metrics
 
 | 集合 | 特性 | 场景 |
 |---|---|---|
-| `ConcurrentDictionary<TKey,TValue>` | 并发字典，复合方法原子 | 全局字典、缓存 |
+| `ConcurrentDictionary<TKey,TValue>` | 并发字典，读写线程安全；`GetOrAdd` / `AddOrUpdate` 的工厂委托在锁外执行，可能被调用多次 | 全局字典、缓存 |
 | `ConcurrentQueue<T>` | FIFO | 生产者-消费者 |
 | `ConcurrentStack<T>` | LIFO | 工作栈 |
 | `ConcurrentBag<T>` | 无序、局部线程优先 | 同线程生产者消费者 |
 | `Channel<T>` | 异步生产消费、背压 | 异步管道（配合 `04` 章） |
 
-- **必须**：需要"读-改-写"原子时用并发集合提供的方法（`GetOrAdd`、`AddOrUpdate`），禁止先 `TryGetValue` 再 `Add`（非原子）
-- **禁止**：迭代并发集合时并发修改——需快照时先 `ToList()` / `ToArray()`
+- **必须**：需要"读-改-写"时用并发集合提供的方法（`GetOrAdd`、`AddOrUpdate`），禁止先 `TryGetValue` 再 `Add`（两步之间非原子）；注意带委托参数的重载，其委托在锁外调用、可能执行多次且只有一个结果被写入，委托必须幂等、无副作用
+- **认知**：并发集合的枚举器可与读写并发使用，不会抛"集合已修改"异常；`ConcurrentDictionary` 的枚举结果不是时点快照，可能包含枚举开始后的修改。需要一致视图时先 `ToArray()` 再处理
 
 ```csharp
 // ❌ TryGetValue 再 Add：两步之间另一个线程已插入，重复键、覆盖、异常都有可能
@@ -99,7 +99,7 @@ if (!_cache.TryGetValue(key, out var value))
     _cache.Add(key, value);      // 并发下可能已存在 → 抛异常或覆盖
 }
 
-// ✅ GetOrAdd：查+插在一个原子操作内完成，由并发字典保证
+// ✅ GetOrAdd：最终只有一个值被写入字典；工厂委托可能被多个线程各执行一次，因此 Load 必须幂等、无副作用
 var value = _cache.GetOrAdd(key, k => Load(k));
 ```
 

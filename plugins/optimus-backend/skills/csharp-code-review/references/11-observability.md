@@ -65,15 +65,16 @@ _logger.LogInformation("Order {OrderId} created by {UserId}", order.Id, order.Us
 ## 5. 日志性能
 
 - **必须**：热路径日志控制在合理级别，避免高频 `Information`
-- **应该**：结构化日志天然延迟求值——未启用的级别不渲染消息体，利用这一点而非手动拼接
+- **应该**：用消息模板 + 参数（而非字符串插值）记录日志：未启用的级别不会渲染消息体；但参数表达式在调用前就会求值，昂贵参数需另行守卫（见下例）
 - **禁止**：日志调用内做昂贵计算（即使该级别被过滤）
 
 ```csharp
 // ❌ 日志内做昂贵计算：即使 Debug 级别被过滤，Serialize 已经执行了
 _logger.LogDebug($"支付回调解析结果：{JsonSerializer.Serialize(payload)}");
 
-// ✅ 参数延迟求值：级别未启用时，Serialize 根本不会执行
-_logger.LogDebug("支付回调解析结果：{Payload}", JsonSerializer.Serialize(payload));
+// ✅ 昂贵参数用 IsEnabled 守卫（或改用 [LoggerMessage] 源生成）：日志方法的参数无论级别是否启用都会先求值
+if (_logger.IsEnabled(LogLevel.Debug))
+    _logger.LogDebug("支付回调解析结果：{Payload}", JsonSerializer.Serialize(payload));
 ```
 
 ## 6. 日志噪声控制
