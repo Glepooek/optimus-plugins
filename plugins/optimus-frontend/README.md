@@ -55,8 +55,9 @@
 
 ### MasterGo Token
 1. 登录 MasterGo (https://mastergo.com)
-2. 进入用户设置 → 开发者设置
-3. 创建 API Token
+2. 进入个人设置
+3. 切换到 **Security Settings** 标签页
+4. 找到 personal access token，点击生成
 
 > 将生成的 token 导出为环境变量 `MASTERGO_TOKEN`。`.mcp.json` 会把它转交给 MasterGo MCP 子进程所读取的 `MG_MCP_TOKEN`，用户无需自行设置后者。
 
