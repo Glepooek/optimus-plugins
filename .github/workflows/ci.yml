@@ -70,8 +70,9 @@ jobs:
       - run: sh .githooks/pre-commit
 
   # ---------------------------------------------------------------------------
-  # unittest discover 不跨目录递归，每个目录必须逐个调用。
-  # 用循环而非一堆 step：新增测试目录时只改一处，且失败时不必翻多个折叠块。
+  # unittest discover 不跨目录递归，每个目录必须逐个调用。目录不再手写：
+  # run_unit_tests.py 按 repository_inventory.py 的三类固定位置自动发现，
+  # 新增测试目录落在这些位置即被执行，本文件与 AGENTS.md 都不用改。
   # ---------------------------------------------------------------------------
   gates-tests:
     runs-on: ubuntu-latest
@@ -82,37 +83,21 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.x'
-      - name: 9 个目录的单元测试
-        run: |
-          # 全仓 9 个测试目录全部列入，无排除项。
-          #
-          # ⚠️ plugins/optimus-frontend/skills/mastergo-to-wpf-page/scripts
-          #    此前被刻意排除：它的 test_optimization.py 有 9 个存量失败
-          #    （AnchorSafety 3 / GridSizing 1 / ValueSafety 5），随 de88b9d
-          #    （重命名该 skill）入库即为红。之所以排除而非留红：gates-tests 是
-          #    必需检查，留红会让主干每个 PR 都无法合并（bypass_actors 为 null，
-          #    无人能绕过）。2026-09-13 按用户裁决删除那 9 条测试，该目录转绿
-          #    并加回本列表（裁决见 docs/todo-list/2026-09-12-todo.md 的 A3）。
-          #
-          # 🔴 那 9 条测试盯的三个缺陷一个都没修——删的是测试不是实现。根因分析
-          #    已搬进该 skill 的 known-issues.md，**那里是它们在版本库里的唯一
-          #    记录**（本注释此前承担该职责，随排除一并撤销）。
-          fail=0
-          for d in \
-            .githooks \
-            .claude/skills/knowledge-base-maintain/scripts \
-            .claude/skills/sync-cc-docs-to-youdaonote/scripts \
-            .claude/skills/sync-cc-tips/scripts \
-            plugins/optimus-frontend/skills/mastergo-icon-expoter/scripts \
-            plugins/optimus-frontend/skills/mastergo-to-wpf-components/scripts \
-            plugins/optimus-frontend/skills/mastergo-to-wpf-page/scripts \
-            plugins/optimus-frontend/skills/svg-to-xaml-path/scripts
-          do
-            echo "::group::$d"
-            python -m unittest discover -s "$d" -p "test_*.py" || fail=1
-            echo "::endgroup::"
-          done
-          exit "$fail"
+      - name: 运行自动发现的单元测试目录
+        # 全部发现到的测试目录都执行，无排除项。
+        #
+        # ⚠️ plugins/optimus-frontend/skills/mastergo-to-wpf-page/scripts
+        #    此前被刻意排除：它的 test_optimization.py 有 9 个存量失败
+        #    （AnchorSafety 3 / GridSizing 1 / ValueSafety 5），随 de88b9d
+        #    （重命名该 skill）入库即为红。之所以排除而非留红：gates-tests 是
+        #    必需检查，留红会让主干每个 PR 都无法合并（bypass_actors 为 null，
+        #    无人能绕过）。2026-09-13 按用户裁决删除那 9 条测试，该目录转绿
+        #    并恢复执行（裁决见 docs/todo-list/2026-09-12-todo.md 的 A3）。
+        #
+        # 🔴 那 9 条测试盯的三个缺陷一个都没修——删的是测试不是实现。根因分析
+        #    已搬进该 skill 的 known-issues.md，**那里是它们在版本库里的唯一
+        #    记录**（本注释此前承担该职责，随排除一并撤销）。
+        run: python .githooks/run_unit_tests.py
 
   # ---------------------------------------------------------------------------
   # 数据文件一致性。三项均从仓库根不带参数运行。
@@ -159,7 +144,7 @@ jobs:
           #   ② fail-on-warnings 对**降级后的** warning 同样判失败
           #      （action 原文：downgraded warnings still fail the run）。
           # 而 I1 是「marketplace plugins[] 必须按名字字母序」——本仓 plugins[]
-          # 刻意按语义编排（10 个自建插件在前、3 个外部引用条目集中在末尾），
+          # 刻意按语义编排（自建插件在前、外部引用条目集中在末尾），
           # 满足 I1 就要打散这个编排。经裁决：保留编排，关掉 fail-on-warnings。
           #
           # 🔴 它放掉的是 CLI warning 判失败（步骤 20/40），其中包括
@@ -178,13 +163,13 @@ jobs:
           # 不设它才是豁免最多的选项。正确实现是显式设成**实测出的违规集合**。
           #
           # 本机按 11-validate-invariants.sh 的逐条判据复算全部 11 条
-          # （CLI 2.1.270 / marketplace 13 条目）：仅 I1 违规，
+          # （2026-09-13 当时：CLI 2.1.270 / marketplace 13 条目）：仅 I1 违规，
           # I2/I3/I4/I5/I8/I9/I10/I11 全部通过。故名单收窄到 I1 一条，
           # 其余 3 条从 warning 回到 error 档。
           #
           # 🔴 I1（marketplace plugins[] 必须按名字字母序，不区分大小写）
-          #    是唯一真正的豁免：本仓 plugins[] 刻意按语义编排（10 个自建
-          #    插件在前、3 个外部引用条目集中在末尾），满足 I1 就要打散这个
+          #    是唯一真正的豁免：本仓 plugins[] 刻意按语义编排（自建插件
+          #    在前、外部引用条目集中在末尾），满足 I1 就要打散这个
           #    编排。经裁决保留编排，见 todo B7。
           # 🔴 I5（外部条目 source.sha 必须 40 位）回到 error 档是零风险的：
           #    .githooks/check_external_entries.py 已在 gates-hooks 里强制
@@ -207,7 +192,7 @@ jobs:
       # 🔴 把 fail-on-warnings: "false" 放掉的严格档拿回来。
       #
       # 那个 input 之所以是 false，只因 I1（字母序）与本仓的语义编排冲突；
-      # 但它的副作用波及**全部** CLI warning，包括 plugins/*/skills/ 下 48 个
+      # 但它的副作用波及**全部** CLI warning，包括 plugins/*/skills/ 下全部
       # 对外发布 skill 的「缺 description」——而缺 description 的 skill 在
       # Claude 侧等于永不被自动触发，属功能性失效。
       #
