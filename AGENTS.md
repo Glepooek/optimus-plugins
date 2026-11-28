@@ -16,14 +16,15 @@
 |---|---|---|
 | 安装入口 | `/plugin marketplace add` 或手动 clone 到 `~/.claude/plugins/marketplace/` | `codex plugin marketplace add <repo>` → `codex plugin add <plugin>@optimus-plugins`，读取 `.agents/plugins/marketplace.json` |
 | 提交流程 | 强制 `/commit-cc-plugin` skill | 标准 git + Conventional Commits，禁止 `--no-verify`；`.githooks/pre-commit` 的一致性门禁两侧同等生效 |
-| Hooks | SessionStart（技巧轮播）、Notification（权限通知）生效 | 无对应机制，Claude 侧 hooks 在 Codex 中不生效 |
+| Hooks | SessionStart（技巧轮播）、Notification（权限通知）生效 | Claude Hook 不随 Codex 插件生效；Codex CLI 0.172.0 的 plugin_hooks 已 removed，用户级 hooks 特性不等于插件级分发面 |
+| 插件组件 | `.claude-plugin/plugin.json` 声明 `agents`，`.mcp.json` 自动加载 | `.codex-plugin/plugin.json` 显式声明 `mcpServers`（frontend 用 `.codex-mcp.json`）；Claude-only 组件登记在 `.githooks/codex_component_exclusions.json` |
 | 维护型 skill 镜像目录 | `.kiro/skills/<name>` | `.agents/skills/<name>` |
 | 插件标识文件 | `.claude-plugin/marketplace.json`（含全部插件） | 额外的 `.agents/plugins/marketplace.json` + 每插件 `.codex-plugin/plugin.json` |
 
 ### 重要约束
 
 - **SKILL.md 是唯一真源**：只改 `plugins/*/skills/*/SKILL.md`，不为 Codex 维护副本或改 frontmatter——两 harness 读的是同一份文件
-- **MCP 配置只面向 Claude Code**：`plugins/*/.mcp.json` 不为 Codex 维护 `config.toml` 镜像，Codex 清单（`.codex-plugin/plugin.json`）不声明 `mcpServers`
+- **MCP/agent 按 harness 实际能力分别声明**：只有路径校验（第 9 项）与使用侧冒烟（CI 的 codex_smoke.py）都通过的组件才可写进 Codex manifest；其余登记进排除表并写明理由。展示文案必须与该 harness 实际分发的组件一致。
 - **跨插件无重复 skills**：新功能前先确认无跨插件重叠
 - **Skills 可相互引用**：子 skill 用相对路径，跨插件用绝对命名空间
 - **复合 skills 很少见**：仅在 3 个以上阶段且每阶段 >200 行时使用
@@ -207,6 +208,8 @@ python .claude/skills/knowledge-base-maintain/scripts/check_index.py
 python .claude/skills/knowledge-base-maintain/scripts/check_refs.py
 python .claude/skills/sync-cc-tips/scripts/validate_tips.py
 ```
+
+Codex 冒烟本地可跑 `CODEX_HOME=<临时目录> python .githooks/codex_smoke.py .`（需已装 Codex CLI 0.172.0），它不属于门禁。
 
 ---
 
