@@ -9,16 +9,10 @@
 """
 
 import os
-import sys
 from pathlib import Path
 from typing import List, Mapping, Optional, Tuple
 
-# 确保 scripts/ 目录在 sys.path 中，以便导入同目录的 optimus_dirs
-_SCRIPTS_DIR = Path(__file__).resolve().parent
-if str(_SCRIPTS_DIR) not in sys.path:
-    sys.path.insert(0, str(_SCRIPTS_DIR))
-
-import optimus_dirs  # noqa: E402
+import optimus_dirs
 
 PROJECT_DIR_ENV = "JENKINS_BUILD_PROJECT_DIR"
 

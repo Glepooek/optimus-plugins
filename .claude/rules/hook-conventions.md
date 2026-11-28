@@ -36,6 +36,7 @@ python -m unittest discover -s .githooks -p "test_*.py"   # 18 个自检用例
 
 - 面向本仓库自身的一致性门禁**禁止**只写在 `plugins/*/hooks/` 里，必须落在 `.githooks/`（git 原生钩子，两个 harness 同等生效）。
 - 插件对外发布的 hook 若承载功能承诺，`hooks/README.md` 必须写明它仅在 Claude Code 下生效。
+- 新增或删除 `hooks/hooks.json` 中的事件，必须同步 `.githooks/codex_component_exclusions.json`（每个事件一条 `kind: hook`、`id` 为事件名），否则门禁第 9 项报「未声明」或「陈旧排除项」。
 
 ## 本仓已登记的 hook 配置
 

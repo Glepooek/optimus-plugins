@@ -3,7 +3,7 @@ name: sync-skill-symlinks
 # codex-portability: allow-harness-path reason=本 skill 的职责就是向各 harness 的 skills 目录同步链接
 description: 将 skill 源目录以符号链接同步到各 AI 工具的 skills 目录，维护单一 source of truth。默认 source：~/.agents/skills/，默认 targets：~/.claude/skills/、~/.kiro/skills/ 和 ~/.codex/skills/。支持自定义：source=<路径> target=<路径1,路径2,...>。触发词：同步 skills、sync skill symlinks、链接 skills、更新 skill 链接、link skills、update skill symlinks。不适用：仅需查看已有链接状态而不修改时，无需触发本 skill。
 metadata:
-  version: "2.0.2"
+  version: "2.0.3"
   author: desktop client team
   category: tool
 compatibility: 纯文件系统操作（符号链接管理）；Windows 下需开发者模式或管理员权限，macOS/Linux 原生支持 ln -s。
@@ -215,7 +215,7 @@ echo "🔍 发现 ${#skills[@]} 个 skill: ${skills[*]}"
 ```powershell
 # $targets 由 Step 0 赋值；此处兜底仅在 Step 0 未执行时生效
 if (-not $targets) {
-# codex-portability: allow-harness-path reason=本 skill 的职责就是向各 harness 的 skills 目录同步链接
+    # codex-portability: allow-harness-path reason=本 skill 的职责就是向各 harness 的 skills 目录同步链接
     $targets = @("$env:USERPROFILE\.claude\skills", "$env:USERPROFILE\.kiro\skills", "$env:USERPROFILE\.codex\skills")
 }
 
@@ -262,7 +262,7 @@ foreach ($target in $targets) {
 ```bash
 # targets 由 Step 0 赋值；此处兜底仅在 Step 0 未执行时生效
 if [ ${#targets[@]} -eq 0 ]; then
-# codex-portability: allow-harness-path reason=本 skill 的职责就是向各 harness 的 skills 目录同步链接
+    # codex-portability: allow-harness-path reason=本 skill 的职责就是向各 harness 的 skills 目录同步链接
     targets=("$HOME/.claude/skills" "$HOME/.kiro/skills" "$HOME/.codex/skills")
 fi
 created=0; skipped=0; warned=0

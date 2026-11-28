@@ -1,3 +1,8 @@
+## [1.3.4] - 2026-11-28
+
+### Changed
+- `main.py` 改用顶层 `import optimus_dirs`，不再在函数内 `__import__`；`jenkins_config_paths.py` 去掉重复的 `sys.path` 插入（`scripts/` 已由入口加入）
+
 # Changelog
 
 ## [1.3.3] - 2026-11-28

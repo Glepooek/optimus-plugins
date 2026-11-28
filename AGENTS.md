@@ -176,7 +176,7 @@ Minor/Major 升级前必须用 `darwin-skill` 给改动的 skill 评分：新分
 
 **新增 skill 必须带 eval case**：`plugins/<plugin>/skills/<skill>/evals/<case>/` 下需有 `prompt.md`（或 `case.yaml`），由 `new-skill-eval-case` job 强制，**存量不回溯**。**活体样本是 `plugins/optimus-frontend/skills/wpf-code-review/evals/` 的 6 个 case**（`01-listbox-virtualization` 等），照它写即可；规范条款见 `knowledge-base/skill-authoring/rules/03-skill-evaluation.md` § 1。⚠️ 门禁只查 case **存在**，不查内容有没有意义——质量属人工评审。⚠️ 那 6 条的判据是付费 `llm` grader，而 `skill-eval.yml` 缺 `ANTHROPIC_API_KEY`，因此**形态合规但在 CI 里一次都跑不了**——别把它当作「eval 已在 CI 里生效」的证据。
 
-**pre-commit 具体拦什么**（与 skill 分工明确）：每插件两份 `plugin.json` 版本同值、`plugins/*/hooks/hooks.json` 与 Claude Code 契约相符、marketplace 外部引用条目锁 40 位 `sha` 且不写 `version`、台账「已接入」表与条目 sha 一致、`.kiro`/`.agents` 符号链接镜像完整且以 `120000` 模式入库。**新克隆的仓库需执行一次 `git config core.hooksPath .githooks`**（该配置是本机的，不随仓库分发）。
+**pre-commit 具体拦什么**（十项，与 skill 分工明确）：每插件两份 `plugin.json` 版本同值、`plugins/*/hooks/hooks.json` 与 Claude Code 契约相符、marketplace 外部引用条目锁 40 位 `sha` 且不写 `version`、台账「已接入」表与条目 sha 一致、`.kiro`/`.agents` 符号链接镜像完整且以 `120000` 模式入库、`evals/` 每个 case 目录都带 marker、**插件不引用插件目录以外的路径**（安装后解析不到，skill 静默退化）、**Codex manifest 的组件声明与真实组件一致**（含 `.githooks/codex_component_exclusions.json` 排除表：漏登记报「未声明」，登记了却已不存在报「陈旧排除项」）、**发布 skill 不写死 harness 专属路径、frontmatter 只用六个允许键、正文不绑定 `AskUserQuestion`**（详见 `.claude/rules/skill-conventions.md` 的「跨 harness 可移植性」节）。**新克隆的仓库需执行一次 `git config core.hooksPath .githooks`**（该配置是本机的，不随仓库分发）。
 
 ---
 
