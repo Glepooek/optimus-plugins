@@ -8,23 +8,30 @@ Jenkins Build CLI
 
 import os
 import sys
+from pathlib import Path
 import yaml
 from jenkins_build import JenkinsBuildSkill
 
-CONFIG_SEARCH_PATHS = [
-    os.path.join(os.getcwd(), "jenkins-config.yaml"),
-    os.path.join(os.path.expanduser("~"), ".claude", "jenkins-config.yaml"),
-]
+# 将 skill 根目录的 scripts/ 加入路径，以便导入 jenkins_config_paths / optimus_dirs
+_SKILL_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_SKILL_ROOT / "scripts"))
+
+from jenkins_config_paths import config_search_paths, find_config  # noqa: E402
 
 
 def load_config() -> dict:
-    for path in CONFIG_SEARCH_PATHS:
-        if os.path.exists(path):
-            print(f"[i] 使用配置文件：{path}")
-            with open(path, "r", encoding="utf-8") as f:
-                return yaml.safe_load(f)
+    result = find_config()
+    if result is not None:
+        config_path, is_legacy = result
+        print(f"[i] 使用配置文件：{config_path}")
+        if is_legacy:
+            dirs = __import__("optimus_dirs").skill_dirs("jenkins-build")
+            new_path = Path(dirs["config_dir"]) / "jenkins-config.yaml"
+            print(f"[!] 正在读取旧配置位置 {config_path}；请迁移到 {new_path}，旧位置今后只读不写")
+        with open(config_path, "r", encoding="utf-8") as f:
+            return yaml.safe_load(f)
     print("[✗] 未找到配置文件，请在以下任一位置创建 jenkins-config.yaml：")
-    for path in CONFIG_SEARCH_PATHS:
+    for path, _ in config_search_paths():
         print(f"    {path}")
     print("    参考：jenkins_build/jenkins-config.yaml.example")
     sys.exit(1)

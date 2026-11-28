@@ -10,8 +10,9 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# venv 固定放在用户目录，避免污染插件仓库或项目目录
-VENV_DIR="$HOME/.claude/cache/jenkins-build/.venv"
+# venv 放在 optimus 缓存目录（由 optimus_dirs.py 解析，跨平台/harness 中立）
+CACHE_DIR="$(python3 "$SCRIPT_DIR/optimus_dirs.py" jenkins-build --create | python3 -c 'import json,sys; print(json.load(sys.stdin)["cache_dir"])')"
+VENV_DIR="$CACHE_DIR/.venv"
 
 # 兼容 Windows（Scripts/）和 Unix（bin/）的 venv 路径
 if [ -f "$VENV_DIR/Scripts/python.exe" ]; then
@@ -39,6 +40,9 @@ if ! "$PYTHON" -c "import requests, yaml" 2>/dev/null; then
     echo "[~] 安装依赖..."
     "$PIP" install requests pyyaml -q
 fi
+
+# 保存调用者工作目录，供 main.py 中的配置查找使用（cd 后 PWD 会变为 skill 目录）
+export JENKINS_BUILD_PROJECT_DIR="$PWD"
 
 # 执行构建（配置查找由 main.py 负责）
 cd "$SKILL_DIR/jenkins_build"
