@@ -335,6 +335,34 @@ def _check_marketplace(repo_root, codex_plugin_names):
     return problems
 
 
+def _check_mcp_subset(plugin_dir, manifest):
+    """Codex 独立 MCP 文件必须是 Claude .mcp.json 的内容一致子集。"""
+    mcp_rel = manifest.get("mcpServers")
+    if not isinstance(mcp_rel, str):
+        return []
+    resolved, _ = _declared_path(plugin_dir, mcp_rel, False, "mcpServers", "")
+    claude_f = plugin_dir / ".mcp.json"
+    if resolved is None or resolved == claude_f.resolve() or not claude_f.exists():
+        return []
+    codex_data, err1 = _load(resolved)
+    claude_data, err2 = _load(claude_f)
+    if err1 or err2 or not isinstance(codex_data, dict) or not isinstance(claude_data, dict):
+        return []
+    codex_servers, claude_servers = codex_data.get("mcpServers"), claude_data.get("mcpServers")
+    if not isinstance(codex_servers, dict) or not isinstance(claude_servers, dict):
+        return []
+    name, problems = plugin_dir.name, []
+    for server_id in sorted(codex_servers):
+        if server_id not in claude_servers:
+            problems.append(
+                f"[{name}] Codex MCP 文件声明了 {server_id!r}，但 Claude .mcp.json 中没有该 server"
+                f"（Codex 分发了 Claude 侧不存在的 server）")
+        elif codex_servers[server_id] != claude_servers[server_id]:
+            problems.append(
+                f"[{name}] mcp-server {server_id!r} 在 Codex MCP 文件与 Claude .mcp.json 中的内容不一致（内容漂移）")
+    return problems
+
+
 def check_codex_contract(repo_root):
     """校验 Codex manifest 与 Claude 侧真实组件、排除表、marketplace 的契约。"""
     repo_root = pathlib.Path(repo_root)
@@ -372,6 +400,8 @@ def check_codex_contract(repo_root):
         problems.extend(declared_problems)
         inventory, inventory_problems = component_inventory(plugin_dir)
         problems.extend(inventory_problems)
+
+        problems.extend(_check_mcp_subset(plugin_dir, manifest))
 
         declared_ids = {(kind, ident) for kind, ident, _ in declared}
         inventory_ids = {(kind, ident) for kind, ident, _ in inventory}

@@ -100,5 +100,20 @@ class TestMainMalformedOutput(unittest.TestCase):
         self.assertIn("[mcp-enumeration]", out)
 
 
+class TestRunFailureCategorization(unittest.TestCase):
+    def test_timeout_becomes_nonzero_result(self):
+        exc = subprocess.TimeoutExpired(["codex"], 120)
+        with unittest.mock.patch.object(codex_smoke.subprocess, "run", side_effect=exc):
+            r = codex_smoke._run("codex", "mcp", "list")
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("超时", r.stderr)
+
+    def test_oserror_becomes_nonzero_result(self):
+        with unittest.mock.patch.object(codex_smoke.subprocess, "run", side_effect=OSError("boom")):
+            r = codex_smoke._run("codex", "mcp", "list")
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("boom", r.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()

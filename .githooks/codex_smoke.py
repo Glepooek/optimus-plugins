@@ -85,9 +85,14 @@ def require_isolated_codex_home(env: Mapping[str, str]) -> str | None:
 
 
 def _run(codex: str, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        [codex, *args], capture_output=True, text=True, encoding="utf-8"
-    )
+    try:
+        return subprocess.run(
+            [codex, *args], capture_output=True, text=True, encoding="utf-8", timeout=120
+        )
+    except subprocess.TimeoutExpired:
+        return subprocess.CompletedProcess([codex, *args], 124, "", "命令超时（120s）")
+    except OSError as exc:
+        return subprocess.CompletedProcess([codex, *args], 127, "", f"无法执行: {exc}")
 
 
 def main(argv: list[str]) -> int:

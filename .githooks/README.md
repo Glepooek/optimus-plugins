@@ -44,7 +44,7 @@ git config core.hooksPath .githooks
 
 🔴 runner 输出中的 `[pre-commit] 未通过` 是与 `commit-cc-plugin` skill 的契约（它据此判断 commit 被门禁拦下），改措辞前先改那边。
 
-第 1 项由 `check_plugin_versions.py` 实现（18 个单元测试）。
+第 1、9 项由 `check_plugin_versions.py` 实现（39 个单元测试）。
 
 第 2 项由 `check_hook_configs.py` 实现（21 个单元测试），扫 `plugins/*/hooks/hooks.json` 与 `.claude/settings*.json`，查七项机械可判定的错配：`async` 与展示类输出的错配、`async`/`asyncRewake` 用在非 command handler、handler 类型与事件不符、非工具事件上的 `if`、不支持 matcher 的事件上写了 matcher、永不匹配的 `mcp__<server>` matcher、PowerShell 裸占位符，另加拼错的事件名。判据真源是 `knowledge-base/claude-code-hooks/`，每条报错都带对应索引条目 ID。脚本定位不到被引用的脚本文件时不报——宁可漏报也不误报。两类文件的 `hooks` 键要求不同：`hooks.json` 缺顶层 `hooks` 对象是错配；`settings*.json` 是通用设置文件（`enabledPlugins`、`permissions`、`env` 等），完全不配 `hooks` 属常态，只在该键存在而类型不对时才报。
 
@@ -110,7 +110,7 @@ python -m unittest discover -s .githooks -p "test_*.py"
 
 ### `codex_smoke.py`：CI 专用冒烟，不在 catalog 内，不计入门禁项数
 
-由 `ci.yml` 的 `plugin-validate` job 在安装固定版本 Codex CLI 后调用：隔离 `CODEX_HOME` 下装全部本地插件，断言插件已启用、全部 skill 在 `codex debug prompt-input` 中可见、MCP 与 `.codex-mcp.json` 一致且不含排除表里的 server。它要联网装 CLI，违反「门禁只读工作树」约定，所以**不进 `repository_gates.py`**，本地不属于八项门禁；`CODEX_HOME` 未设置或指向 `~/.codex` 时拒绝运行。单测 `test_codex_smoke.py` 由 `run_unit_tests.py` 照常发现。
+由 `ci.yml` 的 `plugin-validate` job 在安装固定版本 Codex CLI 后调用：隔离 `CODEX_HOME` 下装全部本地插件，断言插件已启用、全部 skill 在 `codex debug prompt-input` 中可见、期望的 MCP server（取自 `.codex-mcp.json`）均出现、排除表里的 Claude-only server 不出现。它要联网装 CLI，违反「门禁只读工作树」约定，所以**不进 `repository_gates.py`**，本地不属于九项门禁；`CODEX_HOME` 未设置或指向 `~/.codex` 时拒绝运行。单测 `test_codex_smoke.py` 由 `run_unit_tests.py` 照常发现。
 
 ## 与 CI 的关系
 

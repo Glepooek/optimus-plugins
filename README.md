@@ -24,7 +24,7 @@
 
 | 插件 | Codex 差异 |
 |---|---|
-| optimus-frontend | `avalonia-docs`、`microsoft-learn` 随 Codex 插件分发；`mastergo-magic-mcp` 在经验证的 token 转发方案出现前仅 Claude Code 可用 |
+| optimus-frontend | `avalonia-docs`、`microsoft-learn` 随 Codex 插件分发；`mastergo-magic-mcp` 在经验证的 token 转发方案出现前仅 Claude Code 可用；PreToolUse Hook 仅 Claude Code 可用 |
 | optimus-backend | Claude Hook 不随 Codex 插件生效 |
 | optimus-devops | `dotnet-diagnose` agent 在 Codex CLI 0.172.0 下未注册，Codex 用户直接使用 `dotnet-diagnose-triage`；Claude Hook 不随 Codex 插件生效 |
 

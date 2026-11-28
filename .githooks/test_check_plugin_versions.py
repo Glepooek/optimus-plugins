@@ -291,6 +291,27 @@ class TestCodexContract(unittest.TestCase):
         self.assertEqual(len(problems), 1)
         self.assertIn("b", problems[0])
 
+    def test_mcp_declared_not_in_claude_mcp(self):
+        plugin_dir = make_codex_plugin(
+            self.root, "p", codex_extra={"mcpServers": "./mcp.json"},
+            mcp={"a": {"command": "x"}})
+        self.declare_mcp_file(
+            plugin_dir, {"mcpServers": {"a": {"command": "x"}, "ghost": {"command": "z"}}})
+        write_marketplace(self.root, ["p"])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("ghost", problems[0])
+
+    def test_mcp_declared_content_drift(self):
+        plugin_dir = make_codex_plugin(
+            self.root, "p", codex_extra={"mcpServers": "./mcp.json"},
+            mcp={"a": {"url": "https://x"}})
+        self.declare_mcp_file(plugin_dir, {"mcpServers": {"a": {"url": "https://y"}}})
+        write_marketplace(self.root, ["p"])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("'a'", problems[0])
+
     def test_mcp_server_excluded_passes(self):
         plugin_dir = make_codex_plugin(
             self.root, "p", codex_extra={"mcpServers": "./mcp.json"},
