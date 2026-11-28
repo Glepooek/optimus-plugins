@@ -119,14 +119,18 @@ def main(argv: list[str]) -> int:
     if r.returncode != 0:
         failures["plugin-install"].append(f"plugin list 失败: {r.stderr.strip()}")
     else:
-        enabled = {
-            e.get("name")
-            for e in json.loads(r.stdout).get("installed", [])
-            if e.get("installed") and e.get("enabled")
-        }
-        for p in plugins:
-            if p not in enabled and not any(f.startswith(f"{p}:") for f in failures["plugin-install"]):
-                failures["plugin-install"].append(f"{p}: 未安装或未启用")
+        try:
+            enabled = {
+                e.get("name")
+                for e in json.loads(r.stdout).get("installed", [])
+                if e.get("installed") and e.get("enabled")
+            }
+        except (ValueError, AttributeError, TypeError) as exc:
+            failures["plugin-install"].append(f"plugin list 输出无法解析: {exc!r}")
+        else:
+            for p in plugins:
+                if p not in enabled and not any(f.startswith(f"{p}:") for f in failures["plugin-install"]):
+                    failures["plugin-install"].append(f"{p}: 未安装或未启用")
 
     mcp_cfg = json.loads((root / "plugins/optimus-frontend/.codex-mcp.json").read_text(encoding="utf-8"))
     expected_mcp = set(mcp_cfg["mcpServers"])
@@ -137,16 +141,22 @@ def main(argv: list[str]) -> int:
     if r.returncode != 0:
         failures["mcp-enumeration"].append(f"mcp list 失败: {r.stderr.strip()}")
     else:
-        failures["mcp-enumeration"] += mcp_problems(r.stdout, expected_mcp, forbidden_mcp)
+        try:
+            failures["mcp-enumeration"] += mcp_problems(r.stdout, expected_mcp, forbidden_mcp)
+        except (ValueError, AttributeError, TypeError) as exc:
+            failures["mcp-enumeration"].append(f"mcp list 输出无法解析: {exc!r}")
 
     expected_skills = expected_skill_ids(root)
     r = _run(codex, "debug", "prompt-input", "x")
     if r.returncode != 0:
         failures["skill-visibility"].append(f"prompt-input 失败: {r.stderr.strip()}")
     else:
-        failures["skill-visibility"] += [
-            f"skill 不可见: {i}" for i in missing_skill_ids(rendered_text(r.stdout), expected_skills)
-        ]
+        try:
+            failures["skill-visibility"] += [
+                f"skill 不可见: {i}" for i in missing_skill_ids(rendered_text(r.stdout), expected_skills)
+            ]
+        except (ValueError, AttributeError, TypeError) as exc:
+            failures["skill-visibility"].append(f"prompt-input 输出无法解析: {exc!r}")
 
     bad = False
     for cat, items in failures.items():

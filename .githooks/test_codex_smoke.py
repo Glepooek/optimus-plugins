@@ -1,11 +1,17 @@
+import contextlib
+import io
 import json
+import os
+import subprocess
 import pathlib
 import sys
 import tempfile
 import unittest
+import unittest.mock
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
+import codex_smoke  # noqa: E402
 from codex_smoke import (  # noqa: E402
     expected_skill_ids,
     local_plugin_names,
@@ -51,6 +57,47 @@ class TestCodexSmoke(unittest.TestCase):
     def test_local_plugin_names_real_repo(self):
         root = pathlib.Path(__file__).resolve().parent.parent
         self.assertEqual(len(local_plugin_names(root)), 9)
+
+
+class TestMainMalformedOutput(unittest.TestCase):
+    def _run_main(self, fake):
+        root = pathlib.Path(__file__).resolve().parent.parent
+        env = {"CODEX_HOME": tempfile.mkdtemp()}
+        out = io.StringIO()
+        with unittest.mock.patch.dict(os.environ, env),                 unittest.mock.patch.object(codex_smoke.shutil, "which", return_value="codex"),                 unittest.mock.patch.object(codex_smoke, "_run", side_effect=fake),                 contextlib.redirect_stdout(out):
+            rc = codex_smoke.main(["codex_smoke.py", str(root)])
+        return rc, out.getvalue()
+
+    @staticmethod
+    def _cp(stdout="", rc=0):
+        return subprocess.CompletedProcess([], rc, stdout=stdout, stderr="")
+
+    def test_non_json_mcp_list_categorized_and_later_checks_run(self):
+        def fake(codex, *args):
+            if args[:2] == ("mcp", "list"):
+                return self._cp("not json")
+            if args[:2] == ("plugin", "list"):
+                return self._cp(json.dumps({"installed": []}))
+            if args[:2] == ("debug", "prompt-input"):
+                return self._cp("also not json")
+            return self._cp("{}")
+        rc, out = self._run_main(fake)
+        self.assertEqual(rc, 1)
+        self.assertIn("[mcp-enumeration]", out)
+        self.assertIn("[skill-visibility]", out)
+        self.assertIn("[plugin-install]", out)
+
+    def test_wrong_shape_plugin_list_categorized(self):
+        def fake(codex, *args):
+            if args[:2] == ("plugin", "list"):
+                return self._cp("[1, 2]")
+            if args[:2] == ("mcp", "list"):
+                return self._cp("{}")
+            return self._cp("[]")
+        rc, out = self._run_main(fake)
+        self.assertEqual(rc, 1)
+        self.assertIn("[plugin-install] plugin list 输出无法解析", out)
+        self.assertIn("[mcp-enumeration]", out)
 
 
 if __name__ == "__main__":
