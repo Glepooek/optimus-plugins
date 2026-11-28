@@ -158,6 +158,14 @@ def load_exclusions(repo_root):
                 f"[{label}] 排除表第 {index} 条的 kind {entry['kind']!r} 不在 {list(EXCLUSION_KINDS)} 内")
             continue
         valid.append(entry)
+
+    grouped = {}
+    for entry in valid:
+        grouped.setdefault((entry["plugin"], entry["kind"], entry["id"]), []).append(entry)
+    for (plugin, kind, ident), group in grouped.items():
+        if len(group) > 1:
+            problems.append(
+                f"[{plugin}] 排除表重复登记了 {kind} {ident!r}（共 {len(group)} 条），请合并为一条")
     return valid, problems
 
 
@@ -371,19 +379,33 @@ def check_codex_contract(repo_root):
             (entry["kind"], entry["id"])
             for entry in exclusions if entry["plugin"] == plugin_dir.name
         }
+        # 陈旧与否按完整三元组比对：id 对、path 错同样描述的不是真实组件
+        excluded_full = {
+            (entry["kind"], entry["id"], entry["path"])
+            for entry in exclusions if entry["plugin"] == plugin_dir.name
+        }
+        live_excluded_ids = {
+            (kind, ident) for kind, ident, path in excluded_full if (kind, ident, path) in inventory
+        }
 
         for kind, ident in sorted(inventory_ids - declared_ids - excluded_ids):
             problems.append(
                 f"[{plugin_dir.name}] {kind} {ident!r} 未在 Codex manifest 声明，"
                 f"也未登记到 {EXCLUSIONS_REL}")
-        for kind, ident in sorted(excluded_ids - inventory_ids):
+        for kind, ident, path in sorted(excluded_full - inventory):
             problems.append(
-                f"[{plugin_dir.name}] 排除表中的 {kind} {ident!r} 在 Claude 侧组件中不存在"
-                f"（陈旧排除项），请删除该条")
-        for kind, ident in sorted(excluded_ids & declared_ids):
+                f"[{plugin_dir.name}] 排除表中的 {kind} {ident!r}（path={path}）在 Claude 侧组件中"
+                f"不存在（陈旧排除项），请删除该条")
+        for kind, ident in sorted(live_excluded_ids & declared_ids):
             problems.append(
                 f"[{plugin_dir.name}] {kind} {ident!r} 既在排除表中又被 Codex manifest 声明"
                 f"（排除项与 Codex 声明冲突），二者只能留一")
+
+    for entry in exclusions:
+        if entry["plugin"] not in codex_plugin_names:
+            problems.append(
+                f"[{entry['plugin']}] 排除表条目的 plugin 不是任何带 .codex-plugin/plugin.json "
+                f"的插件（陈旧排除项），请删除该条")
 
     problems.extend(_check_marketplace(repo_root, codex_plugin_names))
     return problems

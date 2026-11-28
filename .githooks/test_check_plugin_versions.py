@@ -347,6 +347,37 @@ class TestCodexContract(unittest.TestCase):
         self.assertEqual(len(problems), 1)
         self.assertIn(".mcp.json", problems[0])
 
+    def test_exclusion_wrong_path_is_stale(self):
+        """"id 对、path 错」的排除项描述的不是真实组件，同样算陈旧。"""
+        plugin_dir = make_codex_plugin(
+            self.root, "p", codex_extra={"mcpServers": "./mcp.json"},
+            mcp={"a": {"command": "x"}})
+        self.declare_mcp_file(plugin_dir, {"mcpServers": {"a": {"command": "x"}}})
+        write_marketplace(self.root, ["p"])
+        write_exclusions(self.root, [exclusion("p", "mcp-server", "a", "wrong.json")])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("陈旧", problems[0])
+
+    def test_exclusion_for_unknown_plugin_is_stale(self):
+        make_codex_plugin(self.root, "p")
+        write_marketplace(self.root, ["p"])
+        write_exclusions(self.root, [exclusion("gone", "agent", "x", "agents/x.md")])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("陈旧", problems[0])
+
+    def test_duplicate_exclusion_reported(self):
+        make_codex_plugin(self.root, "p", agents=["x"])
+        write_marketplace(self.root, ["p"])
+        write_exclusions(self.root, [
+            exclusion("p", "agent", "x", "agents/x.md"),
+            exclusion("p", "agent", "x", "agents/x.md"),
+        ])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("重复", problems[0])
+
 
 if __name__ == "__main__":
     unittest.main()
