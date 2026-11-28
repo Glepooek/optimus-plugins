@@ -217,6 +217,28 @@ jobs:
           done
           exit "$fail"
 
+      # ---- Codex 零凭据安装冒烟（不调用模型）----
+      # 挂在 plugin-validate 而不新开 job：ruleset 要求的六个 job 名保持不变。
+      # 固定 0.172.0：`codex debug prompt-input` 的输出格式不属公开契约，
+      # 升级版本前先复核 codex_smoke.py 的 rendered_text 与列表项前缀。
+      # prompt-input 只在 Windows 实测过；若首个 PR 在 ubuntu 上于
+      # [skill-visibility] 失败，按 spec 7.2 把该断言移到非 required 的
+      # Windows job，不得删除。
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+      - name: Codex CLI 安装（固定 0.172.0）
+        run: |
+          for i in 1 2 3; do
+            npm install -g @openai/codex@0.172.0 && codex --version && exit 0
+            echo "[cli-install] 第 $i 次失败，10 秒后重试"; sleep 10
+          done
+          echo "[cli-install] 三次均失败"; exit 1
+      - name: Codex 安装冒烟（零凭据，不调用模型）
+        env:
+          CODEX_HOME: ${{ runner.temp }}/codex-home
+        run: python .githooks/codex_smoke.py .
+
   # ---------------------------------------------------------------------------
   # 「新增 skill 必须带 eval case」。纯静态 diff 检查，零 token——强制 case
   # 存在，但不在 CI 里运行 case（运行成本是机制内在的）。

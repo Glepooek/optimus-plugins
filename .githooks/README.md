@@ -108,6 +108,10 @@ git config core.hooksPath .githooks
 python -m unittest discover -s .githooks -p "test_*.py"
 ```
 
+### `codex_smoke.py`：CI 专用冒烟，不在 catalog 内，不计入门禁项数
+
+由 `ci.yml` 的 `plugin-validate` job 在安装固定版本 Codex CLI 后调用：隔离 `CODEX_HOME` 下装全部本地插件，断言插件已启用、全部 skill 在 `codex debug prompt-input` 中可见、MCP 与 `.codex-mcp.json` 一致且不含排除表里的 server。它要联网装 CLI，违反「门禁只读工作树」约定，所以**不进 `repository_gates.py`**，本地不属于八项门禁；`CODEX_HOME` 未设置或指向 `~/.codex` 时拒绝运行。单测 `test_codex_smoke.py` 由 `run_unit_tests.py` 照常发现。
+
 ## 与 CI 的关系
 
 `.github/workflows/ci.yml` 的 `gates-hooks` job **逐字执行 `sh .githooks/pre-commit`**，不在 workflow YAML 里重写一份门禁逻辑，也不绕过 shell 包装直接调 runner——包装本身也是要验证的交付物。这是本目录唯一的第二执行点。`gates-tests` job 则执行 `python .githooks/run_unit_tests.py`，与本地是同一个入口。
