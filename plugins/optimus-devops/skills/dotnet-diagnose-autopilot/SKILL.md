@@ -1,11 +1,11 @@
 ---
 name: dotnet-diagnose-autopilot
-description: 给定一份原始 .NET 诊断素材（崩溃日志、内存转储 SOS 输出、!syncblk 输出、dotnet-counters 时间序列），自动识别素材类型、调度 dotnet-diagnose agent 完成分析；若首次结论强度为"推测"，用完全独立的第二次盲态调用做交叉验证；产出含首次/复核/一致性判定/最终建议的结构化报告并落盘。两次结论不一致时并列展示，标记需人工复核，不擅自取舍。触发词：自主分诊、自动分析这份 dump、帮我判断这个根因靠不靠谱、交叉验证一下这个诊断结论、autopilot triage、autonomous .NET diagnosis。
+description: 给定一份原始 .NET 诊断素材（崩溃日志、内存转储 SOS 输出、!syncblk 输出、dotnet-counters 时间序列），自动识别素材类型、调度 dotnet-diagnose agent 完成分析（该 agent 仅 Claude Code 可用；Codex 下请直接用 dotnet-diagnose-triage）；若首次结论强度为"推测"，用完全独立的第二次盲态调用做交叉验证；产出含首次/复核/一致性判定/最终建议的结构化报告并落盘。两次结论不一致时并列展示，标记需人工复核，不擅自取舍。触发词：自主分诊、自动分析这份 dump、帮我判断这个根因靠不靠谱、交叉验证一下这个诊断结论、autopilot triage、autonomous .NET diagnosis。
 metadata:
-  version: "1.0.4"
+  version: "1.0.5"
   author: desktop client team
   category: workflow
-compatibility: 需要同一工作树内已安装 optimus-devops 的 dotnet-diagnose agent 与 dotnet-diagnose-triage skill（本 skill 经 Task 工具调度前者，不直接读取判据）。
+compatibility: 需要 Claude Code 且已安装 optimus-devops 的 dotnet-diagnose agent 与 dotnet-diagnose-triage skill（本 skill 经 Task 工具调度前者，不直接读取判据）。dotnet-diagnose agent 当前仅 Claude Code 可用；Codex 中请直接使用 optimus-devops:dotnet-diagnose-triage。
 allowed-tools: Task Write Read
 ---
 
@@ -34,9 +34,11 @@ Step 6  比对两次结论，合成报告并落盘
 
 | # | 类别 | 检查内容 | 不满足时 |
 |---|---|---|---|
-| 1 | 依赖检查 | `dotnet-diagnose` agent 是否可用（`compatibility` 字段声明的依赖） | 硬约束，报错终止："未检测到 optimus-devops:dotnet-diagnose agent，请确认插件已安装" |
+| 1 | 依赖检查 | `optimus-devops:dotnet-diagnose` 是否作为**具名 agent** 出现在当前可调用 agent 列表中；通用子 agent、`spawn_agent` 默认角色、或任何「转发给 @optimus-devops:dotnet-diagnose」但该 agent 未注册的调用，均**不满足**本项。 | 硬约束，在派发任何子任务之前终止，原样保留用户素材，并回复：「未检测到具名 agent optimus-devops:dotnet-diagnose（当前仅 Claude Code 提供）。本 skill 的双次盲态复核无法执行；请直接使用 optimus-devops:dotnet-diagnose-triage 对同一份素材做单次分析。」 |
 | 2 | 输入参数检查 | 用户是否提供了素材（对话内容或文件路径） | 硬约束，报错终止："未收到诊断素材，无法开始分诊" |
 | 3 | 输出参数检查 | `$HOME/dd-autopilot/` 的父目录（`$HOME`）是否存在且可写 | 可协商风险 → 若不可写，仍继续执行分析，落盘环节按"失败处理"表处置，不阻断整个流程 |
+
+⚠️ 禁止用通用子 agent 冒充 dotnet-diagnose：它拿不到 agent 定义，返回的是自行分析却会被当作 agent 原文解析，单次分析因此被包装成两次独立交叉验证。
 
 类别 1、2 不满足属硬约束（无法绕过、继续执行没有意义），类别 3 不满足属可协商风险（报告仍可在对话中完整输出，只是落盘这一步失败）。
 

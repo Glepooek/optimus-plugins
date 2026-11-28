@@ -1,3 +1,9 @@
+## [1.0.5] - 2026-11-28
+
+### Fixed
+- 前置校验第 1 项改为「具名 agent 是否可用」的能力判定，明确通用子 agent / spawn_agent 不满足依赖，避免在 Codex 下以单次分析冒充双次盲态复核
+- compatibility 与 description 注明 dotnet-diagnose agent 仅 Claude Code 可用，并给出 dotnet-diagnose-triage 回退入口
+
 ## [1.0.4] - 2026-10-30
 
 ### Changed
