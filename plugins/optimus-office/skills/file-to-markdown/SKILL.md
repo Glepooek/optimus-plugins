@@ -2,10 +2,10 @@
 name: file-to-markdown
 license: MIT
 metadata:
-  version: "1.1.1"
+  version: "1.1.2"
   category: tool
   author: desktop client team
-compatibility: 核心依赖 markitdown（pip install markitdown），按文件类型可选依赖 mammoth(docx)/pdfminer(pdf)/python-pptx(pptx)/openpyxl(xlsx)。
+compatibility: 核心依赖 markitdown（pip install markitdown，缺失时立即中断），按文件类型可选依赖 mammoth(docx)/pdfminer(pdf)/python-pptx(pptx)/openpyxl(xlsx)。
 allowed-tools: Bash Read Write
 description: >
   将本地文件转换为 Markdown 并保存到 docs/ 目录，支持 Word、PDF、PPT、Excel、CSV、JSON、XML、HTML、TXT 格式。
@@ -14,44 +14,7 @@ description: >
   包括"把这个文件转成 Markdown"、"file to markdown"、"转换文档"、"本地文件转 Markdown"、
   "把这个 Word/PDF/Excel 存成 md"、"文档内容提取"、"把文件内容整理到 docs 里"等场景。
   即使用户没有明确说"Markdown"，只要意图是把本地文档内容转存为文本，也应使用此 skill。
-triggers:
-  - 文件转Markdown
-  - 本地文件转换
-  - 转换文档
-  - file to markdown
-  - convert file
-  - docx转markdown
-  - pdf转markdown
-  - xlsx转markdown
-  - excel转markdown
-  - 文档内容提取
-dependencies:
-  - name: markitdown
-    description: 文件格式转 Markdown 核心工具（硬依赖，缺失时立即中断）
-    required: true
-    check_command: python -m markitdown --version
-    install_command: pip install markitdown
-    install_url: https://github.com/microsoft/markitdown
-  - name: markitdown[docx]
-    description: Word 文档支持
-    required: false
-    check_command: python -c "import mammoth"
-    install_command: pip install 'markitdown[docx]'
-  - name: markitdown[pdf]
-    description: PDF 文档支持
-    required: false
-    check_command: python -c "import pdfminer"
-    install_command: pip install 'markitdown[pdf]'
-  - name: markitdown[pptx]
-    description: PowerPoint 文档支持
-    required: false
-    check_command: python -c "import pptx"
-    install_command: pip install 'markitdown[pptx]'
-  - name: markitdown[xlsx]
-    description: Excel 文档支持
-    required: false
-    check_command: python -c "import openpyxl"
-    install_command: pip install 'markitdown[xlsx]'
+  触发词：文件转Markdown、convert file、docx转markdown、pdf转markdown、xlsx转markdown、excel转markdown。
 ---
 
 # file-to-markdown
@@ -103,6 +66,16 @@ python -m markitdown --version
 | `.pptx` | `python -c "import pptx"` | `pip install 'markitdown[pptx]'` |
 | `.xlsx` | `python -c "import openpyxl"` | `pip install 'markitdown[xlsx]'` |
 | `.csv` `.json` `.xml` `.html` `.txt` | 无需额外检查 | — |
+
+**依赖清单：**
+
+| 依赖 | 必需 | 检查命令 | 安装命令 |
+|------|------|----------|----------|
+| markitdown（文件格式转 Markdown 核心工具，硬依赖，缺失时立即中断；install_url: https://github.com/microsoft/markitdown） | 是 | `python -m markitdown --version` | `pip install markitdown` |
+| markitdown[docx]（Word 文档支持） | 否 | `python -c "import mammoth"` | `pip install 'markitdown[docx]'` |
+| markitdown[pdf]（PDF 文档支持） | 否 | `python -c "import pdfminer"` | `pip install 'markitdown[pdf]'` |
+| markitdown[pptx]（PowerPoint 文档支持） | 否 | `python -c "import pptx"` | `pip install 'markitdown[pptx]'` |
+| markitdown[xlsx]（Excel 文档支持） | 否 | `python -c "import openpyxl"` | `pip install 'markitdown[xlsx]'` |
 
 ---
 

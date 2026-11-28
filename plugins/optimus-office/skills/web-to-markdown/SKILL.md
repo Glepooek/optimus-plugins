@@ -2,7 +2,7 @@
 name: web-to-markdown
 license: MIT
 metadata:
-  version: "1.9.2"
+  version: "1.9.3"
   category: tool
   author: desktop client team
 compatibility: 可选依赖 markitdown、curl（降级抓取）；二级抓取需要 Node.js + @playwright/cli 及 msedge/chrome 浏览器；三级降级用 WebFetch。
@@ -13,35 +13,21 @@ description: >
   MUST use this skill whenever the user provides a URL and wants to save,
   fetch, download, or convert web content into a document — including
   "保存网页"、"抓取这个页面"、"把这个 URL 存下来"、"批量保存文档"。
-triggers:
-  - 保存网页
-  - 抓取网页
-  - 下载网页
-  - 网页转文档
-  - 网页转Markdown
-  - 爬取
-  - URL转文档
-  - save webpage
-  - fetch URL
-  - download page
-  - web to markdown
-  - scrape
-  - crawl
-dependencies:
-  - name: markitdown
-    description: HTML/URL 转 Markdown
-    required: false
-    check_command: python -m markitdown --version
-    install_command: pip install markitdown
-  - name: curl
-    description: markitdown 不可用时的回退抓取工具
-    required: false
-    check_command: curl --version
+  触发词：抓取网页、下载网页、网页转文档、网页转Markdown、爬取、URL转文档、save webpage、fetch URL、download page、web to markdown、scrape、crawl。
 ---
 
 # web-to-markdown
 
 给定一个或多个 URL，将网页内容以 Markdown 格式保存到 `docs/` 目录，自动翻译为中文。
+
+---
+
+## 依赖检查
+
+| 依赖 | 必需 | 检查命令 | 安装命令 |
+|------|------|----------|----------|
+| markitdown（HTML/URL 转 Markdown） | 否 | `python -m markitdown --version` | `pip install markitdown` |
+| curl（markitdown 不可用时的回退抓取工具） | 否 | `curl --version` | — |
 
 ---
 
