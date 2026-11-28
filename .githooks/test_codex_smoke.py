@@ -72,6 +72,28 @@ class TestMainMalformedOutput(unittest.TestCase):
     def _cp(stdout="", rc=0):
         return subprocess.CompletedProcess([], rc, stdout=stdout, stderr="")
 
+    def test_missing_cli_reported_as_cli_install(self):
+        out = io.StringIO()
+        with unittest.mock.patch.dict(os.environ, {"CODEX_HOME": tempfile.mkdtemp()}), \
+                unittest.mock.patch.object(codex_smoke.shutil, "which", return_value=None), \
+                contextlib.redirect_stdout(out):
+            rc = codex_smoke.main(["codex_smoke.py", "."])
+        self.assertEqual(rc, 1)
+        self.assertIn("[cli-install]", out.getvalue())
+
+    def test_failed_add_not_reported_twice(self):
+        first = codex_smoke.local_plugin_names(pathlib.Path(__file__).resolve().parent.parent)[0]
+
+        def fake(codex, *args):
+            if args[:2] == ("plugin", "add") and args[2].startswith(first + "@"):
+                return self._cp(rc=1)
+            if args[:2] == ("plugin", "list"):
+                return self._cp(json.dumps({"installed": []}))
+            return self._cp("[]")
+        rc, out = self._run_main(fake)
+        self.assertEqual(rc, 1)
+        self.assertEqual(sum(1 for ln in out.splitlines() if ln.startswith(f"[plugin-install] {first}:")), 1)
+
     def test_non_json_mcp_list_categorized_and_later_checks_run(self):
         def fake(codex, *args):
             if args[:2] == ("mcp", "list"):

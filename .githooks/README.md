@@ -86,7 +86,7 @@ git config core.hooksPath .githooks
 
 ### `check_skill_portability.py`：第 10 项，判据是「发布 skill 写死了某个 harness 的专属目录或工具名吗」
 
-第 10 项由 `check_skill_portability.py` 实现，扫 `plugins/*/skills/*/SKILL.md`（含 frontmatter）：写死 `.claude/skills` 等 harness 专属路径、frontmatter 使用六个允许键之外的键、正文绑定 `AskUserQuestion`。拦的是「发布 skill 写死 harness 专属目录或工具名」，不拦会导致 Codex 侧脚本或缓存路径解析失败的其他形态；判据见 spec §6.2 与脚本 docstring。合法的专属路径（如 `sync-skill-symlinks` 的默认同步目标）用 `codex-portability: allow-harness-path reason=<非空理由>` 标记豁免：标记在第 N 行，覆盖第 N 与 N+1 行的命中；frontmatter 与代码块用前一行的 `#` 注释，Markdown 正文与表格行用行尾 `<!-- ... -->`。`--list` 列出全部命中。
+第 10 项由 `check_skill_portability.py` 实现，扫 `plugins/*/skills/*/SKILL.md`（含 frontmatter）、skill 内的 `*.sh`/`*.ps1`/`*.py`（不含 `test_*.py`）与 `references/**/*.md`：写死 `.claude/skills` 等 harness 专属路径、frontmatter 使用六个允许键之外的键、正文绑定 `AskUserQuestion`、`<skill-dir>/<相对路径>` 不指向 skill 目录内的真实文件（目录与 `..` 越界同样判 `skill-dir-missing`）。文件读不出 UTF-8 时报 `unreadable` 而不是静默跳过——**扫不到等于放行**，那正是要避免的失效形态。拦的是「发布 skill 写死 harness 专属目录或工具名」，不拦会导致 Codex 侧脚本或缓存路径解析失败的其他形态；判据见 `docs/superpowers/specs/2026-11-28-codex-compatibility-hardening-design.md` §6.2 与脚本 docstring；写法约定见 `.claude/rules/skill-conventions.md` 的「跨 harness 可移植性」节。合法的专属路径（如 `sync-skill-symlinks` 的默认同步目标）用 `codex-portability: allow-harness-path reason=<非空理由>` 标记豁免：标记在第 N 行，覆盖第 N 与 N+1 行的命中；frontmatter 与代码块用前一行的 `#` 注释，Markdown 正文与表格行用行尾 `<!-- ... -->`。`--list` 列出全部命中。
 
 ### `check_new_skill_eval_case.py`：一个脚本，两个模式，一个挂得上一个挂不上
 
@@ -116,6 +116,14 @@ python -m unittest discover -s .githooks -p "test_*.py"
 ### `codex_smoke.py`：CI 专用冒烟，不在 catalog 内，不计入门禁项数
 
 由 `ci.yml` 的 `plugin-validate` job 在安装固定版本 Codex CLI 后调用：隔离 `CODEX_HOME` 下装全部本地插件，断言插件已启用、全部 skill 在 `codex debug prompt-input` 中可见、期望的 MCP server（取自 `.codex-mcp.json`）均出现、排除表里的 Claude-only server 不出现。它要联网装 CLI，违反「门禁只读工作树」约定，所以**不进 `repository_gates.py`**，本地不属于十项门禁；`CODEX_HOME` 未设置或指向 `~/.codex` 时拒绝运行。单测 `test_codex_smoke.py` 由 `run_unit_tests.py` 照常发现。
+
+本地复现（需已装 Codex CLI 0.172.0；Git Bash）：
+
+```bash
+CODEX_HOME="$(mktemp -d)/codex-home" python .githooks/codex_smoke.py .
+```
+
+失败按 `[cli-install]` / `[plugin-install]` / `[skill-visibility]` / `[mcp-enumeration]` 分类打印。
 
 ## 与 CI 的关系
 

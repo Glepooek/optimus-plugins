@@ -106,7 +106,7 @@ def main(argv: list[str]) -> int:
     Path(os.environ["CODEX_HOME"]).mkdir(parents=True, exist_ok=True)
     codex = shutil.which("codex")
     if not codex:
-        print("[plugin-install] 找不到 codex 可执行文件")
+        print("[cli-install] 找不到 codex 可执行文件")
         return 1
 
     failures: dict[str, list[str]] = {"plugin-install": [], "skill-visibility": [], "mcp-enumeration": []}
@@ -115,9 +115,11 @@ def main(argv: list[str]) -> int:
     r = _run(codex, "plugin", "marketplace", "add", str(root), "--json")
     if r.returncode != 0:
         failures["plugin-install"].append(f"marketplace add 失败: {r.stderr.strip()}")
+    add_failed: set[str] = set()
     for p in plugins:
         r = _run(codex, "plugin", "add", f"{p}@{MARKETPLACE}", "--json")
         if r.returncode != 0:
+            add_failed.add(p)
             failures["plugin-install"].append(f"{p}: {r.stderr.strip()}")
 
     r = _run(codex, "plugin", "list", "--json")
@@ -134,7 +136,7 @@ def main(argv: list[str]) -> int:
             failures["plugin-install"].append(f"plugin list 输出无法解析: {exc!r}")
         else:
             for p in plugins:
-                if p not in enabled and not any(f.startswith(f"{p}:") for f in failures["plugin-install"]):
+                if p not in enabled and p not in add_failed:
                     failures["plugin-install"].append(f"{p}: 未安装或未启用")
 
     mcp_cfg = json.loads((root / "plugins/optimus-frontend/.codex-mcp.json").read_text(encoding="utf-8"))

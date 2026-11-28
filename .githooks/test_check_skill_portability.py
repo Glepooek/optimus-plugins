@@ -123,6 +123,34 @@ class PortabilityTests(unittest.TestCase):
                         {"scripts/ok.py": "pass\n"})
         self.assertEqual(m.scan_repo(self.root), [])
 
+    def test_skill_dir_reference_to_directory_rejected(self):
+        self.make_skill("p", "s", CLEAN_FM + "\n<skill-dir>/scripts\n", {"scripts/a.py": "x\n"})
+        self.assertEqual(self.rules(m.scan_repo(self.root)), [("skill-dir-missing", 11)])
+
+    def test_skill_dir_reference_escaping_skill_rejected(self):
+        self.make_skill("p", "other", CLEAN_FM, {"a.py": "x\n"})
+        self.make_skill("p", "s", CLEAN_FM + "\n<skill-dir>/../other/a.py\n")
+        self.assertEqual(self.rules(m.scan_repo(self.root)), [("skill-dir-missing", 11)])
+
+    def test_test_prefixed_shell_script_scanned(self):
+        self.make_skill("p", "s", CLEAN_FM, {"scripts/test_run.sh": "cd ~/.claude/x\n"})
+        self.assertEqual(self.rules(m.scan_repo(self.root)), [("harness-path", 1)])
+
+    def test_references_markdown_scanned(self):
+        self.make_skill("p", "s", CLEAN_FM, {"references/a.md": "见\n~/.codex/skills/x\n"})
+        findings = m.scan_repo(self.root)
+        self.assertEqual(self.rules(findings), [("harness-path", 2)])
+        self.assertTrue(findings[0].path.endswith("references/a.md"))
+
+    def test_non_reference_markdown_not_scanned(self):
+        self.make_skill("p", "s", CLEAN_FM, {"CHANGELOG.md": "~/.claude/x\n"})
+        self.assertEqual(m.scan_repo(self.root), [])
+
+    def test_unreadable_file_reported_under_own_rule(self):
+        d = self.make_skill("p", "s", CLEAN_FM)
+        (d / "run.sh").write_bytes(b"\xff\xfe\x00bad")
+        self.assertEqual(self.rules(m.scan_repo(self.root)), [("unreadable", 0)])
+
     def test_list_mode_returns_zero(self):
         self.make_skill("p", "s", CLEAN_FM + "\n.claude/skills/x\n")
         buf = io.StringIO()

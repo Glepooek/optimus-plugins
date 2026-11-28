@@ -80,6 +80,37 @@ allowed-tools: Read Write Bash Task
 ---
 ```
 
+## 跨 harness 可移植性
+
+SKILL.md 是 Claude Code 与 Codex 共用的唯一真源——两个 harness 读的是同一份正文。所以正文、skill 内的脚本与 `references/**/*.md` 里**不能出现某一侧的安装路径或专属工具名**：另一侧不会报错，只会照做然后解析失败。机械判定由门禁第 10 项（`.githooks/check_skill_portability.py`）承担，本节讲怎么写才不撞上它。
+
+**skill 自身文件一律用 `<skill-dir>/` 引用，路径加引号。** 安装后 skill 目录在哪儿由 harness 决定，唯一稳定的写法是从 SKILL.md 所在目录出发的相对引用：
+
+```bash
+python "<skill-dir>/scripts/run.py" --config X
+```
+
+`<skill-dir>/` 后必须指向 skill 目录内**真实存在的文件**。指向目录、或用 `..` 越出 skill 目录都判 `skill-dir-missing`——这两种写法开发态能跑、安装后解析不到，正是要拦的形态。
+
+**配置与缓存只经随包的 `scripts/optimus_dirs.py` 解析**（`AGENTS.md` 与 `.githooks/test_bundled_helper_copies.py` 约束那份副本一致性）：
+
+| 用途 | 解析顺序 |
+|---|---|
+| 配置 | `OPTIMUS_CONFIG_DIR` → Windows `%APPDATA%/optimus`，POSIX `~/.config/optimus` |
+| 缓存 | `OPTIMUS_CACHE_DIR` → Windows `%LOCALAPPDATA%/optimus/cache`，POSIX `~/.cache/optimus` |
+
+三条禁令：**产物不写进 skill 目录本身**（安装态那是 harness 的缓存目录，升级即被覆盖）；**不写死 `~/.claude`、`~/.codex` 下的路径**；**旧位置只做只读回退**（读得到就用，写一律写新位置），且回退分支要注释说明是兼容旧安装。
+
+**正文不提 harness 专属工具名。** `AskUserQuestion` 在 Codex 没有对应物，写进正文会让该 skill 在那一侧直接失效——需要征询用户时用自然语言写「先确认再继续」。`allowed-tools` 行不算正文，不受此限。
+
+**合法的专属路径用标记豁免，不要为了过门禁改写事实。** 例如 `sync-skill-symlinks` 的默认同步目标本就是 `~/.claude/skills/`，那是功能不是缺陷：
+
+```text
+codex-portability: allow-harness-path reason=<非空理由>
+```
+
+标记在第 N 行，覆盖第 N 与第 N+1 行的命中；YAML/bash/PowerShell 用前一行的 `#` 注释，Markdown 正文与表格行用行尾 `<!-- ... -->`。理由留空报 `marker-no-reason`，标记旁没有任何命中报 `marker-orphan`（说明它已过期，删掉）。
+
 ## 正文只讲「现在按什么办」
 
 通用要求见 `knowledge-base/skill-authoring/rules/01-skill-format.md`：详细参考材料拆到 `references/`，**禁止在正文堆砌只在少数场景才需要的完整参考**。本仓把它落成一条可机械判定的判据：

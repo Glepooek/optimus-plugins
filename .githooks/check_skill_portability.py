@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""skill 可移植性扫描（仓库门禁第 10 项候选）。
+"""skill 可移植性扫描（仓库门禁第 10 项）。
 
 依据 docs/superpowers/specs/2026-11-28-codex-compatibility-hardening-design.md §6.2。
 SKILL.md 是 Claude Code 与 Codex 共用的唯一真源，因此其中不应出现某一 harness 专属的
@@ -11,10 +11,14 @@ SKILL.md 是 Claude Code 与 Codex 共用的唯一真源，因此其中不应出
   tool-token         正文出现 BLOCKED_TOOL_TOKENS（allowed-tools 行不算正文）
   marker-no-reason   豁免标记缺 reason=
   marker-orphan      豁免标记旁没有任何 harness-path 命中
-  skill-dir-missing  正文 <skill-dir>/<相对路径> 指向的文件在 skill 目录内不存在
+  skill-dir-missing  正文 <skill-dir>/<相对路径> 不是 skill 目录内的实际文件（目录、越界路径都不算）
+  unreadable         文件无法按 UTF-8 读取（扫描不到即等于放行，所以单独报出）
+
+扫描范围：skill 根目录的 SKILL.md；skill 内递归的 *.sh、*.ps1、*.py（不含 test_*.py）；
+references/ 下递归的 *.md——它们随包分发、由模型按需读取，写死的路径同样会被照做。
 
 三处取舍：
-1. 排除 test_*.py：测试夹具必须字面写出旧路径才能断言回退行为，扫它们只会逼出无意义豁免。
+1. 排除 test_*.py（仅 .py）：测试夹具必须字面写出旧路径才能断言回退行为，扫它们只会逼出无意义豁免。
 2. 阻断清单只有 AskUserQuestion：只收录已确认 Codex 无对应物、且会让 skill 在 Codex 下
    直接失效的工具名；宁缺毋滥，避免门禁变成噪声。已知盲区：拼接出来的路径（如
    os.path.join(expanduser("~"), ".claude")）正则扫不到，只认字面路径。
@@ -53,6 +57,7 @@ BLOCKED_TOOL_TOKENS = ("AskUserQuestion",)
 _TOOL_RES = tuple(re.compile(rf"\b{t}\b") for t in BLOCKED_TOOL_TOKENS)
 _SKILL_DIR_RE = re.compile(r"<skill-dir>/([^\s`\"')]+)")
 _SCRIPT_SUFFIXES = {".sh", ".ps1", ".py"}
+_RULE_UNREADABLE = "unreadable"
 
 
 @dataclass(frozen=True)
@@ -113,7 +118,9 @@ def _scan_file(path, rel, lines, is_skill_md, skill_dir):
                 out.append(Finding(rel, i + 1, "tool-token", ln.strip()))
             for m in _SKILL_DIR_RE.finditer(ln):
                 sub = m.group(1).rstrip(".,;:，。；：")
-                if not (skill_dir / sub).exists():
+                target = (skill_dir / sub).resolve()
+                inside = target.is_relative_to(skill_dir.resolve())
+                if not (inside and target.is_file()):
                     out.append(Finding(rel, i + 1, "skill-dir-missing",
                                        f"<skill-dir>/{sub}"))
     return out
@@ -128,14 +135,17 @@ def scan_skill(skill_dir, repo_root):
             continue
         if p.name == "SKILL.md" and p.parent == skill_dir:
             files.append(p)
-        elif p.suffix in _SCRIPT_SUFFIXES and not p.name.startswith("test_"):
+        elif p.suffix in _SCRIPT_SUFFIXES:
+            if not (p.suffix == ".py" and p.name.startswith("test_")):
+                files.append(p)
+        elif p.suffix == ".md" and p.relative_to(skill_dir).parts[0] == "references":
             files.append(p)
     for p in files:
         try:
             text = p.read_text(encoding="utf-8-sig")
         except (OSError, UnicodeDecodeError) as e:
             findings.append(Finding(p.relative_to(repo_root).as_posix(), 0,
-                                    "harness-path", f"无法读取：{e}"))
+                                    _RULE_UNREADABLE, f"无法读取：{e}"))
             continue
         rel = p.relative_to(repo_root).as_posix()
         findings.extend(_scan_file(

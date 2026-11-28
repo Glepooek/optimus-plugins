@@ -306,7 +306,7 @@ external_plugins/<name>/
 └── LICENSE                         上游 License 原样带入
 ```
 
-`external_plugins/<name>/UPSTREAM.md` 是拷贝模式**唯一**的防漂移手段，四项必填：上游 repo URL、拷贝自的 40 位 commit SHA、拷贝日期、**本地改动逐条清单**（无改动则写「无」）。缺了它就等于「仓内一份、上游一份，谁都不知道差多少」——`.githooks/check_external_entries.py` 第 8 项会校验它存在且含一枚 40 位 SHA。
+`external_plugins/<name>/UPSTREAM.md` 是拷贝模式**唯一**的防漂移手段，四项必填：上游 repo URL、拷贝自的 40 位 commit SHA、拷贝日期、**本地改动逐条清单**（无改动则写「无」）。缺了它就等于「仓内一份、上游一份，谁都不知道差多少」——`.githooks/check_external_entries.py`（门禁第 3 项）会校验它存在且含一枚 40 位 SHA。
 
 ### version 规则
 

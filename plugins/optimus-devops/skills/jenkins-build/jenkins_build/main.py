@@ -17,6 +17,7 @@ _SKILL_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_SKILL_ROOT / "scripts"))
 
 from jenkins_config_paths import config_search_paths, find_config  # noqa: E402
+import optimus_dirs  # noqa: E402
 
 
 def load_config() -> dict:
@@ -25,7 +26,7 @@ def load_config() -> dict:
         config_path, is_legacy = result
         print(f"[i] 使用配置文件：{config_path}")
         if is_legacy:
-            dirs = __import__("optimus_dirs").skill_dirs("jenkins-build")
+            dirs = optimus_dirs.skill_dirs("jenkins-build")
             new_path = Path(dirs["config_dir"]) / "jenkins-config.yaml"
             print(f"[!] 正在读取旧配置位置 {config_path}；请迁移到 {new_path}，旧位置今后只读不写")
         with open(config_path, "r", encoding="utf-8") as f:

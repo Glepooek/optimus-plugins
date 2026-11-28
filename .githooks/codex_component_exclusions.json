@@ -5,49 +5,49 @@
       "kind": "agent",
       "id": "dotnet-diagnose",
       "path": "agents/dotnet-diagnose.md",
-      "reason": "Codex CLI 0.172.0 未注册插件 agent（含 multi_agent_v2），见 spec §4.2"
+      "reason": "Codex CLI 0.172.0 未注册插件 agent（含 multi_agent_v2），见 docs/superpowers/specs/2026-11-28-codex-compatibility-hardening-design.md §4.2"
     },
     {
       "plugin": "optimus-frontend",
       "kind": "mcp-server",
       "id": "mastergo-magic-mcp",
       "path": ".mcp.json",
-      "reason": "Codex 不展开 ${MASTERGO_TOKEN}，token 无法传入，见 spec §4.1"
+      "reason": "Codex 不展开 ${MASTERGO_TOKEN}，token 无法传入，见 docs/superpowers/specs/2026-11-28-codex-compatibility-hardening-design.md §4.1"
     },
     {
       "plugin": "optimus-frontend",
       "kind": "hook",
       "id": "PreToolUse",
       "path": "hooks/hooks.json",
-      "reason": "Codex CLI 0.172.0 的 plugin_hooks 已 removed，Codex 不加载插件 Hook，见 spec §4.3"
+      "reason": "Codex CLI 0.172.0 的 plugin_hooks 已 removed，Codex 不加载插件 Hook，见 docs/superpowers/specs/2026-11-28-codex-compatibility-hardening-design.md §4.3"
     },
     {
       "plugin": "optimus-backend",
       "kind": "hook",
       "id": "PreToolUse",
       "path": "hooks/hooks.json",
-      "reason": "Codex CLI 0.172.0 的 plugin_hooks 已 removed，Codex 不加载插件 Hook，见 spec §4.3"
+      "reason": "Codex CLI 0.172.0 的 plugin_hooks 已 removed，Codex 不加载插件 Hook，见 docs/superpowers/specs/2026-11-28-codex-compatibility-hardening-design.md §4.3"
     },
     {
       "plugin": "optimus-devops",
       "kind": "hook",
       "id": "SessionStart",
       "path": "hooks/hooks.json",
-      "reason": "Codex CLI 0.172.0 的 plugin_hooks 已 removed，Codex 不加载插件 Hook，见 spec §4.3"
+      "reason": "Codex CLI 0.172.0 的 plugin_hooks 已 removed，Codex 不加载插件 Hook，见 docs/superpowers/specs/2026-11-28-codex-compatibility-hardening-design.md §4.3"
     },
     {
       "plugin": "optimus-devops",
       "kind": "hook",
       "id": "PreToolUse",
       "path": "hooks/hooks.json",
-      "reason": "Codex CLI 0.172.0 的 plugin_hooks 已 removed，Codex 不加载插件 Hook，见 spec §4.3"
+      "reason": "Codex CLI 0.172.0 的 plugin_hooks 已 removed，Codex 不加载插件 Hook，见 docs/superpowers/specs/2026-11-28-codex-compatibility-hardening-design.md §4.3"
     },
     {
       "plugin": "optimus-devops",
       "kind": "hook",
       "id": "Notification",
       "path": "hooks/hooks.json",
-      "reason": "Codex CLI 0.172.0 的 plugin_hooks 已 removed，Codex 不加载插件 Hook，见 spec §4.3"
+      "reason": "Codex CLI 0.172.0 的 plugin_hooks 已 removed，Codex 不加载插件 Hook，见 docs/superpowers/specs/2026-11-28-codex-compatibility-hardening-design.md §4.3"
     }
   ]
 }
