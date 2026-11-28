@@ -47,9 +47,8 @@ triggers:
   ⚠ 未检测到 superpowers 技能集。本技能依赖 superpowers 提供的工作流（brainstorming、writing-plans、subagent-driven-development 等）。
 
   请先安装 superpowers：
-  1. 访问 superpowers 项目仓库
-  2. 将 superpowers 技能复制到项目的 .claude/skills/ 目录下
-  3. 重新启动 Claude Code
+  - Claude Code：/plugin install superpowers@claude-plugins-official，然后重启会话
+  - Codex CLI：在会话中输入 /plugins，搜索 superpowers，选择 Install Plugin
 
   安装完成后重新触发本技能。
   ```

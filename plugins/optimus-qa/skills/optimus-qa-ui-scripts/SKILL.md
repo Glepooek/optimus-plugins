@@ -6,7 +6,7 @@ metadata:
   author: desktop client team
   category: tool
 compatibility: 需要 Node.js/npm、Playwright（含Chromium）、Midscene（@midscene/web）、TypeScript；需要用户提供 AI 模型 API Key（阿里云Qwen或OpenAI兼容）；会自动执行 npm install，需要网络访问。
-allowed-tools: Bash Read Write AskUserQuestion
+allowed-tools: Bash Read Write
 ---
 
 # Midscene UI 自动化测试项目启动器
@@ -23,7 +23,7 @@ allowed-tools: Bash Read Write AskUserQuestion
 
 ### 第一步：收集项目信息
 
-询问用户以下信息（用 AskUserQuestion 逐步收集）：
+询问用户以下信息（一次集中列出缺失项，用户未提供的必填项逐项追问）：
 1. **项目目录路径**（必填，默认 `./ui-automation`，所有 UI 自动化文件统一存放在此目录下，与业务代码隔离）
 2. **登录页面 URL**（必填）
 3. **测试账号**：用户名 + 密码
