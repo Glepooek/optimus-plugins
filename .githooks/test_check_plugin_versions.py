@@ -379,5 +379,12 @@ class TestCodexContract(unittest.TestCase):
         self.assertIn("重复", problems[0])
 
 
+class TestRealRepository(unittest.TestCase):
+    def test_real_repository_passes(self):
+        root = pathlib.Path(__file__).resolve().parent.parent
+        self.assertEqual(check_all(root), [])
+        self.assertEqual(check_codex_contract(root), [])
+
+
 if __name__ == "__main__":
     unittest.main()

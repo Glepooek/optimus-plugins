@@ -26,10 +26,11 @@ git config core.hooksPath .githooks
 | 6 | 镜像以 `120000` 模式入库 | `core.symlinks=false` 时会存成普通文件，克隆到别的机器就不是链接 |
 | 7 | `evals/` 下每个子目录都含 `case.yaml` 或 `prompt.md` | 缺 marker 的目录被 `claude plugin eval` 静默忽略——少跑一个 case，而总数只在 verbose 输出里 |
 | 8 | 插件内不引用插件目录以外的路径 | 安装后读不到被判据引用的文件，skill 静默退化为泛型知识审查 |
+| 9 | Codex manifest 组件声明与真实组件一致（含 Claude-only 排除表） | Codex 安装成功但组件缺失、越界或被误报为可用——codex plugin add 对此不报错 |
 
-## 执行结构：8 个逻辑检查 / 6 个脚本 / 1 个 runner
+## 执行结构：9 个逻辑检查 / 6 个脚本 / 1 个 runner
 
-上表 8 项由 **6 个脚本**实现（`check_skill_mirrors.py` 一个脚本覆盖第 4–6 项），两个数不是同一个单位，不要互相换算。
+上表 9 项由 **6 个脚本**实现（`check_skill_mirrors.py` 一个脚本覆盖第 4–6 项，`check_plugin_versions.py` 覆盖第 1、9 项），两个数不是同一个单位，不要互相换算。
 
 | 文件 | 角色 |
 |---|---|
@@ -111,7 +112,7 @@ python -m unittest discover -s .githooks -p "test_*.py"
 
 `.github/workflows/ci.yml` 的 `gates-hooks` job **逐字执行 `sh .githooks/pre-commit`**，不在 workflow YAML 里重写一份门禁逻辑，也不绕过 shell 包装直接调 runner——包装本身也是要验证的交付物。这是本目录唯一的第二执行点。`gates-tests` job 则执行 `python .githooks/run_unit_tests.py`，与本地是同一个入口。
 
-🔴 **由此产生一条硬约定：catalog（`repository_gates.py`，经 `pre-commit` 执行）不得引入依赖暂存区的检查**（`git diff --cached`、`git diff --name-only --staged` 等）。当前八项检查全部基于工作树与 `git ls-files`，**这条性质必须保持**——一旦引入，CI 的逐字复用即失效，门禁判据会在两个环境间静默分叉：本地拦得住的 CI 拦不住，反之亦然。
+🔴 **由此产生一条硬约定：catalog（`repository_gates.py`，经 `pre-commit` 执行）不得引入依赖暂存区的检查**（`git diff --cached`、`git diff --name-only --staged` 等）。当前九项检查全部基于工作树与 `git ls-files`，**这条性质必须保持**——一旦引入，CI 的逐字复用即失效，门禁判据会在两个环境间静默分叉：本地拦得住的 CI 拦不住，反之亦然。
 
 需要 diff 的门禁改为「接受 base/head 两个 ref 作参数、只由 CI 调用、不进 catalog」。⚠️ **这条约定约束的是检查，不是文件**：`check_new_skill_eval_case.py` 的两个模式分别落在约定的两侧——增量模式走上面那条路，`--all` 模式因为只读工作树而挂进了 `pre-commit`（见上一节）。**判断该不该挂，看的是这个检查要不要 diff，而不是它所在的脚本以前挂没挂。**
 
