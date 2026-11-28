@@ -12,18 +12,20 @@ import unittest
 _SKILL_ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_SKILL_ROOT))
 
+# 导入必须整块放进 try：jenkins_build.jenkins_build 顶层 import requests/yaml，
+# 写在模块级会让缺依赖的环境在**收集阶段**报 ImportError，skipIf 来不及生效。
 try:
     import jenkins_build
+    from jenkins_build.jenkins_build import JenkinsBuildSkill as _ModuleClass
 except ImportError:  # 缺 requests 等运行依赖时不在本测试范围内
     jenkins_build = None
-
-from jenkins_build.jenkins_build import JenkinsBuildSkill as ModuleClass  # noqa: E402
+    _ModuleClass = None
 
 
 @unittest.skipIf(jenkins_build is None, "缺 jenkins_build 运行依赖")
 class TestPackageExports(unittest.TestCase):
     def test_package_reexports_skill_class(self):
-        self.assertIs(jenkins_build.JenkinsBuildSkill, ModuleClass)
+        self.assertIs(jenkins_build.JenkinsBuildSkill, _ModuleClass)
 
     def test_dunder_all_lists_only_skill_class(self):
         self.assertEqual(list(jenkins_build.__all__), ["JenkinsBuildSkill"])
