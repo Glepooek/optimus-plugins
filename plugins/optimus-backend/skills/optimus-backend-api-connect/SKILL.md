@@ -2,6 +2,7 @@
 name: optimus-backend-api-connect
 description: 根据服务注册表自动对接后端 API，生成对接代码
 metadata:
+  version: "1.0.0"
   author: desktop client team
   category: generator
 compatibility: 需要网络访问 api-doc-test.optimus.cn 服务注册表（有本地缓存降级）；需要 Python 运行时执行 fetch_swagger.py/fetch_webpage_api.py/fetch_feishu_doc.py 三个脚本；对接飞书托管文档时需要 FEISHU_APP_ID/FEISHU_APP_SECRET 凭证。
@@ -12,21 +13,36 @@ allowed-tools: Bash Read Glob Grep WebFetch Write
 
 ---
 
+## 阶段零：解析目录
+
+执行下列命令（`<skill-dir>` 为本 SKILL.md 所在目录的绝对路径），取输出 JSON 的 `cache_dir` 记为 `<cache>`：
+
+```bash
+python "<skill-dir>/scripts/optimus_dirs.py" optimus-backend-api-connect --create
+```
+
+后续所有命令中的路径都用双引号包裹。
+
+---
+
 ## 阶段一：读取配置
 
 从远程地址拉取服务注册表配置：
 
 ```bash
-curl -s -f https://api-doc-test.optimus.cn/api/file/api-services.yml -o .claude/skills/optimus-backend-api-connect/cache/api-services.yml
+curl -s -f https://api-doc-test.optimus.cn/api/file/api-services.yml -o "<cache>/api-services.yml"
 ```
 
-拉取成功后，读取 `.claude/skills/optimus-backend-api-connect/cache/api-services.yml`。
+拉取成功后，读取 `<cache>/api-services.yml`。
 
 **处理以下情况：**
 
 **情况 A — 远程拉取失败（网络错误或 HTTP 非 200）：**
-- 若本地缓存 `.claude/skills/optimus-backend-api-connect/cache/api-services.yml` 已存在，使用缓存并提示用户：
-  > "远程配置拉取失败，已使用本地缓存版本。"
+- 依次检查本地缓存，命中即使用并提示用户：
+  1. `<cache>/api-services.yml`
+     > "远程配置拉取失败，已使用本地缓存版本。"
+  2. 旧路径 `.claude/skills/optimus-backend-api-connect/cache/api-services.yml`（**只读**） <!-- codex-portability: allow-harness-path reason=旧缓存位置只读回退 -->
+     > "已读取旧缓存位置，新缓存将写入 `<cache>`。"
 - 若本地缓存也不存在，提示用户：
   > "无法获取服务注册表：远程地址 `https://api-doc-test.optimus.cn/api/file/api-services.yml` 不可达，且无本地缓存。请检查网络连接。"
 
@@ -43,7 +59,7 @@ curl -s -f https://api-doc-test.optimus.cn/api/file/api-services.yml -o .claude/
 
 将 `$ARGUMENTS` 解析为服务名或自然语言功能描述。
 
-1. 读取 `.claude/skills/optimus-backend-api-connect/cache/api-services.yml` 中的所有服务
+1. 读取 `<cache>/api-services.yml` 中的所有服务
 2. 将 `$ARGUMENTS` 与每个服务的 `name` 和 `description` 进行语义匹配，排序后取最相关结果
 3. 根据匹配情况决定是否需要用户确认：
    - **唯一高度匹配**（仅一个结果且语义明确对应）→ 直接选中，告知用户并继续，无需等待确认
@@ -64,10 +80,10 @@ curl -s -f https://api-doc-test.optimus.cn/api/file/api-services.yml -o .claude/
 针对每个选中的服务，根据 `docs[].type` 选择对应策略拉取并解析文档：
 
 **`swagger` / `openapi`：**
-优先使用项目内置脚本 `.claude/skills/optimus-backend-api-connect/fetch_swagger.py` 拉取 spec（支持自动探测底层 spec 地址）：
+优先使用项目内置脚本 `<skill-dir>/fetch_swagger.py` 拉取 spec（支持自动探测底层 spec 地址）：
 
 ```bash
-python .claude/skills/optimus-backend-api-connect/fetch_swagger.py <docs[].url> --output .claude/skills/optimus-backend-api-connect/cache/<服务名>.json
+python "<skill-dir>/fetch_swagger.py" <docs[].url> --output "<cache>/<服务名>.json"
 ```
 
 - 脚本支持以下文档类型：
@@ -80,24 +96,24 @@ python .claude/skills/optimus-backend-api-connect/fetch_swagger.py <docs[].url> 
 
 **`markdown`：**
 文档为 Markdown 文件（`.md` / `.markdown` 直链，如托管在 OSS/CDN 上的 API-Documentation.md）。
-使用项目内置脚本 `.claude/skills/optimus-backend-api-connect/fetch_webpage_api.py` 获取并解析：
+使用项目内置脚本 `<skill-dir>/fetch_webpage_api.py` 获取并解析：
 
 ```bash
-python .claude/skills/optimus-backend-api-connect/fetch_webpage_api.py <docs[].url> \
-  --output .claude/skills/optimus-backend-api-connect/cache/<服务名>.md
+python "<skill-dir>/fetch_webpage_api.py" <docs[].url> \
+  --output "<cache>/<服务名>.md"
 ```
 
 - 脚本自动识别 Markdown 内容（通过 URL 后缀或内容特征），提取接口路径、HTTP 方法和描述
 - 成功后读取生成的本地 `.md` 文件，从中提取接口信息
 - 若 URL 无法访问（内网/权限限制），提示用户手动下载文档后传入本地路径：
   ```bash
-  python .claude/skills/optimus-backend-api-connect/fetch_webpage_api.py <本地文件路径或 file:// URL> \
-    --output .claude/skills/optimus-backend-api-connect/cache/<服务名>.md
+  python "<skill-dir>/fetch_webpage_api.py" <本地文件路径或 file:// URL> \
+    --output "<cache>/<服务名>.md"
   ```
 
 **`feishu`：**
 文档托管在飞书云文档（新版文档，URL 格式为 `https://xxx.feishu.cn/docx/<doc_token>`）。
-使用项目内置脚本 `.claude/skills/optimus-backend-api-connect/fetch_feishu_doc.py` 调用飞书 API 获取：
+使用项目内置脚本 `<skill-dir>/fetch_feishu_doc.py` 调用飞书 API 获取：
 
 **凭证来源（按优先级依次尝试）：**
 1. `docs[].auth.app_id` + `docs[].auth.app_secret`（在服务注册表中配置，**推荐**）
@@ -105,7 +121,7 @@ python .claude/skills/optimus-backend-api-connect/fetch_webpage_api.py <docs[].u
 3. `docs[].auth.token`（直接配置 access_token）
 4. 环境变量 `FEISHU_ACCESS_TOKEN`
 
-若使用 app 凭证（方式 1 或 2），脚本会自动调用飞书接口获取 `tenant_access_token`，并缓存到 `.claude/skills/optimus-backend-api-connect/cache/.feishu_token_cache.json`（缓存有效期内复用，避免重复请求）。
+若使用 app 凭证（方式 1 或 2），脚本会自动调用飞书接口获取 `tenant_access_token`，并缓存到 `<cache>/.feishu_token_cache.json`（缓存有效期内复用，避免重复请求）。
 
 若均未配置，提示用户：
 ```
@@ -121,14 +137,14 @@ python .claude/skills/optimus-backend-api-connect/fetch_webpage_api.py <docs[].u
 **执行命令：**
 ```bash
 # 使用 app 凭证（自动获取 token）
-python .claude/skills/optimus-backend-api-connect/fetch_feishu_doc.py <doc_token> \
+python "<skill-dir>/fetch_feishu_doc.py" <doc_token> \
   --app-id <app_id> --app-secret <app_secret> \
-  --output .claude/skills/optimus-backend-api-connect/cache/<服务名>.md
+  --output "<cache>/<服务名>.md"
 
 # 或使用已有 token
-python .claude/skills/optimus-backend-api-connect/fetch_feishu_doc.py <doc_token> \
+python "<skill-dir>/fetch_feishu_doc.py" <doc_token> \
   --token <access_token> \
-  --output .claude/skills/optimus-backend-api-connect/cache/<服务名>.md
+  --output "<cache>/<服务名>.md"
 ```
 
 - `doc_token` 从 `docs[].url` 中提取：URL 中 `/docx/` 后面的部分即为 `doc_token`

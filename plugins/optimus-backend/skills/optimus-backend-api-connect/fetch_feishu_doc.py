@@ -40,6 +40,7 @@ import os
 import sys
 import time
 from pathlib import Path
+from typing import Mapping, Optional
 
 try:
     import requests
@@ -50,9 +51,20 @@ except ImportError:
 FEISHU_DOC_API = "https://open.feishu.cn/open-apis/docs/v1/content"
 FEISHU_TOKEN_API = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal"
 
-# token 缓存文件，存放于脚本同目录下的 cache/ 中
-_SCRIPT_DIR = Path(__file__).parent
-_TOKEN_CACHE_FILE = _SCRIPT_DIR / "cache" / ".feishu_token_cache.json"
+_SCRIPT_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(_SCRIPT_DIR / "scripts"))
+from optimus_dirs import skill_dirs  # noqa: E402
+
+_SKILL_NAME = "optimus-backend-api-connect"
+
+
+def _cache_dir(env: Optional[Mapping[str, str]] = None) -> Path:
+    return Path(skill_dirs(_SKILL_NAME, env)["cache_dir"])
+
+
+def token_cache_file(env: Optional[Mapping[str, str]] = None) -> Path:
+    """token 缓存文件，位于用户缓存目录（不写入已安装的插件目录）。"""
+    return _cache_dir(env) / ".feishu_token_cache.json"
 
 
 # ──────────────────────────────────────────────────────────────
@@ -61,10 +73,11 @@ _TOKEN_CACHE_FILE = _SCRIPT_DIR / "cache" / ".feishu_token_cache.json"
 
 def _load_cached_token(app_id: str) -> str | None:
     """从本地缓存读取有效的 tenant_access_token（剩余有效期 > 30 分钟才使用）。"""
-    if not _TOKEN_CACHE_FILE.exists():
+    cache_file = token_cache_file()
+    if not cache_file.exists():
         return None
     try:
-        cache = json.loads(_TOKEN_CACHE_FILE.read_text(encoding="utf-8"))
+        cache = json.loads(cache_file.read_text(encoding="utf-8"))
         entry = cache.get(app_id)
         if not entry:
             return None
@@ -78,18 +91,19 @@ def _load_cached_token(app_id: str) -> str | None:
 
 def _save_cached_token(app_id: str, token: str, expire: int) -> None:
     """将 tenant_access_token 写入本地缓存。"""
-    _TOKEN_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    cache_file = token_cache_file()
+    cache_file.parent.mkdir(parents=True, exist_ok=True)
     cache = {}
-    if _TOKEN_CACHE_FILE.exists():
+    if cache_file.exists():
         try:
-            cache = json.loads(_TOKEN_CACHE_FILE.read_text(encoding="utf-8"))
+            cache = json.loads(cache_file.read_text(encoding="utf-8"))
         except Exception:
             pass
     cache[app_id] = {
         "token": token,
         "expires_at": time.time() + expire,
     }
-    _TOKEN_CACHE_FILE.write_text(json.dumps(cache, ensure_ascii=False, indent=2), encoding="utf-8")
+    cache_file.write_text(json.dumps(cache, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def get_tenant_access_token(app_id: str, app_secret: str) -> str:
@@ -242,7 +256,7 @@ def main():
     auth_group.add_argument("--token", "-t", help="直接传入 tenant_access_token 或 user_access_token")
     auth_group.add_argument("--token-file", help="从文件读取 token（文件内容为纯 token 字符串）")
 
-    parser.add_argument("--output", "-o", help="输出文件路径（默认：cache/feishu-<doc_token前8位>.md）")
+    parser.add_argument("--output", "-o", help="输出文件路径（默认：用户缓存目录/optimus-backend-api-connect/feishu-<doc_token前8位>.md）")
     args = parser.parse_args()
 
     try:
@@ -253,7 +267,7 @@ def main():
 
     output_path = (
         Path(args.output) if args.output
-        else _SCRIPT_DIR / "cache" / f"feishu-{args.doc_token[:8]}.md"
+        else _cache_dir() / f"feishu-{args.doc_token[:8]}.md"
     )
 
     try:
