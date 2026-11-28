@@ -184,14 +184,14 @@ Minor/Major 升级前必须用 `darwin-skill` 给改动的 skill 评分：新分
 
 发起提交前先自我校验，不要默认第一版就是对的——尤其是新增/迁移/重命名文件后的悬空引用（路径、`§ 章节号`、`index.jsonl` 条目与 `anchor`）和正文声明的计数（"共 N 条""六字段"）与实际产出是否一致，这两类错误 CI 能拦住的只是其中机械可判定的子集，遗漏的部分只能靠人工在提交前检查。改动 skill / hook / command 后用 `--plugin-dir` 加载本仓做交互验证，见 `test-locally` skill（`/test-locally` 触发）。以下清单本地复现「提交与推送」那六个必需检查中的**三个**——`gates-hooks`、`gates-tests`、`gates-data`；余下 `plugin-validate`（上游 action）、`new-skill-eval-case`（依赖 PR diff）与 `actionlint`（本机未装该二进制）**无本地等价命令，只能在 PR 上验证**，别把本节跑绿当成 CI 会绿。
 
-**九项提交门禁**（9 个逻辑检查，由 6 个脚本实现；对应 `gates-hooks`）：
+**十项提交门禁**（10 个逻辑检查，由 7 个脚本实现；对应 `gates-hooks`）：
 
 ```bash
 python .githooks/run_repository_gates.py   # 任何 shell（含 PowerShell）均可
 sh .githooks/pre-commit                    # 与 CI 逐字相同的入口，需 Git Bash 等 sh 环境
 ```
 
-⚠️ 两条跑的是同一个 catalog（`.githooks/repository_gates.py`，跑哪些脚本只在那里登记），覆盖全部九项，**都不需要先 `git config core.hooksPath .githooks`**——那条配置只决定提交时会不会自动触发。`pre-commit` 只是定位自身后交给 runner 的薄包装；CI 的 `gates-hooks` 仍执行 `sh .githooks/pre-commit`，以便连这层包装一起验证。
+⚠️ 两条跑的是同一个 catalog（`.githooks/repository_gates.py`，跑哪些脚本只在那里登记），覆盖全部十项，**都不需要先 `git config core.hooksPath .githooks`**——那条配置只决定提交时会不会自动触发。`pre-commit` 只是定位自身后交给 runner 的薄包装；CI 的 `gates-hooks` 仍执行 `sh .githooks/pre-commit`，以便连这层包装一起验证。
 
 **Python 单元测试**（**本机无 `pytest`，只能用 `unittest`**）：`unittest discover` 不递归跨目录，必须逐目录跑；下面这一条自动发现全部测试目录并逐个执行，与 `ci.yml` 的 `gates-tests` 是同一个入口：
 
@@ -222,6 +222,6 @@ Codex 冒烟本地可跑 `CODEX_HOME=<临时目录> python .githooks/codex_smoke
 | `.claude-plugin/marketplace.json` | 插件清单与展示元数据；顶层 `version` 仅记录集合构成，**不是插件版本来源** | 两者共用 |
 | `.agents/plugins/marketplace.json` | Codex plugin marketplace 安装入口 | Codex 专属 |
 | `.claude/rules/`（四份，按编辑路径自动加载） | 各自承载什么见「产物规范」节 | 两者共用 |
-| `.githooks/`（`pre-commit` 薄入口 + `repository_gates.py` catalog + 两个 runner + 六个自检脚本） | 九项提交门禁与全仓单测入口，检查项与判据见 `.githooks/README.md`；需 `git config core.hooksPath .githooks` 启用自动触发 | 两者共用 |
+| `.githooks/`（`pre-commit` 薄入口 + `repository_gates.py` catalog + 两个 runner + 七个自检脚本） | 十项提交门禁与全仓单测入口，检查项与判据见 `.githooks/README.md`；需 `git config core.hooksPath .githooks` 启用自动触发 | 两者共用 |
 
 **已被 gitignore 的目录（有意排除，非缺失）：** `.claude/skills/darwin-skill/`（⚠️ 其中 `results.tsv` 已 `git add -f` 入库，**不受该行影响**，见「darwin-skill 评分门禁」节）、`.remember/`、`.codegraph/`、`.superpowers/`、`.playwright-cli/`、`.playwright-mcp/`

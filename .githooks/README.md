@@ -27,14 +27,15 @@ git config core.hooksPath .githooks
 | 7 | `evals/` 下每个子目录都含 `case.yaml` 或 `prompt.md` | 缺 marker 的目录被 `claude plugin eval` 静默忽略——少跑一个 case，而总数只在 verbose 输出里 |
 | 8 | 插件内不引用插件目录以外的路径 | 安装后读不到被判据引用的文件，skill 静默退化为泛型知识审查 |
 | 9 | Codex manifest 组件声明与真实组件一致（含 Claude-only 排除表） | Codex 安装成功但组件缺失、越界或被误报为可用——codex plugin add 对此不报错 |
+| 10 | 发布 skill 不写死 harness 专属路径、不用非允许 frontmatter 键、正文不绑定 AskUserQuestion | Codex 侧 skill 找不到脚本、把缓存写进插件目录，或依赖被忽略的字段——都不报错 |
 
-## 执行结构：9 个逻辑检查 / 6 个脚本 / 1 个 runner
+## 执行结构：10 个逻辑检查 / 7 个脚本 / 1 个 runner
 
-上表 9 项由 **6 个脚本**实现（`check_skill_mirrors.py` 一个脚本覆盖第 4–6 项，`check_plugin_versions.py` 覆盖第 1、9 项），两个数不是同一个单位，不要互相换算。
+上表 10 项由 **7 个脚本**实现（`check_skill_mirrors.py` 一个脚本覆盖第 4–6 项，`check_plugin_versions.py` 覆盖第 1、9 项），两个数不是同一个单位，不要互相换算。
 
 | 文件 | 角色 |
 |---|---|
-| `repository_gates.py` | **catalog 真源**：登记跑哪 6 个脚本、带什么参数；每个 `Gate` 旁写着该项为什么存在（原先写在 `pre-commit` 里的逐项理由迁到了这里） |
+| `repository_gates.py` | **catalog 真源**：登记跑哪 7 个脚本、带什么参数；每个 `Gate` 旁写着该项为什么存在（原先写在 `pre-commit` 里的逐项理由迁到了这里） |
 | `run_repository_gates.py` | 门禁 runner：逐项执行 catalog，一项失败不遮住后面的问题，最后统一返回 0/1；仓库根由自身位置推出，不依赖调用者当前目录 |
 | `pre-commit` | 薄入口：先确认 PATH 上有 `python`（没有也照样输出 `[pre-commit] 未通过`），再定位自身并 `exec` runner，不含任何检查逻辑 |
 | `repository_inventory.py` | 测试目录发现器：按 `.githooks/`、`.claude/skills/*/scripts/`、`plugins/*/skills/*/scripts/` 三类固定位置找 `test_*.py`。读的是 git 视图（已跟踪 + 未跟踪且未被忽略），被 `.gitignore` 排除的文件不会被发现——它们在 CI checkout 里不存在，本地若照跑，两侧范围就分叉了。`TestRealRepositoryCoverage` 守住反方向：仓库里任何落在三类位置之外的 `test_*.py` 都会让单测变红，而不是被静默漏跑 |
@@ -83,6 +84,10 @@ git config core.hooksPath .githooks
 
 单测 `test_add_f_does_not_make_an_ignored_skill_distributed` 是该事故的活体复现，在临时目录里跑**真 git**（不 mock `check-ignore`）——把 git 换成替身的测试恰好绕过出错的那一环，永远抓不到它。已做阴性对照：临时把实现换成漏掉 `--no-index` 的版本，该目录立刻被判为分发并报出 2 条缺镜像。
 
+### `check_skill_portability.py`：第 10 项，判据是「发布 skill 写死了某个 harness 的专属目录或工具名吗」
+
+第 10 项由 `check_skill_portability.py` 实现，扫 `plugins/*/skills/*/SKILL.md`（含 frontmatter）：写死 `.claude/skills` 等 harness 专属路径、frontmatter 使用六个允许键之外的键、正文绑定 `AskUserQuestion`。拦的是「发布 skill 写死 harness 专属目录或工具名」，不拦会导致 Codex 侧脚本或缓存路径解析失败的其他形态；判据见 spec §6.2 与脚本 docstring。合法的专属路径（如 `sync-skill-symlinks` 的默认同步目标）用 `codex-portability: allow-harness-path reason=<非空理由>` 标记豁免：标记在第 N 行，覆盖第 N 与 N+1 行的命中；frontmatter 与代码块用前一行的 `#` 注释，Markdown 正文与表格行用行尾 `<!-- ... -->`。`--list` 列出全部命中。
+
 ### `check_new_skill_eval_case.py`：一个脚本，两个模式，一个挂得上一个挂不上
 
 该脚本（31 个单元测试）有两个互不重叠的模式，**分界线正是「要不要 diff」**：
@@ -110,13 +115,13 @@ python -m unittest discover -s .githooks -p "test_*.py"
 
 ### `codex_smoke.py`：CI 专用冒烟，不在 catalog 内，不计入门禁项数
 
-由 `ci.yml` 的 `plugin-validate` job 在安装固定版本 Codex CLI 后调用：隔离 `CODEX_HOME` 下装全部本地插件，断言插件已启用、全部 skill 在 `codex debug prompt-input` 中可见、期望的 MCP server（取自 `.codex-mcp.json`）均出现、排除表里的 Claude-only server 不出现。它要联网装 CLI，违反「门禁只读工作树」约定，所以**不进 `repository_gates.py`**，本地不属于九项门禁；`CODEX_HOME` 未设置或指向 `~/.codex` 时拒绝运行。单测 `test_codex_smoke.py` 由 `run_unit_tests.py` 照常发现。
+由 `ci.yml` 的 `plugin-validate` job 在安装固定版本 Codex CLI 后调用：隔离 `CODEX_HOME` 下装全部本地插件，断言插件已启用、全部 skill 在 `codex debug prompt-input` 中可见、期望的 MCP server（取自 `.codex-mcp.json`）均出现、排除表里的 Claude-only server 不出现。它要联网装 CLI，违反「门禁只读工作树」约定，所以**不进 `repository_gates.py`**，本地不属于十项门禁；`CODEX_HOME` 未设置或指向 `~/.codex` 时拒绝运行。单测 `test_codex_smoke.py` 由 `run_unit_tests.py` 照常发现。
 
 ## 与 CI 的关系
 
 `.github/workflows/ci.yml` 的 `gates-hooks` job **逐字执行 `sh .githooks/pre-commit`**，不在 workflow YAML 里重写一份门禁逻辑，也不绕过 shell 包装直接调 runner——包装本身也是要验证的交付物。这是本目录唯一的第二执行点。`gates-tests` job 则执行 `python .githooks/run_unit_tests.py`，与本地是同一个入口。
 
-🔴 **由此产生一条硬约定：catalog（`repository_gates.py`，经 `pre-commit` 执行）不得引入依赖暂存区的检查**（`git diff --cached`、`git diff --name-only --staged` 等）。当前九项检查全部基于工作树与 `git ls-files`，**这条性质必须保持**——一旦引入，CI 的逐字复用即失效，门禁判据会在两个环境间静默分叉：本地拦得住的 CI 拦不住，反之亦然。
+🔴 **由此产生一条硬约定：catalog（`repository_gates.py`，经 `pre-commit` 执行）不得引入依赖暂存区的检查**（`git diff --cached`、`git diff --name-only --staged` 等）。当前十项检查全部基于工作树与 `git ls-files`，**这条性质必须保持**——一旦引入，CI 的逐字复用即失效，门禁判据会在两个环境间静默分叉：本地拦得住的 CI 拦不住，反之亦然。
 
 需要 diff 的门禁改为「接受 base/head 两个 ref 作参数、只由 CI 调用、不进 catalog」。⚠️ **这条约定约束的是检查，不是文件**：`check_new_skill_eval_case.py` 的两个模式分别落在约定的两侧——增量模式走上面那条路，`--all` 模式因为只读工作树而挂进了 `pre-commit`（见上一节）。**判断该不该挂，看的是这个检查要不要 diff，而不是它所在的脚本以前挂没挂。**
 

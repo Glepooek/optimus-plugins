@@ -1,8 +1,9 @@
 ---
 name: sync-skill-symlinks
+# codex-portability: allow-harness-path reason=本 skill 的职责就是向各 harness 的 skills 目录同步链接
 description: 将 skill 源目录以符号链接同步到各 AI 工具的 skills 目录，维护单一 source of truth。默认 source：~/.agents/skills/，默认 targets：~/.claude/skills/、~/.kiro/skills/ 和 ~/.codex/skills/。支持自定义：source=<路径> target=<路径1,路径2,...>。触发词：同步 skills、sync skill symlinks、链接 skills、更新 skill 链接、link skills、update skill symlinks。不适用：仅需查看已有链接状态而不修改时，无需触发本 skill。
 metadata:
-  version: "2.0.1"
+  version: "2.0.2"
   author: desktop client team
   category: tool
 compatibility: 纯文件系统操作（符号链接管理）；Windows 下需开发者模式或管理员权限，macOS/Linux 原生支持 ln -s。
@@ -26,6 +27,7 @@ allowed-tools: Bash
 ```powershell
 # 默认值
 $source    = "$env:USERPROFILE\.agents\skills"
+# codex-portability: allow-harness-path reason=本 skill 的职责就是向各 harness 的 skills 目录同步链接
 $targets   = @("$env:USERPROFILE\.claude\skills", "$env:USERPROFILE\.kiro\skills", "$env:USERPROFILE\.codex\skills")
 $useCustom = $false
 
@@ -58,6 +60,7 @@ if ($useCustom) {
 ```bash
 # 默认值
 source_dir="$HOME/.agents/skills"
+# codex-portability: allow-harness-path reason=本 skill 的职责就是向各 harness 的 skills 目录同步链接
 targets=("$HOME/.claude/skills" "$HOME/.kiro/skills" "$HOME/.codex/skills")
 use_custom=false
 
@@ -205,13 +208,14 @@ echo "🔍 发现 ${#skills[@]} 个 skill: ${skills[*]}"
 
 ## Step 3 — 创建符号链接
 
-`$targets` 由 Step 0 赋值（默认：`~/.claude/skills/`、`~/.kiro/skills/` 和 `~/.codex/skills/`）。对每个目标目录逐一处理：父目录不存在则静默跳过（默认 targets）；自动创建目标目录本身；链接不存在则新建，已存在但目标路径不符则自动更新，目标路径一致则跳过，非符号链接则警告。
+`$targets` 由 Step 0 赋值（默认：`~/.claude/skills/`、`~/.kiro/skills/` 和 `~/.codex/skills/`）。对每个目标目录逐一处理：父目录不存在则静默跳过（默认 targets）；自动创建目标目录本身；链接不存在则新建，已存在但目标路径不符则自动更新，目标路径一致则跳过，非符号链接则警告。 <!-- codex-portability: allow-harness-path reason=本 skill 的职责就是向各 harness 的 skills 目录同步链接 -->
 
 **Windows PowerShell：**
 
 ```powershell
 # $targets 由 Step 0 赋值；此处兜底仅在 Step 0 未执行时生效
 if (-not $targets) {
+# codex-portability: allow-harness-path reason=本 skill 的职责就是向各 harness 的 skills 目录同步链接
     $targets = @("$env:USERPROFILE\.claude\skills", "$env:USERPROFILE\.kiro\skills", "$env:USERPROFILE\.codex\skills")
 }
 
@@ -258,6 +262,7 @@ foreach ($target in $targets) {
 ```bash
 # targets 由 Step 0 赋值；此处兜底仅在 Step 0 未执行时生效
 if [ ${#targets[@]} -eq 0 ]; then
+# codex-portability: allow-harness-path reason=本 skill 的职责就是向各 harness 的 skills 目录同步链接
     targets=("$HOME/.claude/skills" "$HOME/.kiro/skills" "$HOME/.codex/skills")
 fi
 created=0; skipped=0; warned=0
@@ -367,7 +372,7 @@ fi
 | 1 | 在源目录中直接放置文件（非子目录） | 被 `find -type d` 跳过，skill 不会被同步 | 每个 skill 必须是独立子目录，如 `my-skill/SKILL.md` |
 | 2 | 在目标目录手动创建与 skill 同名的普通目录 | 被检测为"非符号链接"，打印警告并永远跳过 | 先删除该目录（`rm -rf` / `Remove-Item -Recurse`），再运行 skill |
 | 3 | Windows 下未开启开发者模式也非管理员 | Step 1 权限检测失败，skill 终止 | 开启设置 → 隐私和安全 → 开发者选项，或以管理员身份运行终端 |
-| 4 | 直接编辑目标目录（`~/.claude/skills/xxx`）中的文件 | 实际修改的是 source 中的原始文件（符号链接穿透），符合预期；但若误删链接则 source 文件不受影响 | 明确知道这一点即可；若要独立副本请改用 `cp -r` 复制而非 symlink |
+| 4 | 直接编辑目标目录（`~/.claude/skills/xxx`）中的文件 | 实际修改的是 source 中的原始文件（符号链接穿透），符合预期；但若误删链接则 source 文件不受影响 | 明确知道这一点即可；若要独立副本请改用 `cp -r` 复制而非 symlink | <!-- codex-portability: allow-harness-path reason=本 skill 的职责就是向各 harness 的 skills 目录同步链接 -->
 | 5 | source 目录被删除后不清理即再次运行 | Step 2 正常终止，但目标目录中的失效链接不会自动清除 | 运行 skill 触发 Step 5 CHECKPOINT，回复 `y` 清除失效链接 |
 | 6 | CHECKPOINT 确认删除时未仔细核对失效链接列表 | Step 4 扫描所有符号链接，含手动创建或其他工具管理的链接，可能误删 | 回复 `y` 前逐条核对路径；不确定的选 `n` 留待手动处理 |
 
