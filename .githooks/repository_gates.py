@@ -8,7 +8,7 @@
 挂在 hook 而非 skill 里，是因为 Codex 侧走标准 git 流程，读不到 skill 正文。
 
 计数口径：下面登记 **6 个脚本**，覆盖 .githooks/README.md「检查项」表里的
-**8 个逻辑检查**（check_skill_mirrors.py 一个脚本覆盖第 4–6 项）。两个数不是
+**9 个逻辑检查**（check_skill_mirrors.py 一个脚本覆盖第 4–6 项，check_plugin_versions.py 覆盖第 1、9 项）。两个数不是
 同一个单位，不要互相换算。
 
 执行方：run_repository_gates.py（pre-commit 与 CI 的 gates-hooks 都经它）。
@@ -32,6 +32,8 @@ GATES: tuple[Gate, ...] = (
     # 版本真源是「两份构成的一对」。不一致时不要拿一边覆盖另一边——错的可能恰好是
     # 「另一份」（该升 Minor 却升了 Patch），覆盖会把正确的一边也改错。
     # 正确处置：按 AGENTS.md 版本管理规则判断本次改动该升什么号，两份都写成该值。
+    # 同一脚本还承担检查项 9：Codex manifest 声明的组件须与 Claude 侧真实组件一致，
+    # Claude-only 组件登记在 .githooks/codex_component_exclusions.json（计数口径见本文件 docstring）。
     Gate("plugin-versions", ".githooks/check_plugin_versions.py", (".",)),
 
     # --- 检查项 2：hook 配置与 Claude Code 契约相符 ---

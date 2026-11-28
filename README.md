@@ -20,6 +20,16 @@
 | [optimus-decision](plugins/optimus-decision) | 工程决策支持：数据结构、算法策略与复杂度分析 |
 | [optimus-session](plugins/optimus-session) | 跨会话交接：保存进度、决策与恢复上下文 |
 
+## 🔀 Claude Code / Codex 差异
+
+| 插件 | Codex 差异 |
+|---|---|
+| optimus-frontend | `avalonia-docs`、`microsoft-learn` 随 Codex 插件分发；`mastergo-magic-mcp` 在经验证的 token 转发方案出现前仅 Claude Code 可用；PreToolUse Hook 仅 Claude Code 可用 |
+| optimus-backend | Claude Hook 不随 Codex 插件生效 |
+| optimus-devops | `dotnet-diagnose` agent 在 Codex CLI 0.172.0 下未注册，Codex 用户直接使用 `dotnet-diagnose-triage`；Claude Hook 不随 Codex 插件生效 |
+
+Claude marketplace 另有 3 个外部引用条目，Codex marketplace 只含 9 个本仓自建插件。Claude-only 组件的唯一登记处是 `.githooks/codex_component_exclusions.json`。
+
 ## 🔧 外部依赖
 
 各插件除 Claude Code 内置能力外，还依赖以下外部工具/服务：

@@ -4,7 +4,7 @@ import shutil
 import tempfile
 import unittest
 
-from check_plugin_versions import check_all
+from check_plugin_versions import check_all, check_codex_contract
 
 
 def make_plugin(root, name, claude_ver, codex_ver, claude_extra=None, base_dir="plugins"):
@@ -162,6 +162,249 @@ class TestCheckPluginVersions(unittest.TestCase):
         make_plugin(self.root, "p-bad", "1.0.0", "1.0.1")
         make_plugin(self.root, "v-bad", "2.0.0", "2.0.1", base_dir="external_plugins")
         self.assertEqual(len(check_all(self.root)), 2)
+
+
+def make_codex_plugin(root, name, codex_extra=None, mcp=None, agents=None, hooks=None):
+    """造一个双侧插件；mcp 为 dict 时写 .mcp.json，agents 为名字列表，hooks 为事件名列表。"""
+    base = root / "plugins" / name
+    claude = base / ".claude-plugin"
+    claude.mkdir(parents=True, exist_ok=True)
+    (claude / "plugin.json").write_text(
+        json.dumps({"name": name, "version": "1.0.0"}, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8")
+    codex = base / ".codex-plugin"
+    codex.mkdir(parents=True, exist_ok=True)
+    body = {"name": name, "version": "1.0.0", "skills": "./skills/"}
+    if codex_extra:
+        body.update(codex_extra)
+    (codex / "plugin.json").write_text(
+        json.dumps(body, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (base / "skills").mkdir(exist_ok=True)
+    if mcp is not None:
+        (base / ".mcp.json").write_text(
+            json.dumps({"mcpServers": mcp}, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8")
+    if agents:
+        d = base / "agents"
+        d.mkdir(exist_ok=True)
+        for agent_name in agents:
+            (d / f"{agent_name}.md").write_text(
+                f"---\nname: {agent_name}\ndescription: 测试 agent\n---\n\n正文\n",
+                encoding="utf-8")
+    if hooks:
+        d = base / "hooks"
+        d.mkdir(exist_ok=True)
+        (d / "hooks.json").write_text(
+            json.dumps({"hooks": {event: [] for event in hooks}}, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8")
+    return base
+
+
+def write_marketplace(root, names):
+    d = root / ".agents" / "plugins"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "marketplace.json").write_text(
+        json.dumps({"name": "test", "plugins": [
+            {"name": n, "source": {"source": "local", "path": f"./plugins/{n}"}}
+            for n in names
+        ]}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def write_exclusions(root, entries):
+    d = root / ".githooks"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "codex_component_exclusions.json").write_text(
+        json.dumps({"exclusions": entries}, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8")
+
+
+def exclusion(plugin, kind, ident, path, reason="测试用排除"):
+    return {"plugin": plugin, "kind": kind, "id": ident, "path": path, "reason": reason}
+
+
+class TestCodexContract(unittest.TestCase):
+    def setUp(self):
+        self.root = pathlib.Path(tempfile.mkdtemp())
+
+    def tearDown(self):
+        shutil.rmtree(self.root, ignore_errors=True)
+
+    def declare_mcp_file(self, plugin_dir, content):
+        (plugin_dir / "mcp.json").write_text(
+            json.dumps(content, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    def test_minimal_plugin_passes(self):
+        make_codex_plugin(self.root, "p")
+        write_marketplace(self.root, ["p"])
+        self.assertEqual(check_codex_contract(self.root), [])
+
+    def test_codex_name_mismatch(self):
+        make_codex_plugin(self.root, "p", codex_extra={"name": "other"})
+        write_marketplace(self.root, ["p"])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("name", problems[0])
+
+    def test_marketplace_missing_plugin(self):
+        make_codex_plugin(self.root, "p1")
+        make_codex_plugin(self.root, "p2")
+        write_marketplace(self.root, ["p1"])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("marketplace", problems[0])
+
+    def test_marketplace_extra_plugin(self):
+        make_codex_plugin(self.root, "p")
+        write_marketplace(self.root, ["p", "ghost"])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("marketplace", problems[0])
+
+    def test_declared_mcp_file_missing(self):
+        make_codex_plugin(self.root, "p", codex_extra={"mcpServers": "./nope.json"})
+        write_marketplace(self.root, ["p"])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("nope.json", problems[0])
+
+    def test_declared_path_escapes_plugin(self):
+        make_codex_plugin(self.root, "p", codex_extra={"mcpServers": "../x.json"})
+        write_marketplace(self.root, ["p"])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("越界", problems[0])
+
+    def test_codex_hooks_key_rejected(self):
+        make_codex_plugin(self.root, "p", codex_extra={"hooks": "./hooks/hooks.json"})
+        write_marketplace(self.root, ["p"])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("plugin_hooks", problems[0])
+
+    def test_mcp_server_uncovered(self):
+        plugin_dir = make_codex_plugin(
+            self.root, "p", codex_extra={"mcpServers": "./mcp.json"},
+            mcp={"a": {"command": "x"}, "b": {"command": "y"}})
+        self.declare_mcp_file(plugin_dir, {"mcpServers": {"a": {"command": "x"}}})
+        write_marketplace(self.root, ["p"])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("b", problems[0])
+
+    def test_mcp_declared_not_in_claude_mcp(self):
+        plugin_dir = make_codex_plugin(
+            self.root, "p", codex_extra={"mcpServers": "./mcp.json"},
+            mcp={"a": {"command": "x"}})
+        self.declare_mcp_file(
+            plugin_dir, {"mcpServers": {"a": {"command": "x"}, "ghost": {"command": "z"}}})
+        write_marketplace(self.root, ["p"])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("ghost", problems[0])
+
+    def test_mcp_declared_content_drift(self):
+        plugin_dir = make_codex_plugin(
+            self.root, "p", codex_extra={"mcpServers": "./mcp.json"},
+            mcp={"a": {"url": "https://x"}})
+        self.declare_mcp_file(plugin_dir, {"mcpServers": {"a": {"url": "https://y"}}})
+        write_marketplace(self.root, ["p"])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("'a'", problems[0])
+
+    def test_mcp_server_excluded_passes(self):
+        plugin_dir = make_codex_plugin(
+            self.root, "p", codex_extra={"mcpServers": "./mcp.json"},
+            mcp={"a": {"command": "x"}, "b": {"command": "y"}})
+        self.declare_mcp_file(plugin_dir, {"mcpServers": {"a": {"command": "x"}}})
+        write_marketplace(self.root, ["p"])
+        write_exclusions(self.root, [exclusion("p", "mcp-server", "b", ".mcp.json")])
+        self.assertEqual(check_codex_contract(self.root), [])
+
+    def test_agent_uncovered(self):
+        make_codex_plugin(self.root, "p", agents=["x"])
+        write_marketplace(self.root, ["p"])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("x", problems[0])
+
+    def test_hook_event_requires_exclusion(self):
+        make_codex_plugin(self.root, "p", hooks=["PreToolUse"])
+        write_marketplace(self.root, ["p"])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("PreToolUse", problems[0])
+
+    def test_stale_exclusion(self):
+        make_codex_plugin(self.root, "p")
+        write_marketplace(self.root, ["p"])
+        write_exclusions(self.root, [exclusion("p", "agent", "ghost", "agents/ghost.md")])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("陈旧", problems[0])
+
+    def test_exclusion_conflicts_with_declaration(self):
+        make_codex_plugin(self.root, "p", agents=["x"],
+                          codex_extra={"agents": ["./agents/x.md"]})
+        write_marketplace(self.root, ["p"])
+        write_exclusions(self.root, [exclusion("p", "agent", "x", "agents/x.md")])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("冲突", problems[0])
+
+    def test_exclusion_missing_reason(self):
+        make_codex_plugin(self.root, "p")
+        write_marketplace(self.root, ["p"])
+        write_exclusions(self.root, [exclusion("p", "agent", "ghost", "agents/ghost.md", reason="")])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("reason", problems[0])
+
+    def test_malformed_mcp_json_reported_not_raised(self):
+        plugin_dir = make_codex_plugin(self.root, "p", mcp={"a": {"command": "x"}})
+        (plugin_dir / ".mcp.json").write_text("{", encoding="utf-8")
+        write_marketplace(self.root, ["p"])
+        problems = check_codex_contract(self.root)   # 不得抛异常
+        self.assertEqual(len(problems), 1)
+        self.assertIn(".mcp.json", problems[0])
+
+    def test_exclusion_wrong_path_is_stale(self):
+        """"id 对、path 错」的排除项描述的不是真实组件，同样算陈旧。"""
+        plugin_dir = make_codex_plugin(
+            self.root, "p", codex_extra={"mcpServers": "./mcp.json"},
+            mcp={"a": {"command": "x"}})
+        self.declare_mcp_file(plugin_dir, {"mcpServers": {"a": {"command": "x"}}})
+        write_marketplace(self.root, ["p"])
+        write_exclusions(self.root, [exclusion("p", "mcp-server", "a", "wrong.json")])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("陈旧", problems[0])
+
+    def test_exclusion_for_unknown_plugin_is_stale(self):
+        make_codex_plugin(self.root, "p")
+        write_marketplace(self.root, ["p"])
+        write_exclusions(self.root, [exclusion("gone", "agent", "x", "agents/x.md")])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("陈旧", problems[0])
+
+    def test_duplicate_exclusion_reported(self):
+        make_codex_plugin(self.root, "p", agents=["x"])
+        write_marketplace(self.root, ["p"])
+        write_exclusions(self.root, [
+            exclusion("p", "agent", "x", "agents/x.md"),
+            exclusion("p", "agent", "x", "agents/x.md"),
+        ])
+        problems = check_codex_contract(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("重复", problems[0])
+
+
+class TestRealRepository(unittest.TestCase):
+    def test_real_repository_passes(self):
+        root = pathlib.Path(__file__).resolve().parent.parent
+        self.assertEqual(check_all(root), [])
+        self.assertEqual(check_codex_contract(root), [])
 
 
 if __name__ == "__main__":

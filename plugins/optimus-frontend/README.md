@@ -1,6 +1,6 @@
 # Optimus Frontend 内置 MCP 服务
 
-`optimus-frontend` 插件自带三个 MCP（Model Context Protocol）服务器，安装插件后由 Claude Code 自动加载。MCP 配置**仅面向 Claude Code**，不提供 Codex 版本。
+`optimus-frontend` 插件自带三个 MCP（Model Context Protocol）服务器，安装插件后由 Claude Code 自动加载。Claude 侧三个 MCP 全部可用；Codex 侧内置 Avalonia Docs 与 Microsoft Learn（`.codex-mcp.json`），MasterGo MCP 仅 Claude Code 可用。
 
 ## 包含的 MCP 服务器
 

@@ -1,6 +1,6 @@
 # 工具与资源目录
 
-> 版本：1.0.2
+> 版本：1.1.0
 
 > 记录团队已调研或已使用的外部工具/资源（CLI、MCP server、Skill、Agent、Plugin 等）——是什么、能做什么、怎么安装/更新/移除，以及与本仓库现有资产的关系与取舍理由。**纯描述性领域，不定义 MUST/SHOULD/MAY 规范条款**。
 
@@ -29,6 +29,7 @@
 | 评估 API 测试/管理工具 | `reference/apifox-cli.md` |
 | 评估飞书/Lark 自动化工具 | `reference/lark-cli.md` |
 | 评估文件转 Markdown 工具 | `reference/markitdown.md` |
+| 评估 Codex harness 的插件能力边界 | `reference/codex-cli.md` |
 
 ## 文件地图
 
@@ -42,6 +43,7 @@
 | `reference/playwright-cli.md` | Playwright CLI | cli, playwright |
 | `reference/lark-cli.md` | lark-cli (Lark/Feishu) | cli, feishu |
 | `reference/markitdown.md` | MarkItDown | cli, markdown-conversion |
+| `reference/codex-cli.md` | Codex CLI | cli, codex |
 
 ## 索引与机器消费
 

@@ -26,10 +26,11 @@ git config core.hooksPath .githooks
 | 6 | 镜像以 `120000` 模式入库 | `core.symlinks=false` 时会存成普通文件，克隆到别的机器就不是链接 |
 | 7 | `evals/` 下每个子目录都含 `case.yaml` 或 `prompt.md` | 缺 marker 的目录被 `claude plugin eval` 静默忽略——少跑一个 case，而总数只在 verbose 输出里 |
 | 8 | 插件内不引用插件目录以外的路径 | 安装后读不到被判据引用的文件，skill 静默退化为泛型知识审查 |
+| 9 | Codex manifest 组件声明与真实组件一致（含 Claude-only 排除表） | Codex 安装成功但组件缺失、越界或被误报为可用——codex plugin add 对此不报错 |
 
-## 执行结构：8 个逻辑检查 / 6 个脚本 / 1 个 runner
+## 执行结构：9 个逻辑检查 / 6 个脚本 / 1 个 runner
 
-上表 8 项由 **6 个脚本**实现（`check_skill_mirrors.py` 一个脚本覆盖第 4–6 项），两个数不是同一个单位，不要互相换算。
+上表 9 项由 **6 个脚本**实现（`check_skill_mirrors.py` 一个脚本覆盖第 4–6 项，`check_plugin_versions.py` 覆盖第 1、9 项），两个数不是同一个单位，不要互相换算。
 
 | 文件 | 角色 |
 |---|---|
@@ -43,7 +44,7 @@ git config core.hooksPath .githooks
 
 🔴 runner 输出中的 `[pre-commit] 未通过` 是与 `commit-cc-plugin` skill 的契约（它据此判断 commit 被门禁拦下），改措辞前先改那边。
 
-第 1 项由 `check_plugin_versions.py` 实现（18 个单元测试）。
+第 1、9 项由 `check_plugin_versions.py` 实现（39 个单元测试）。
 
 第 2 项由 `check_hook_configs.py` 实现（21 个单元测试），扫 `plugins/*/hooks/hooks.json` 与 `.claude/settings*.json`，查七项机械可判定的错配：`async` 与展示类输出的错配、`async`/`asyncRewake` 用在非 command handler、handler 类型与事件不符、非工具事件上的 `if`、不支持 matcher 的事件上写了 matcher、永不匹配的 `mcp__<server>` matcher、PowerShell 裸占位符，另加拼错的事件名。判据真源是 `knowledge-base/claude-code-hooks/`，每条报错都带对应索引条目 ID。脚本定位不到被引用的脚本文件时不报——宁可漏报也不误报。两类文件的 `hooks` 键要求不同：`hooks.json` 缺顶层 `hooks` 对象是错配；`settings*.json` 是通用设置文件（`enabledPlugins`、`permissions`、`env` 等），完全不配 `hooks` 属常态，只在该键存在而类型不对时才报。
 
@@ -107,11 +108,15 @@ git config core.hooksPath .githooks
 python -m unittest discover -s .githooks -p "test_*.py"
 ```
 
+### `codex_smoke.py`：CI 专用冒烟，不在 catalog 内，不计入门禁项数
+
+由 `ci.yml` 的 `plugin-validate` job 在安装固定版本 Codex CLI 后调用：隔离 `CODEX_HOME` 下装全部本地插件，断言插件已启用、全部 skill 在 `codex debug prompt-input` 中可见、期望的 MCP server（取自 `.codex-mcp.json`）均出现、排除表里的 Claude-only server 不出现。它要联网装 CLI，违反「门禁只读工作树」约定，所以**不进 `repository_gates.py`**，本地不属于九项门禁；`CODEX_HOME` 未设置或指向 `~/.codex` 时拒绝运行。单测 `test_codex_smoke.py` 由 `run_unit_tests.py` 照常发现。
+
 ## 与 CI 的关系
 
 `.github/workflows/ci.yml` 的 `gates-hooks` job **逐字执行 `sh .githooks/pre-commit`**，不在 workflow YAML 里重写一份门禁逻辑，也不绕过 shell 包装直接调 runner——包装本身也是要验证的交付物。这是本目录唯一的第二执行点。`gates-tests` job 则执行 `python .githooks/run_unit_tests.py`，与本地是同一个入口。
 
-🔴 **由此产生一条硬约定：catalog（`repository_gates.py`，经 `pre-commit` 执行）不得引入依赖暂存区的检查**（`git diff --cached`、`git diff --name-only --staged` 等）。当前八项检查全部基于工作树与 `git ls-files`，**这条性质必须保持**——一旦引入，CI 的逐字复用即失效，门禁判据会在两个环境间静默分叉：本地拦得住的 CI 拦不住，反之亦然。
+🔴 **由此产生一条硬约定：catalog（`repository_gates.py`，经 `pre-commit` 执行）不得引入依赖暂存区的检查**（`git diff --cached`、`git diff --name-only --staged` 等）。当前九项检查全部基于工作树与 `git ls-files`，**这条性质必须保持**——一旦引入，CI 的逐字复用即失效，门禁判据会在两个环境间静默分叉：本地拦得住的 CI 拦不住，反之亦然。
 
 需要 diff 的门禁改为「接受 base/head 两个 ref 作参数、只由 CI 调用、不进 catalog」。⚠️ **这条约定约束的是检查，不是文件**：`check_new_skill_eval_case.py` 的两个模式分别落在约定的两侧——增量模式走上面那条路，`--all` 模式因为只读工作树而挂进了 `pre-commit`（见上一节）。**判断该不该挂，看的是这个检查要不要 diff，而不是它所在的脚本以前挂没挂。**
 

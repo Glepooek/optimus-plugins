@@ -16,14 +16,15 @@
 |---|---|---|
 | 安装入口 | `/plugin marketplace add` 或手动 clone 到 `~/.claude/plugins/marketplace/` | `codex plugin marketplace add <repo>` → `codex plugin add <plugin>@optimus-plugins`，读取 `.agents/plugins/marketplace.json` |
 | 提交流程 | 强制 `/commit-cc-plugin` skill | 标准 git + Conventional Commits，禁止 `--no-verify`；`.githooks/pre-commit` 的一致性门禁两侧同等生效 |
-| Hooks | SessionStart（技巧轮播）、Notification（权限通知）生效 | 无对应机制，Claude 侧 hooks 在 Codex 中不生效 |
+| Hooks | SessionStart（技巧轮播）、Notification（权限通知）生效 | Claude Hook 不随 Codex 插件生效；Codex CLI 0.172.0 的 plugin_hooks 已 removed，用户级 hooks 特性不等于插件级分发面 |
+| 插件组件 | `.claude-plugin/plugin.json` 声明 `agents`，`.mcp.json` 自动加载 | `.codex-plugin/plugin.json` 显式声明 `mcpServers`（frontend 用 `.codex-mcp.json`）；Claude-only 组件登记在 `.githooks/codex_component_exclusions.json` |
 | 维护型 skill 镜像目录 | `.kiro/skills/<name>` | `.agents/skills/<name>` |
 | 插件标识文件 | `.claude-plugin/marketplace.json`（含全部插件） | 额外的 `.agents/plugins/marketplace.json` + 每插件 `.codex-plugin/plugin.json` |
 
 ### 重要约束
 
 - **SKILL.md 是唯一真源**：只改 `plugins/*/skills/*/SKILL.md`，不为 Codex 维护副本或改 frontmatter——两 harness 读的是同一份文件
-- **MCP 配置只面向 Claude Code**：`plugins/*/.mcp.json` 不为 Codex 维护 `config.toml` 镜像，Codex 清单（`.codex-plugin/plugin.json`）不声明 `mcpServers`
+- **MCP/agent 按 harness 实际能力分别声明**：只有路径校验（第 9 项）与使用侧冒烟（CI 的 codex_smoke.py）都通过的组件才可写进 Codex manifest；其余登记进排除表并写明理由。展示文案必须与该 harness 实际分发的组件一致。
 - **跨插件无重复 skills**：新功能前先确认无跨插件重叠
 - **Skills 可相互引用**：子 skill 用相对路径，跨插件用绝对命名空间
 - **复合 skills 很少见**：仅在 3 个以上阶段且每阶段 >200 行时使用
@@ -183,14 +184,14 @@ Minor/Major 升级前必须用 `darwin-skill` 给改动的 skill 评分：新分
 
 发起提交前先自我校验，不要默认第一版就是对的——尤其是新增/迁移/重命名文件后的悬空引用（路径、`§ 章节号`、`index.jsonl` 条目与 `anchor`）和正文声明的计数（"共 N 条""六字段"）与实际产出是否一致，这两类错误 CI 能拦住的只是其中机械可判定的子集，遗漏的部分只能靠人工在提交前检查。改动 skill / hook / command 后用 `--plugin-dir` 加载本仓做交互验证，见 `test-locally` skill（`/test-locally` 触发）。以下清单本地复现「提交与推送」那六个必需检查中的**三个**——`gates-hooks`、`gates-tests`、`gates-data`；余下 `plugin-validate`（上游 action）、`new-skill-eval-case`（依赖 PR diff）与 `actionlint`（本机未装该二进制）**无本地等价命令，只能在 PR 上验证**，别把本节跑绿当成 CI 会绿。
 
-**八项提交门禁**（8 个逻辑检查，由 6 个脚本实现；对应 `gates-hooks`）：
+**九项提交门禁**（9 个逻辑检查，由 6 个脚本实现；对应 `gates-hooks`）：
 
 ```bash
 python .githooks/run_repository_gates.py   # 任何 shell（含 PowerShell）均可
 sh .githooks/pre-commit                    # 与 CI 逐字相同的入口，需 Git Bash 等 sh 环境
 ```
 
-⚠️ 两条跑的是同一个 catalog（`.githooks/repository_gates.py`，跑哪些脚本只在那里登记），覆盖全部八项，**都不需要先 `git config core.hooksPath .githooks`**——那条配置只决定提交时会不会自动触发。`pre-commit` 只是定位自身后交给 runner 的薄包装；CI 的 `gates-hooks` 仍执行 `sh .githooks/pre-commit`，以便连这层包装一起验证。
+⚠️ 两条跑的是同一个 catalog（`.githooks/repository_gates.py`，跑哪些脚本只在那里登记），覆盖全部九项，**都不需要先 `git config core.hooksPath .githooks`**——那条配置只决定提交时会不会自动触发。`pre-commit` 只是定位自身后交给 runner 的薄包装；CI 的 `gates-hooks` 仍执行 `sh .githooks/pre-commit`，以便连这层包装一起验证。
 
 **Python 单元测试**（**本机无 `pytest`，只能用 `unittest`**）：`unittest discover` 不递归跨目录，必须逐目录跑；下面这一条自动发现全部测试目录并逐个执行，与 `ci.yml` 的 `gates-tests` 是同一个入口：
 
@@ -208,6 +209,8 @@ python .claude/skills/knowledge-base-maintain/scripts/check_refs.py
 python .claude/skills/sync-cc-tips/scripts/validate_tips.py
 ```
 
+Codex 冒烟本地可跑 `CODEX_HOME=<临时目录> python .githooks/codex_smoke.py .`（需已装 Codex CLI 0.172.0），它不属于门禁。
+
 ---
 
 ## 关键文件
@@ -219,6 +222,6 @@ python .claude/skills/sync-cc-tips/scripts/validate_tips.py
 | `.claude-plugin/marketplace.json` | 插件清单与展示元数据；顶层 `version` 仅记录集合构成，**不是插件版本来源** | 两者共用 |
 | `.agents/plugins/marketplace.json` | Codex plugin marketplace 安装入口 | Codex 专属 |
 | `.claude/rules/`（四份，按编辑路径自动加载） | 各自承载什么见「产物规范」节 | 两者共用 |
-| `.githooks/`（`pre-commit` 薄入口 + `repository_gates.py` catalog + 两个 runner + 六个自检脚本） | 八项提交门禁与全仓单测入口，检查项与判据见 `.githooks/README.md`；需 `git config core.hooksPath .githooks` 启用自动触发 | 两者共用 |
+| `.githooks/`（`pre-commit` 薄入口 + `repository_gates.py` catalog + 两个 runner + 六个自检脚本） | 九项提交门禁与全仓单测入口，检查项与判据见 `.githooks/README.md`；需 `git config core.hooksPath .githooks` 启用自动触发 | 两者共用 |
 
 **已被 gitignore 的目录（有意排除，非缺失）：** `.claude/skills/darwin-skill/`（⚠️ 其中 `results.tsv` 已 `git add -f` 入库，**不受该行影响**，见「darwin-skill 评分门禁」节）、`.remember/`、`.codegraph/`、`.superpowers/`、`.playwright-cli/`、`.playwright-mcp/`

@@ -1,6 +1,6 @@
 # dotnet-diagnose-autopilot
 
-> 版本：1.0.2 | 分类：workflow
+> 版本：1.0.5 | 分类：workflow
 
 给定一份原始 .NET 诊断素材，自动识别类型、调度 dotnet-diagnose agent 完成分析，必要时用完全独立的第二次盲态调用交叉验证，产出结构化报告并标记分歧交人工复核。
 
@@ -99,3 +99,5 @@ dotnet-diagnose-triage/references/
 ```
 
 本 skill 不加载任何 skill（`allowed-tools` 不含 `Skill`），只经 `Task` 工具调度 agent；与 `dotnet-diagnose-triage` 之间无直接依赖，全部间接经由 agent。
+
+`optimus-devops:dotnet-diagnose` agent 当前仅 Claude Code 可用；Codex 下无对应 agent，请直接使用 `optimus-devops:dotnet-diagnose-triage` 做单次分析。
