@@ -2,7 +2,7 @@
 name: commit-cc-plugin
 description: 在 optimus-plugins 插件仓库中提交并推送改动时使用。任何涉及此仓库 git 提交/推送的操作，都必须使用此 skill，绝不能用普通 git 工作流替代。触发场景：用户明确表达提交或推送意图，如说"提交"、"推上去"、"push"、"commit"、"保存改动"、"同步到远端"、"帮我提交"、"推到 master"、"推一下"、"存一下"。
 metadata:
-  version: "6.0.2"
+  version: "6.0.3"
   author: desktop client team
   category: workflow
 compatibility: 需要 Git 仓库环境及远程推送权限；需 GitHub CLI（`gh`，已通过 `gh auth status` 认证）用于开 PR、轮询必需检查、squash merge；不依赖任何 MCP server。
@@ -221,7 +221,7 @@ git show -s --format=%B HEAD | grep -F '\n'
 |---|---|
 | `版本不一致` / `缺 version 字段` / `缺 .claude-plugin` / `缺 .codex-plugin` | 按 `AGENTS.md` 版本管理规则判断本次改动该升到哪个版本号，把**两份** `plugin.json` 都改成该值。**不要**拿一份覆盖另一份——错的可能恰好是"另一份"（该升 Minor 却升了 Patch） |
 | `缺符号链接` / `指向已不存在的` | 按报错括号里给出的命令补齐或清理，产生的文件纳入本次暂存后重新提交 |
-| `有多余字段` | 门禁白名单与本次改动冲突，见 `.githooks/pre-commit` 与 `check_plugin_versions.py` 的注释；放宽白名单需同时改脚本、改测试、记 `known-issues.md`，三件事缺一不可 |
+| `有多余字段` | 门禁白名单与本次改动冲突，见 `.githooks/check_plugin_versions.py` 的 `CLAUDE_ALLOWED_KEYS` 及其注释；放宽白名单需同时改脚本、改测试、记 `known-issues.md`，三件事缺一不可 |
 | 检查本身的 bug（如误报） | 修 `.githooks/` 下的脚本并跑通 `python -m unittest discover -s .githooks -p "test_*.py"`，不要改用 `--no-verify` 跳过 |
 | `不是 40 位小写十六进制` / `条目内不得写 version` / `未登记在 … 的「已接入」表` / `缺锚点 <!-- registry:active -->` | marketplace 外部引用条目写歪，触发 `check_external_entries.py`。按 `/add-external-skill` 的写入规则修正条目或台账 |
 | `台账 sha … 不一致` | 先判明哪一个对应实际验证过的状态，不要随手对齐——先看是条目还是台账反映的是「更新做了一半」，修那个偏离实际状态的一边 |

@@ -27,6 +27,22 @@ git config core.hooksPath .githooks
 | 7 | `evals/` 下每个子目录都含 `case.yaml` 或 `prompt.md` | 缺 marker 的目录被 `claude plugin eval` 静默忽略——少跑一个 case，而总数只在 verbose 输出里 |
 | 8 | 插件内不引用插件目录以外的路径 | 安装后读不到被判据引用的文件，skill 静默退化为泛型知识审查 |
 
+## 执行结构：8 个逻辑检查 / 6 个脚本 / 1 个 runner
+
+上表 8 项由 **6 个脚本**实现（`check_skill_mirrors.py` 一个脚本覆盖第 4–6 项），两个数不是同一个单位，不要互相换算。
+
+| 文件 | 角色 |
+|---|---|
+| `repository_gates.py` | **catalog 真源**：登记跑哪 6 个脚本、带什么参数；每个 `Gate` 旁写着该项为什么存在（原先写在 `pre-commit` 里的逐项理由迁到了这里） |
+| `run_repository_gates.py` | 门禁 runner：逐项执行 catalog，一项失败不遮住后面的问题，最后统一返回 0/1；仓库根由自身位置推出，不依赖调用者当前目录 |
+| `pre-commit` | 薄入口：先确认 PATH 上有 `python`（没有也照样输出 `[pre-commit] 未通过`），再定位自身并 `exec` runner，不含任何检查逻辑 |
+| `repository_inventory.py` | 测试目录发现器：按 `.githooks/`、`.claude/skills/*/scripts/`、`plugins/*/skills/*/scripts/` 三类固定位置找 `test_*.py`。读的是 git 视图（已跟踪 + 未跟踪且未被忽略），被 `.gitignore` 排除的文件不会被发现——它们在 CI checkout 里不存在，本地若照跑，两侧范围就分叉了。`TestRealRepositoryCoverage` 守住反方向：仓库里任何落在三类位置之外的 `test_*.py` 都会让单测变红，而不是被静默漏跑 |
+| `run_unit_tests.py` | 单测 runner：对发现到的每个目录跑 `unittest discover`，全部跑完再汇总；发现结果为空即失败；在 GitHub Actions 里按目录输出 `::group::` 折叠 |
+
+**三个入口跑的是同一个 catalog**：Git hook 自动触发 `pre-commit`；PowerShell 或任意 shell 直接 `python .githooks/run_repository_gates.py`；CI 的 `gates-hooks` 执行 `sh .githooks/pre-commit`（见「与 CI 的关系」）。新增检查只改 `repository_gates.py` 并同步上表，不要在 `pre-commit` 或 workflow 里另写一份。
+
+🔴 runner 输出中的 `[pre-commit] 未通过` 是与 `commit-cc-plugin` skill 的契约（它据此判断 commit 被门禁拦下），改措辞前先改那边。
+
 第 1 项由 `check_plugin_versions.py` 实现（18 个单元测试）。
 
 第 2 项由 `check_hook_configs.py` 实现（21 个单元测试），扫 `plugins/*/hooks/hooks.json` 与 `.claude/settings*.json`，查七项机械可判定的错配：`async` 与展示类输出的错配、`async`/`asyncRewake` 用在非 command handler、handler 类型与事件不符、非工具事件上的 `if`、不支持 matcher 的事件上写了 matcher、永不匹配的 `mcp__<server>` matcher、PowerShell 裸占位符，另加拼错的事件名。判据真源是 `knowledge-base/claude-code-hooks/`，每条报错都带对应索引条目 ID。脚本定位不到被引用的脚本文件时不报——宁可漏报也不误报。两类文件的 `hooks` 键要求不同：`hooks.json` 缺顶层 `hooks` 对象是错配；`settings*.json` 是通用设置文件（`enabledPlugins`、`permissions`、`env` 等），完全不配 `hooks` 属常态，只在该键存在而类型不对时才报。
@@ -72,7 +88,7 @@ git config core.hooksPath .githooks
 
 | 模式 | 判据 | 挂在 `pre-commit`？ | 由谁调用 |
 |---|---|---|---|
-| `--all`（上表第 7 项） | `plugins/*/skills/*/evals/` 下**每个**子目录都含 `case.yaml` 或 `prompt.md` | ✅ 挂了 | `pre-commit` 第 5 项检查 + `gates-hooks`（逐字复用） |
+| `--all`（上表第 7 项） | `plugins/*/skills/*/evals/` 下**每个**子目录都含 `case.yaml` 或 `prompt.md` | ✅ 挂了 | catalog 第 5 个 gate（`eval-cases`），经 `pre-commit` 与 `gates-hooks` 执行 |
 | `<base-ref> <head-ref>` | 本次改动新增的 `plugins/<plugin>/skills/<skill>/SKILL.md` 必须配 `evals/<case>/`（缺失即失败并给出应建路径） | ❌ 挂不上 | 只由 `ci.yml` 的 `new-skill-eval-case` job 调用 |
 
 增量模式挂不上的原因是它需要两个 ref 之间的 diff，而 `pre-commit` 必须保持暂存区无关（见下节「与 CI 的关系」）；`--all` 只读工作树，因此不受该约定限制。位置都在 `.githooks/` 是遵守 `.claude/rules/hook-conventions.md` 的「仓库级门禁必须放 `.githooks/`」。
@@ -93,11 +109,11 @@ python -m unittest discover -s .githooks -p "test_*.py"
 
 ## 与 CI 的关系
 
-`.github/workflows/ci.yml` 的 `gates-hooks` job **逐字执行 `sh .githooks/pre-commit`**，不在 workflow YAML 里重写一份门禁逻辑。这是本目录唯一的第二执行点。
+`.github/workflows/ci.yml` 的 `gates-hooks` job **逐字执行 `sh .githooks/pre-commit`**，不在 workflow YAML 里重写一份门禁逻辑，也不绕过 shell 包装直接调 runner——包装本身也是要验证的交付物。这是本目录唯一的第二执行点。`gates-tests` job 则执行 `python .githooks/run_unit_tests.py`，与本地是同一个入口。
 
-🔴 **由此产生一条硬约定：`pre-commit` 不得引入依赖暂存区的检查**（`git diff --cached`、`git diff --name-only --staged` 等）。当前八项检查全部基于工作树与 `git ls-files`，**这条性质必须保持**——一旦引入，CI 的逐字复用即失效，门禁判据会在两个环境间静默分叉：本地拦得住的 CI 拦不住，反之亦然。
+🔴 **由此产生一条硬约定：catalog（`repository_gates.py`，经 `pre-commit` 执行）不得引入依赖暂存区的检查**（`git diff --cached`、`git diff --name-only --staged` 等）。当前八项检查全部基于工作树与 `git ls-files`，**这条性质必须保持**——一旦引入，CI 的逐字复用即失效，门禁判据会在两个环境间静默分叉：本地拦得住的 CI 拦不住，反之亦然。
 
-需要 diff 的门禁改为「接受 base/head 两个 ref 作参数、只由 CI 调用、不进 `pre-commit` 序列」。⚠️ **这条约定约束的是检查，不是文件**：`check_new_skill_eval_case.py` 的两个模式分别落在约定的两侧——增量模式走上面那条路，`--all` 模式因为只读工作树而挂进了 `pre-commit`（见上一节）。**判断该不该挂，看的是这个检查要不要 diff，而不是它所在的脚本以前挂没挂。**
+需要 diff 的门禁改为「接受 base/head 两个 ref 作参数、只由 CI 调用、不进 catalog」。⚠️ **这条约定约束的是检查，不是文件**：`check_new_skill_eval_case.py` 的两个模式分别落在约定的两侧——增量模式走上面那条路，`--all` 模式因为只读工作树而挂进了 `pre-commit`（见上一节）。**判断该不该挂，看的是这个检查要不要 diff，而不是它所在的脚本以前挂没挂。**
 
 ⚠️ **「暂存区无关」不等于「不许碰 index」，这个区别在第 4–6 项上有实际后果。** 约定的实质是「判据不得随**这次暂存了什么**而变」，因此禁的是 `git diff --cached` 这类「本次要提交什么」的查询；而 `git ls-files -s`（第 6 项读模式位）把 index 当作「仓库已跟踪什么」的视图，在干净工作树下等于 HEAD，CI checkout 后结论一致。**`git check-ignore` 的默认行为恰好踩在两者之间**——它读 index，却让判据随「这个子树里有没有文件被 `add -f` 过」而翻转，这已经不是稳定的仓库状态视图了。`--no-index` 把它拉回纯 `.gitignore` 判定，也就把这一项拉回约定之内。**同一句「读 index」，一处安全一处不安全，分界线是「读到的东西会不会随一次 `git add` 改变判据」。**
 

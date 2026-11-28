@@ -72,8 +72,8 @@ jobs:
           #
           # ⚠️ -shellcheck= -pyflakes= 关掉两个嵌入 linter。
           #    本门禁要拦的是「GitHub Actions 根本跑不起来的 workflow」，
-          #    而 ci.yml 的 run: 里有多段 shell 循环（gates-tests 的 9 目录
-          #    遍历、plugin-validate 的 per-plugin 校验），把 shell 风格
+          #    而 ci.yml 的 run: 里有 shell 循环（如 plugin-validate 的
+          #    per-plugin 校验），把 shell 风格
           #    警告一并判失败会让本 job 变成一个风格检查器，冲淡它的判据。
           #    ⚠️ 关掉不是「这些警告不重要」，而是它们与本 job 的判据不同类；
           #    要查 shell 风格该单独立一项，而不是搭在这里顺手做。
