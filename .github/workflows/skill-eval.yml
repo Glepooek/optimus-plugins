@@ -86,7 +86,7 @@ jobs:
           #                          ② 曾是已删除的 jenkins-build case 的必要
           #                          条件，今后新增 tool_used grader 时重新生效。
           #   --runs 1            默认是 case.runs ?? 3。
-          #                       🔴 **该 input 与 case 文件冲突，是一个未决项，
+          #                       🔴 **该 input 与 case 文件冲突，是已知且刻意保留的，
           #                          不是笔误**：wpf-code-review 的 6 个 case
           #                          写的是 runs: 3（llm grader 有抖动，单次
           #                          结果不足以判定回归，见 spec § 10 风险 11），
@@ -95,7 +95,9 @@ jobs:
           #                       ⚠️ 保留 --runs 1 而非删掉它，是刻意不改动一个
           #                          付费 workflow 的成本档。该冲突登记为
           #                          docs/todo-list/2026-09-12-todo.md 的 B2，
-          #                          **仍未裁决**。
+          #                          已裁决为**不处理**（付费 eval 不在考虑
+          #                          范围，冲突原样保留）；重新启用付费 eval
+          #                          时须重开 B2。
           #   --max-cost-usd 5    ⚠️ 它挡不住第一次 run（CLI 原文：ceiling
           #                       is checked before each run launches），
           #                       只是失控时的刹车
