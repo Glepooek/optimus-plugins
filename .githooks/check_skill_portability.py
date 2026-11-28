@@ -132,7 +132,7 @@ def scan_skill(skill_dir, repo_root):
             files.append(p)
     for p in files:
         try:
-            text = p.read_text(encoding="utf-8")
+            text = p.read_text(encoding="utf-8-sig")
         except (OSError, UnicodeDecodeError) as e:
             findings.append(Finding(p.relative_to(repo_root).as_posix(), 0,
                                     "harness-path", f"无法读取：{e}"))

@@ -48,6 +48,13 @@ class PortabilityTests(unittest.TestCase):
         (d / "SKILL.md").write_bytes(b"---\r\nname: d\r\ntriggers: x\r\n---\r\nbody\r\n")
         self.assertEqual(self.rules(m.scan_repo(self.root)), [("frontmatter-key", 3)])
 
+    def test_bom_frontmatter_parsed(self):
+        d = self.make_skill("p", "s", "x")
+        (d / "SKILL.md").write_bytes(
+            b"\xef\xbb\xbf" + "---\nname: x\ndescription: d\ntriggers: [a]\n---\nbody\n".encode()
+        )
+        self.assertEqual(self.rules(m.scan_repo(self.root)), [("frontmatter-key", 4)])
+
     def test_claude_skills_path_in_body(self):
         self.make_skill("p", "s", CLEAN_FM + "\n运行 .claude/skills/x/a.py\n")
         self.assertEqual(self.rules(m.scan_repo(self.root)), [("harness-path", 11)])

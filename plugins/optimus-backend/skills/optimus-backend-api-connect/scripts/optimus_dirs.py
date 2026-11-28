@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """optimus_dirs.py - 解析 optimus skill 的配置/缓存目录（仅标准库，跨平台）。
 
-本文件在 plugins/optimus-devops/skills/jenkins-build/scripts/optimus_dirs.py
-有一份逐字相同的副本（插件自包含要求）；改一处必须同步另一处。
+本文件在两个插件内各有一份逐字相同的副本：optimus-backend/skills/optimus-backend-api-connect/scripts/
+与 optimus-devops/skills/jenkins-build/scripts/（插件自包含要求），改一处必须同步另一处，
+.githooks/test_bundled_helper_copies.py 校验二者字节一致。
 
 解析优先级：
   1. 环境变量 OPTIMUS_CONFIG_DIR / OPTIMUS_CACHE_DIR（非空；相对路径按当前工作目录转绝对）
