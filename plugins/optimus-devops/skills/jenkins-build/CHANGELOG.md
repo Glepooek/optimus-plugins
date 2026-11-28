@@ -1,3 +1,9 @@
+## [1.3.5] - 2026-11-28
+
+### Fixed
+- `python -m jenkins_build.main` 启动时报 `ImportError: cannot import name 'JenkinsBuildSkill'`：包 `__init__.py` 为空，而 `main.py` 的 `from jenkins_build import JenkinsBuildSkill` 在 `-m` 下解析到包本身。现由 `__init__.py` re-export，`run.sh` 与 `python main.py` 两条路径行为不变
+- 新增 `scripts/test_package_exports.py` 锁定该导出契约（2 条断言）
+
 ## [1.3.4] - 2026-11-28
 
 ### Changed
