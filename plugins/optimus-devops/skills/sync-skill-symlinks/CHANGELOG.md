@@ -1,3 +1,8 @@
+## [2.0.2] - 2026-11-28
+
+### Changed
+- 为默认同步目标路径（`~/.claude/skills`、`~/.kiro/skills`、`~/.codex/skills`）加 portability 豁免标记，行为不变
+
 ## [2.0.1] - 2026-10-30
 
 ### Changed

@@ -2,7 +2,7 @@
 name: jenkins-build
 description: Use when user wants to immediately execute a Jenkins CI build — 触发构建、跑 Jenkins、build [job]、帮我打包（CI场景）、构建 [项目]、ci 跑一下。Applies even when "Jenkins" is not mentioned — any intent to trigger CI and wait for result. Not for Jenkinsfile authoring, diagnosing past failures, API token management, or GitHub Actions.
 metadata:
-  version: "1.3.2"
+  version: "1.3.3"
   author: desktop client team
   category: tool
 compatibility: 需要 Python3 环境（脚本自动创建 venv 并安装 requests/pyyaml）；需要用户提供 jenkins-config.yaml（Jenkins URL + API Token）及可访问的 Jenkins 服务器。
@@ -39,7 +39,8 @@ allowed-tools: Bash
 | 优先级 | 路径 | 适用场景 |
 |---|---|---|
 | 1（最高） | `<当前工作目录>/jenkins-config.yaml` | 项目级，建议加入 `.gitignore` |
-| 2 | `~/.claude/jenkins-config.yaml` | 用户级全局默认 |
+| 2 | `<optimus-config-dir>/jenkins-build/jenkins-config.yaml`（Windows 为 `%APPDATA%\optimus\jenkins-build\`，其他平台为 `~/.config/optimus/jenkins-build/`，可用 `OPTIMUS_CONFIG_DIR` 覆盖） | 用户级全局默认 |
+| 3 | `~/.claude/jenkins-config.yaml` | 旧位置，只读兼容，命中时提示迁移 <!-- codex-portability: allow-harness-path reason=旧配置位置只读回退 --> |
 
 配置模板及示例详见：`jenkins_build/jenkins-config.yaml.example`
 
@@ -59,23 +60,23 @@ allowed-tools: Bash
 - **输入**：Step 3 确认通过后的 job 名称 + 可选 `KEY=VALUE` 参数
 - **输出**：构建已进入 Jenkins 队列/RUNNING 状态
 
-优先使用 `scripts/run.sh` 脚本运行（自动管理 venv、安装依赖）：
+优先使用 `scripts/run.sh` 脚本运行（自动管理 venv、安装依赖）。`<skill-dir>` 是本 SKILL.md 所在目录的绝对路径：
 
 ```bash
 # 触发默认 job（jenkins-config.yaml 第一个）
-.claude/skills/jenkins-build/scripts/run.sh
+"<skill-dir>/scripts/run.sh"
 
 # 触发指定 job
-.claude/skills/jenkins-build/scripts/run.sh zk-api
+"<skill-dir>/scripts/run.sh" zk-api
 
 # 触发带参数的 job
-.claude/skills/jenkins-build/scripts/run.sh zk-api BRANCH=main
+"<skill-dir>/scripts/run.sh" zk-api BRANCH=main
 ```
 
 也可以直接调用 Python 脚本（需手动安装依赖 `pip install requests pyyaml`）：
 
 ```bash
-python3 jenkins_build/main.py [job_name] [KEY=VALUE ...]
+python3 "<skill-dir>/jenkins_build/main.py" [job_name] [KEY=VALUE ...]
 ```
 
 ### Step 5：等待并轮询
@@ -95,7 +96,7 @@ python3 jenkins_build/main.py [job_name] [KEY=VALUE ...]
 - 主程序入口：`jenkins_build/main.py`
 - Jenkins 构建封装：`jenkins_build/jenkins_build.py`
 - 配置示例：`jenkins_build/jenkins-config.yaml.example`
-- venv 位置：`~/.claude/cache/jenkins-build/.venv`（固定，不随安装方式变化）
+- venv 位置：`<optimus-cache-dir>/jenkins-build/.venv`（由 `scripts/optimus_dirs.py` 解析）
 
 ## 构建完成后通知
 
@@ -130,7 +131,7 @@ python3 jenkins_build/main.py [job_name] [KEY=VALUE ...]
 | 构建结果 `FAILURE` | 打开构建日志（脚本输出构建 URL）排查失败原因 | 修复后重新触发，仍失败则上报给对应开发负责人 |
 | 构建结果 `ABORTED` | 通常是手动取消或超时，确认是否需要重触发 | 检查 Jenkins job 的超时配置 |
 | `job_name` 不存在 | 检查 `jenkins-config.yaml` 中 jobs 列表，确认拼写与路径一致 | 在 Jenkins UI 手动确认 job path |
-| 未找到配置文件 | 按提示在 `~/.claude/jenkins-config.yaml` 创建配置 | 参考 `jenkins-config.yaml.example` |
+| 未找到配置文件 | 按提示在优先级 1 或 2 的位置创建配置 | 参考 `jenkins-config.yaml.example` |
 
 ## ⛔ 反例黑名单
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.3] - 2026-11-28
+
+### Fixed
+- 项目级配置（优先级 1）因 `run.sh` 在执行前切换 cwd 至 skill 目录，导致 `jenkins-config.yaml` 永远找不到；现在在 `cd` 前 export `JENKINS_BUILD_PROJECT_DIR="$PWD"` 保留调用者目录
+- 配置查找与 venv 路径不再依赖 `.claude` 目录；配置路径由 `jenkins_config_paths.py` 解析（三级优先级，旧位置保留为只读回退并打印迁移提示），venv 路径由 `optimus_dirs.py` 解析
+- SKILL.md 中的命令示例改用 `<skill-dir>` 定位，不再写死 `.claude/skills/jenkins-build/`
+
 ## [1.3.2] - 2026-10-30
 
 ### Changed

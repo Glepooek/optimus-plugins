@@ -89,8 +89,8 @@ class TestRepositoryRoot(unittest.TestCase):
 
 
 class TestCatalog(unittest.TestCase):
-    def test_catalog_lists_six_existing_scripts(self):
-        self.assertEqual(len(GATES), 6)
+    def test_catalog_lists_seven_existing_scripts(self):
+        self.assertEqual(len(GATES), 7)
         for gate in GATES:
             self.assertTrue((REPOSITORY_ROOT / gate.script).is_file(), gate.script)
 

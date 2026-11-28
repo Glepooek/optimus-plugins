@@ -2,7 +2,7 @@
 name: docx-writer
 license: MIT
 metadata:
-  version: "1.0.1"
+  version: "1.0.2"
   category: generator
   author: desktop client team
   sources:
@@ -19,17 +19,7 @@ description: >
   包括"写报告"、"起草提案"、"制作合同"、"填写表单"、"按模板重排版"，
   或任何最终输出为 .docx 文件的任务。即使用户未明确提及"docx"，
   如果任务隐含需要可打印的正式文档，也应使用此 Skill。
-triggers:
-  - Word
-  - docx
-  - document
-  - 文档
-  - Word文档
-  - 报告
-  - 合同
-  - 公文
-  - 排版
-  - 套模板
+  触发词：document、Word文档、公文、套模板。
 ---
 
 # docx-writer

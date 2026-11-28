@@ -1,29 +1,12 @@
 ---
 name: optimus-backend-dev
-description: 后端开发技能。基于 superpowers 工作流驱动完整的后端开发流程：需求分析、方案设计、代码实现、文档生成。涉及第三方 API 对接时优先检查公司已有服务（optimus-backend-api-connect）。开发完成后自动生成架构设计文档和后端 API 接口文档，可选上传至飞书云空间。
+description: 后端开发技能。基于 superpowers 工作流驱动完整的后端开发流程：需求分析、方案设计、代码实现、文档生成。涉及第三方 API 对接时优先检查公司已有服务（optimus-backend-api-connect）。开发完成后自动生成架构设计文档和后端 API 接口文档，可选上传至飞书云空间。触发词：服务开发、接口开发、api开发、后端接口、微服务开发、后端功能、java开发、springboot、spring boot、go开发、python后端、后端需求、服务端开发、backend、后端开发。
 metadata:
-  version: "1.0.1"
+  version: "1.0.2"
   author: desktop client team
   category: workflow
 compatibility: 硬性依赖 superpowers 插件已安装（brainstorming/writing-plans/subagent-driven-development/verification-before-completion/finishing-a-development-branch 均为必调工作流）；可选调用 optimus-backend-api-connect、optimus-feishu-project-docs-push。
 allowed-tools: Glob Read Write Task
-triggers:
-  - 后端开发
-  - backend
-  - 后端
-  - 服务开发
-  - 接口开发
-  - api开发
-  - 后端接口
-  - 微服务开发
-  - 后端功能
-  - java开发
-  - springboot
-  - spring boot
-  - go开发
-  - python后端
-  - 后端需求
-  - 服务端开发
 ---
 
 > **optimus-backend-dev v1.0.0** | 最后更新 2026-04-10
@@ -47,9 +30,8 @@ triggers:
   ⚠ 未检测到 superpowers 技能集。本技能依赖 superpowers 提供的工作流（brainstorming、writing-plans、subagent-driven-development 等）。
 
   请先安装 superpowers：
-  1. 访问 superpowers 项目仓库
-  2. 将 superpowers 技能复制到项目的 .claude/skills/ 目录下
-  3. 重新启动 Claude Code
+  - Claude Code：/plugin install superpowers@claude-plugins-official，然后重启会话
+  - Codex CLI：在会话中输入 /plugins，搜索 superpowers，选择 Install Plugin
 
   安装完成后重新触发本技能。
   ```

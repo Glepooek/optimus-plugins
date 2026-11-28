@@ -7,8 +7,8 @@
 
 挂在 hook 而非 skill 里，是因为 Codex 侧走标准 git 流程，读不到 skill 正文。
 
-计数口径：下面登记 **6 个脚本**，覆盖 .githooks/README.md「检查项」表里的
-**9 个逻辑检查**（check_skill_mirrors.py 一个脚本覆盖第 4–6 项，check_plugin_versions.py 覆盖第 1、9 项）。两个数不是
+计数口径：下面登记 **7 个脚本**，覆盖 .githooks/README.md「检查项」表里的
+**10 个逻辑检查**（check_skill_mirrors.py 一个脚本覆盖第 4–6 项，check_plugin_versions.py 覆盖第 1、9 项）。两个数不是
 同一个单位，不要互相换算。
 
 执行方：run_repository_gates.py（pre-commit 与 CI 的 gates-hooks 都经它）。
@@ -85,4 +85,11 @@ GATES: tuple[Gate, ...] = (
     # 判据与「哪些文件不查」（CHANGELOG、hooks/README、books/）见脚本 docstring。
     # 该脚本自行由 __file__ 定位仓库根，因此不传 "."。
     Gate("plugin-self-contained", ".githooks/check_plugin_self_contained.py"),
+
+    # --- 检查项 10：发布 skill 不写死 harness 专属路径 / 非允许 frontmatter 键 / AskUserQuestion ---
+    # 本项拦的是「发布 skill 写死 harness 专属目录或工具名」，不拦会导致 Codex 侧脚本
+    # 或缓存路径解析失败的其他形态；这些写法在 Claude 侧都能跑，到 Codex 侧才静默失效。
+    # 合法的专属路径用 `codex-portability: allow-harness-path reason=...` 标记豁免。
+    # 判据见 spec §6.2 与脚本 docstring。
+    Gate("skill-portability", ".githooks/check_skill_portability.py", (".",)),
 )
